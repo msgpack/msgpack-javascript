@@ -1,3 +1,4 @@
+/*!{id:msgpack.js,ver:1.01,license:"MIT",author:"uupaa.js@gmail.com"}*/
 
 // === msgpack ===
 // MessagePack -> http://msgpack.sourceforge.net/
@@ -5,8 +6,12 @@
 this.msgpack || (function(globalScope) {
 
 globalScope.msgpack = {
-    pack:       msgpackpack,    // msgpack.pack(data:Mix):ByteArray
+    pack:       msgpackpack,    // msgpack.pack(data:Mix, toString:Boolean = false):ByteArray/ByteString
+                                //  [1][mix to String]    msgpack.pack({}, true) -> "..."
+                                //  [2][mix to ByteArray] msgpack.pack({})       -> [...]
     unpack:     msgpackunpack,  // msgpack.unpack(data:BinaryString/ByteArray):Mix
+                                //  [1][String to mix]    msgpack.unpack("...") -> {}
+                                //  [2][ByteArray to mix] msgpack.unpack([...]) -> {}
     worker:     "msgpack.js",   // msgpack.worker - WebWorkers script filename
     upload:     msgpackupload,  // msgpack.upload(url:String, option:Hash, callback:Function)
     download:   msgpackdownload // msgpack.download(url:String, option:Hash, callback:Function)
@@ -31,14 +36,24 @@ self.importScripts && (onmessage = function(event) {
 });
 
 // msgpack.pack
-function msgpackpack(data) { // @param Mix:
-                             // @return ByteArray:
-    return encode([], data);
+function msgpackpack(data,       // @param Mix:
+                     toString) { // @param Boolean(= false):
+                                 // @return ByteArray/BinaryString:
+    //  [1][mix to String]    msgpack.pack({}, true) -> "..."
+    //  [2][mix to ByteArray] msgpack.pack({})       -> [...]
+
+    var byteArray = encode([], data);
+
+    return toString ? String.fromCharCode.apply(null, byteArray) // toString
+                    : byteArray;
 }
 
 // msgpack.unpack
 function msgpackunpack(data) { // @param BinaryString/ByteArray:
                                // @return Mix:
+    //  [1][String to mix]    msgpack.unpack("...") -> {}
+    //  [2][ByteArray to mix] msgpack.unpack([...]) -> {}
+
     return { data: typeof data === "string" ? toByteArray(data)
                                             : data,
              index: -1, decode: decode }.decode();
