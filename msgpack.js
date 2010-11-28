@@ -1,4 +1,4 @@
-/*!{id:msgpack.js,ver:1.01,license:"MIT",author:"uupaa.js@gmail.com"}*/
+/*!{id:msgpack.js,ver:1.02,license:"MIT",author:"uupaa.js@gmail.com"}*/
 
 // === msgpack ===
 // MessagePack -> http://msgpack.sourceforge.net/
@@ -24,7 +24,7 @@ var _ie         = /MSIE/.test(navigator.userAgent),
     _num2b64    = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                    "abcdefghijklmnopqrstuvwxyz0123456789+/").split(""),
     _sign       = { 8: 0x80, 16: 0x8000, 32: 0x80000000 },
-    _split8char = /.{8}/g;
+    _8bits      = /[01]{8}/g;
 
 // for WebWorkers Code Block
 self.importScripts && (onmessage = function(event) {
@@ -42,10 +42,21 @@ function msgpackpack(data,       // @param Mix:
     //  [1][mix to String]    msgpack.pack({}, true) -> "..."
     //  [2][mix to ByteArray] msgpack.pack({})       -> [...]
 
-    var byteArray = encode([], data);
+    var byteArray = encode([], data), rv, i, iz, num2bin = _num2bin;
 
-    return toString ? String.fromCharCode.apply(null, byteArray) // toString
-                    : byteArray;
+    if (toString) {
+        // http://d.hatena.ne.jp/uupaa/20101128
+        try {
+            return String.fromCharCode.apply(this, byteArray); // toString
+        } catch(err) {
+            ; // avoid "Maximum call stack size exceeded"
+        }
+        for (rv = [], i = 0, iz = byteArray.length; i < iz; ++i) {
+            rv[i] = num2bin[byteArray[i]];
+        }
+        return rv.join("");
+    }
+    return byteArray;
 }
 
 // msgpack.unpack
@@ -62,7 +73,7 @@ function msgpackunpack(data) { // @param BinaryString/ByteArray:
 // inner - encoder
 function encode(rv,    // @param ByteArray: result
                 mix) { // @param Mix: source data
-    var size = 0, i = 0, iz, c, ary, hash,
+    var size = 0, i = 0, iz, c, hash, pos,
         high, low, i64 = 0, sign, exp, frac;
 
     if (mix == null) { // null or undefined
@@ -77,7 +88,7 @@ function encode(rv,    // @param ByteArray: result
                 rv.push(0xcb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff); // quiet NaN
             } else if (mix === Infinity) {
                 rv.push(0xcb, 0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00); // positive infinity
-            } else if (Math.floor(mix) === mix) {
+            } else if (Math.floor(mix) === mix) { // int or uint
                 if (mix < 0) { // int
                     if (mix >= -32) { // negative fixnum
                         rv.push(0xe0 + mix + 32);
@@ -132,9 +143,12 @@ function encode(rv,    // @param ByteArray: result
                         toString(2).slice(1);
 
                 // exp is between 1 and 2047. make it 11 bits
-                exp  = ("000000000" + exp.toString(2)).slice(-11);
-
-                ary  = (+sign + exp + frac).match(_split8char);
+                // http://d.hatena.ne.jp/uupaa/20101128
+                if (!sign) {
+                    ary = ((exp + 4096).toString(2).slice(1) + frac).match(_8bits);
+                } else {
+                    ary = ((exp + 2048).toString(2) + frac).match(_8bits);
+                }
                 rv.push(0xcb, hash[ary[0]], hash[ary[1]],
                               hash[ary[2]], hash[ary[3]],
                               hash[ary[4]], hash[ary[5]],
@@ -142,20 +156,39 @@ function encode(rv,    // @param ByteArray: result
             }
             break;
         case "string":
+            // http://d.hatena.ne.jp/uupaa/20101128
+            iz = mix.length;
+            pos = rv.length; // keep rewrite position
+
+            // set default type [0xa0 + ASCIIString.length]
+            rv.push(0xa0 + iz);
+
             // utf8.encode
-            for (ary = [], iz = mix.length, i = 0; i < iz; ++i) {
+            for (i = 0; i < iz; ++i) {
                 c = mix.charCodeAt(i);
                 if (c < 0x80) { // ASCII(0x00 ~ 0x7f)
-                    ary.push(c & 0x7f);
+                    rv.push(c & 0x7f);
                 } else if (c < 0x0800) {
-                    ary.push(((c >>>  6) & 0x1f) | 0xc0, (c & 0x3f) | 0x80);
+                    rv.push(((c >>>  6) & 0x1f) | 0xc0, (c & 0x3f) | 0x80);
                 } else if (c < 0x10000) {
-                    ary.push(((c >>> 12) & 0x0f) | 0xe0,
+                    rv.push(((c >>> 12) & 0x0f) | 0xe0,
                              ((c >>>  6) & 0x3f) | 0x80, (c & 0x3f) | 0x80);
                 }
             }
-            setType(rv, 32, ary.length, [0xa0, 0xda, 0xdb]);
-            Array.prototype.push.apply(rv, ary);
+            size = rv.length - pos - 1; // -1 = default type(0xa0 + length)
+
+            // rewrite string type.
+            if (iz !== size) {
+                // has none ascii string or length >= 32
+                if (size < 32) {
+                    rv[pos] = 0xa0 + size;
+                } else if (size < 0x10000) { // 16
+                    rv.splice(pos, 1, 0xda, size >> 8, size & 0xff);
+                } else if (size < 0x100000000) { // 32
+                    rv.splice(pos, 1, 0xdb, size >>> 24, (size >> 16) & 0xff,
+                                            (size >>  8) & 0xff, size & 0xff);
+                }
+            }
             break;
         default: // array or hash
             if (Object.prototype.toString.call(mix) === "[object Array]") { // array

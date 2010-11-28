@@ -23,17 +23,30 @@ function test(json) {
 
     function times() {
         var perf = +new Date;
+        var perfPoint;
         if (json) {
             if (window.JSON) {
                 encoded = JSON.stringify(mix); // NativeJSON
-                decoded = JSON.parse(encoded); // NativeJSON
+
+                perfPoint = +new Date;
+                uu.log("JSON.stringify = @ms", perfPoint - perf);
+
+                decoded = JSON.parse(encoded);
+
+                uu.log("JSON.parse = @ms", (+new Date) - perfPoint);
             } else {
                 encoded = uu.json(mix);
                 decoded = uu.json.decode(encoded);
             }
         } else {
             encoded = msgpack.pack(mix);
+
+            perfPoint = +new Date;
+            uu.log("msgpack.pack = @ms", perfPoint - perf);
+
             decoded = msgpack.unpack(encoded);
+
+            uu.log("msgpack.unpack = @ms", (+new Date) - perfPoint);
         }
         return  (+new Date) - perf;
     }
@@ -46,7 +59,7 @@ function test(json) {
 //    rv.shift();
 
     if (json) {
-        uu.log("json = @ms", rv[0]);
+        uu.log("JSON = @ms", rv[0]);
     } else {
         uu.log("msgpack = @ms", rv[0]);
     }
