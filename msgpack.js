@@ -24,7 +24,9 @@ var _ie         = /MSIE/.test(navigator.userAgent),
     _num2b64    = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                    "abcdefghijklmnopqrstuvwxyz0123456789+/").split(""),
     _sign       = { 8: 0x80, 16: 0x8000, 32: 0x80000000 },
-    _8bits      = /[01]{8}/g;
+    _pooledArray = [],
+    _IEEE754positive = /^.(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})$/,
+    _IEEE754negative =  /^(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})$/;
 
 // for WebWorkers Code Block
 self.importScripts && (onmessage = function(event) {
@@ -42,21 +44,10 @@ function msgpackpack(data,       // @param Mix:
     //  [1][mix to String]    msgpack.pack({}, true) -> "..."
     //  [2][mix to ByteArray] msgpack.pack({})       -> [...]
 
-    var byteArray = encode([], data), rv, i, iz, num2bin = _num2bin;
+    var byteArray = encode([], data);
 
-    if (toString) {
-        // http://d.hatena.ne.jp/uupaa/20101128
-        try {
-            return String.fromCharCode.apply(this, byteArray); // toString
-        } catch(err) {
-            ; // avoid "Maximum call stack size exceeded"
-        }
-        for (rv = [], i = 0, iz = byteArray.length; i < iz; ++i) {
-            rv[i] = num2bin[byteArray[i]];
-        }
-        return rv.join("");
-    }
-    return byteArray;
+    return toString ? byteArrayToByteString(byteArray)
+                    : byteArray;
 }
 
 // msgpack.unpack
@@ -73,7 +64,7 @@ function msgpackunpack(data) { // @param BinaryString/ByteArray:
 // inner - encoder
 function encode(rv,    // @param ByteArray: result
                 mix) { // @param Mix: source data
-    var size = 0, i = 0, iz, c, hash, pos,
+    var size = 0, i = 0, iz, c, ary, hash, pos,
         high, low, i64 = 0, sign, exp, frac;
 
     if (mix == null) { // null or undefined
@@ -135,7 +126,8 @@ function encode(rv,    // @param ByteArray: result
                 sign && (mix *= -1);
 
                 // add offset 1023 to ensure positive
-                exp  = Math.log(mix) / Math.LN2 + 1023 | 0;
+                // 0.6931471805599453 = Math.LN2;
+                exp  = ((Math.log(mix) / 0.6931471805599453) + 1023) | 0;
 
                 // shift 52 - (exp - 1023) bits to make integer part exactly 53 bits,
                 // then throw away trash less than decimal point
@@ -144,15 +136,13 @@ function encode(rv,    // @param ByteArray: result
 
                 // exp is between 1 and 2047. make it 11 bits
                 // http://d.hatena.ne.jp/uupaa/20101128
-                if (!sign) {
-                    ary = ((exp + 4096).toString(2).slice(1) + frac).match(_8bits);
-                } else {
-                    ary = ((exp + 2048).toString(2) + frac).match(_8bits);
-                }
-                rv.push(0xcb, hash[ary[0]], hash[ary[1]],
-                              hash[ary[2]], hash[ary[3]],
-                              hash[ary[4]], hash[ary[5]],
-                              hash[ary[6]], hash[ary[7]]);
+                _pooledArray = !sign ? _IEEE754positive.exec((exp + 4096).toString(2) + frac)
+                                     : _IEEE754negative.exec((exp + 2048).toString(2) + frac);
+                ary = _pooledArray; // alias
+                rv.push(0xcb, hash[ary[1]], hash[ary[2]],
+                              hash[ary[3]], hash[ary[4]],
+                              hash[ary[5]], hash[ary[6]],
+                              hash[ary[7]], hash[ary[8]]);
             }
             break;
         case "string":
@@ -218,7 +208,7 @@ function encode(rv,    // @param ByteArray: result
 
 // inner - decoder
 function decode() { // @return Mix:
-    var rv, undef, size, i = 0, iz, msb = 0, c, sign, exp, frac, key,
+    var rv, undef, size, i = 0, iz, msb = 0, c, sign, exp, frac, key, ary,
         that = this,
         data = that.data,
         type = data[++that.index];
@@ -284,18 +274,21 @@ function decode() { // @return Mix:
     case 0xa0:  i = that.index + 1;                             // raw
                 that.index += size;
                 // utf8.decode
-                for (rv = [], ri = -1, iz = i + size; i < iz; ++i) {
+                _pooledArray = [];
+                ary = _pooledArray; // alias
+                for (iz = i + size; i < iz; ++i) {
                     c = data[i]; // first byte
                     if (c < 0x80) { // ASCII(0x00 ~ 0x7f)
-                        rv[++ri] = c;
+                        ary.push(c);
                     } else if (c < 0xe0) {
-                        rv[++ri] = (c & 0x1f) <<  6 | (data[++i] & 0x3f);
+                        ary.push((c & 0x1f) <<  6 | (data[++i] & 0x3f));
                     } else if (c < 0xf0) {
-                        rv[++ri] = (c & 0x0f) << 12 | (data[++i] & 0x3f) << 6
-                                                    | (data[++i] & 0x3f);
+                        ary.push((c & 0x0f) << 12 | (data[++i] & 0x3f) << 6
+                                                  | (data[++i] & 0x3f));
                     }
                 }
-                return String.fromCharCode.apply(null, rv);
+                return ary.length < 1024000 ? String.fromCharCode.apply(null, ary)
+                                            : byteArrayToByteString(ary);
     case 0xdf:  size = readByte(that, 4);                       // map 32
     case 0xde:  size === undef && (size = readByte(that, 2));   // map 16
     case 0x80:  for (rv = {}; i < size; ++i) {                  // map
@@ -372,6 +365,23 @@ function setType(rv,      // @param ByteArray: result
         rv.push(types[2], size >>> 24, (size >> 16) & 0xff,
                                        (size >>  8) & 0xff, size & 0xff);
     }
+}
+
+// inner - byteArray To ByteString
+function byteArrayToByteString(byteArray) { // @param ByteArray
+                                            // @return String
+    // http://d.hatena.ne.jp/uupaa/20101128
+    try {
+        return String.fromCharCode.apply(this, byteArray); // toString
+    } catch(err) {
+        ; // avoid "Maximum call stack size exceeded"
+    }
+    var rv = [], i = 0, iz = byteArray.length, num2bin = _num2bin;
+
+    for (; i < iz; ++i) {
+        rv[i] = num2bin[byteArray[i]];
+    }
+    return rv.join("");
 }
 
 // msgpack.download - load from server

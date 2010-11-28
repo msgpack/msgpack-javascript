@@ -4,12 +4,14 @@
 <script src="../msgpack.js"></script>
 <script src="uupaa.js"></script>
 <script src="10000.js"></script>
+<!--
+<script src="100000.js"></script>
+ -->
 <script>
 
 
 uu.ready(function() {
     if (uu.ie678) {
-alert(1);
         uu.id("Biggest").disabled = true;
     }
 });
@@ -95,17 +97,20 @@ function create(size) { // @param Number:
     for (i = 0; i < size; ++i) {
         obj[i] = addItem();
     }
-//    uu.id("json").value = uu.json(obj, true);
-    uu.id("json").value = "(*snip*)";
-    uu.log("size = " + size);
+    if (0) {
+        uu.id("json").value = uu.json(obj, true);
+    } else {
+        uu.id("json").value = "(*snip*)";
+    }
+    uu.log("data size = " + size);
 
     mix = obj;
 }
 
-function solid(solidData) {
+function solid(solidData, dataSize) {
     mix = solidData;
     uu.id("json").value = "(*snip*)";
-    uu.log("size = 10000");
+    uu.log("data size = " + dataSize);
 }
 </script>
 </head><body>
@@ -124,13 +129,11 @@ function solid(solidData) {
 </tr>
 <tr>
     <td>
-        <input type="button" disabled="disabled" value="Load 100000" onclick="solid(solid100000)" />
-        <input type="button" value="Load 10000" onclick="solid(solid10000)" />
+<!--
+        <input type="button" value="Load 100000" onclick="solid(solid100000, 100000)" />
+ -->
+        <input type="button" value="Load 10000" onclick="solid(solid10000, 10000)" />
         <br />
-        <input type="button" id="Biggest" value="Create 100000" onclick="create(100000)" />
-        <input type="button" value="Create 10000" onclick="create(10000)" />
-        <input type="button" value="Create 1000" onclick="create(1000)" />
-        <input type="button" value="Create 10" onclick="create(10)" />
     </td>
     <td> -&gt; </td>
     <td>
@@ -147,6 +150,11 @@ function solid(solidData) {
 </tr>
 </table>
 <textarea id="json" cols="120" rows="5"></textarea>
+        <input type="button" id="Biggest" value="Create 100000" onclick="create(100000)" />
+        <input type="button" value="Create 10000" onclick="create(10000)" />
+        <input type="button" value="Create 1000" onclick="create(1000)" />
+        <input type="button" value="Create 10" onclick="create(10)" />
+
 
 
 
