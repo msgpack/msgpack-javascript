@@ -112,6 +112,11 @@ function solid(solidData, dataSize) {
     uu.id("json").value = "(*snip*)";
     uu.log("data size = " + dataSize);
 }
+function load10() {
+    mix = {"0":"0\u0000\u0000\u0000\u0000","1":{"1":false},"2":null,"3":null,"4":0.032400000294840005,"5":[{"5":{"5":5}},false,false],"6":{"6":-6},"7":-0.05670000051597,"8":8,"9":9};
+    uu.id("json").value = '{"0":"0\u0000\u0000\u0000\u0000","1":{"1":false},"2":null,"3":null,"4":0.032400000294840005,"5":[{"5":{"5":5}},false,false],"6":{"6":-6},"7":-0.05670000051597,"8":8,"9":9}';
+    uu.log("data size = " + 10);
+}
 </script>
 </head><body>
 <h1>Benchmark</h1>
@@ -133,6 +138,7 @@ function solid(solidData, dataSize) {
         <input type="button" value="Load 100000" onclick="solid(solid100000, 100000)" />
  -->
         <input type="button" value="Load 10000" onclick="solid(solid10000, 10000)" />
+        <input type="button" value="Load 10" onclick="load10()" />
         <br />
     </td>
     <td> -&gt; </td>
@@ -149,7 +155,8 @@ function solid(solidData, dataSize) {
     </td>
 </tr>
 </table>
-<textarea id="json" cols="120" rows="5"></textarea>
+<textarea id="json" cols="40" rows="2"></textarea>
+<br />
         <input type="button" id="Biggest" value="Create 100000" onclick="create(100000)" />
         <input type="button" value="Create 10000" onclick="create(10000)" />
         <input type="button" value="Create 1000" onclick="create(1000)" />

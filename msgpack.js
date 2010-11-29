@@ -1,4 +1,4 @@
-/*!{id:msgpack.js,ver:1.02,license:"MIT",author:"uupaa.js@gmail.com"}*/
+/*!{id:msgpack.js,ver:1.03,license:"MIT",author:"uupaa.js@gmail.com"}*/
 
 // === msgpack ===
 // MessagePack -> http://msgpack.sourceforge.net/
@@ -18,15 +18,15 @@ globalScope.msgpack = {
 };
 
 var _ie         = /MSIE/.test(navigator.userAgent),
-    _bit2num    = {}, // BitStringToNumber      { "00000000": 0, ... "11111111": 255 }
     _bin2num    = {}, // BinaryStringToNumber   { "\00": 0, ... "\ff": 255 }
     _num2bin    = {}, // NumberToBinaryString   { 0: "\00", ... 255: "\ff" }
     _num2b64    = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                    "abcdefghijklmnopqrstuvwxyz0123456789+/").split(""),
     _sign       = { 8: 0x80, 16: 0x8000, 32: 0x80000000 },
-    _pooledArray = [],
-    _IEEE754positive = /^.(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})$/,
-    _IEEE754negative =  /^(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})(.{8})$/;
+    _buf        = [], // decode buffer
+    _idx        = 0,  // decode buffer[index]
+    _ary        = [], // pooled array
+    _toString   = Object.prototype.toString;
 
 // for WebWorkers Code Block
 self.importScripts && (onmessage = function(event) {
@@ -52,19 +52,19 @@ function msgpackpack(data,       // @param Mix:
 
 // msgpack.unpack
 function msgpackunpack(data) { // @param BinaryString/ByteArray:
-                               // @return Mix:
+                               // @return Mix/undefined: undefined is error return
     //  [1][String to mix]    msgpack.unpack("...") -> {}
     //  [2][ByteArray to mix] msgpack.unpack([...]) -> {}
 
-    return { data: typeof data === "string" ? toByteArray(data)
-                                            : data,
-             index: -1, decode: decode }.decode();
+    _buf = typeof data === "string" ? toByteArray(data) : data;
+    _idx = -1;
+    return decode();
 }
 
 // inner - encoder
 function encode(rv,    // @param ByteArray: result
                 mix) { // @param Mix: source data
-    var size = 0, i = 0, iz, c, ary, hash, pos,
+    var size = 0, i = 0, iz, c, pos,
         high, low, i64 = 0, sign, exp, frac;
 
     if (mix == null) { // null or undefined
@@ -111,38 +111,49 @@ function encode(rv,    // @param ByteArray: result
                 }
                 if (i64) {
                     high = Math.floor(mix / 0x100000000);
-                    low = mix & (0x100000000 - 1);
+                    low = mix & 0xffffffff;
                     rv.push(mix < 0 ? 0xd3 : 0xcf,
-                                  (high >> 24) & 0xff, (high >> 16) & 0xff,
-                                  (high >>  8) & 0xff,         high & 0xff,
-                                  (low  >> 24) & 0xff, (low  >> 16) & 0xff,
-                                  (low  >>  8) & 0xff,          low & 0xff);
+                            (high >> 24) & 0xff, (high >> 16) & 0xff,
+                            (high >>  8) & 0xff,         high & 0xff,
+                            (low  >> 24) & 0xff, (low  >> 16) & 0xff,
+                            (low  >>  8) & 0xff,          low & 0xff);
                 }
             } else { // double
-                // THX! edvakf
-                // http://javascript.g.hatena.ne.jp/edvakf/20100614/1276503044
-                hash = _bit2num;
+                // THX!! @edvakf
+                // http://javascript.g.hatena.ne.jp/edvakf/20101128/1291000731
                 sign = mix < 0;
                 sign && (mix *= -1);
 
+                // exp => 11 bits
                 // add offset 1023 to ensure positive
                 // 0.6931471805599453 = Math.LN2;
                 exp  = ((Math.log(mix) / 0.6931471805599453) + 1023) | 0;
 
+                // frac => 53 bits
                 // shift 52 - (exp - 1023) bits to make integer part exactly 53 bits,
                 // then throw away trash less than decimal point
-                frac = (Math.floor(mix * Math.pow(2, 52 + 1023 - exp))).
-                        toString(2).slice(1);
+                frac = Math.floor(mix * Math.pow(2, 52 + 1023 - exp));
 
-                // exp is between 1 and 2047. make it 11 bits
-                // http://d.hatena.ne.jp/uupaa/20101128
-                _pooledArray = !sign ? _IEEE754positive.exec((exp + 4096).toString(2) + frac)
-                                     : _IEEE754negative.exec((exp + 2048).toString(2) + frac);
-                ary = _pooledArray; // alias
-                rv.push(0xcb, hash[ary[1]], hash[ary[2]],
-                              hash[ary[3]], hash[ary[4]],
-                              hash[ary[5]], hash[ary[6]],
-                              hash[ary[7]], hash[ary[8]]);
+                //  S+-Exp(11)--++-----------------Fraction(52bits)-----------------------+
+                //  ||          ||                                                        |
+                //  v+----------++--------------------------------------------------------+
+                //  00000000|00000000|00000000|00000000|00000000|00000000|00000000|00000000
+                //  6      5    55  4        4        3        2        1        8        0
+                //  3      6    21  8        0        2        4        6
+                //
+                //  +----------high(32bits)-----------+ +----------low(32bits)------------+
+                //  |                                 | |                                 |
+                //  +---------------------------------+ +---------------------------------+
+                //  3      2    21  1        8        0
+                //  1      4    09  6
+                low  = frac & 0xffffffff;
+                high = ((frac / 0x100000000) & 0xfffff) | (exp << 20);
+                sign && (high += 0x80000000);
+
+                rv.push(0xcb, (high >> 24) & 0xff, (high >> 16) & 0xff,
+                              (high >>  8) & 0xff,  high        & 0xff,
+                              (low  >> 24) & 0xff, (low  >> 16) & 0xff,
+                              (low  >>  8) & 0xff,  low         & 0xff);
             }
             break;
         case "string":
@@ -181,24 +192,34 @@ function encode(rv,    // @param ByteArray: result
             }
             break;
         default: // array or hash
-            if (Object.prototype.toString.call(mix) === "[object Array]") { // array
+            if (_toString.call(mix) === "[object Array]") { // array
                 size = mix.length;
                 setType(rv, 16, size, [0x90, 0xdc, 0xdd]);
                 for (; i < size; ++i) {
                     encode(rv, mix[i]);
                 }
             } else { // hash
-                if (Object.keys) {
-                    size = Object.keys(mix).length;
-                } else {
-                    for (i in mix) {
-                        mix.hasOwnProperty(i) && ++size;
-                    }
-                }
-                setType(rv, 16, size, [0x80, 0xde, 0xdf]);
+                // http://d.hatena.ne.jp/uupaa/20101129
+                pos = rv.length; // keep rewrite position
+
+                // set default type [0x80 + 0]
+                rv.push(0x80);
+                size = 0;
+
                 for (i in mix) {
+                    ++size;
                     encode(rv, i);
                     encode(rv, mix[i]);
+                }
+
+                // rewrite hash type.
+                if (size && size < 16) {
+                    rv[pos] = 0x80 + size;
+                } else if (size < 0x10000) { // 16
+                    rv.splice(pos, 1, 0xde, size >> 8, size & 0xff);
+                } else if (size < 0x100000000) { // 32
+                    rv.splice(pos, 1, 0xdf, size >>> 24, (size >> 16) & 0xff,
+                                            (size >>  8) & 0xff, size & 0xff);
                 }
             }
         }
@@ -208,10 +229,8 @@ function encode(rv,    // @param ByteArray: result
 
 // inner - decoder
 function decode() { // @return Mix:
-    var rv, undef, size, i = 0, iz, msb = 0, c, sign, exp, frac, key, ary,
-        that = this,
-        data = that.data,
-        type = data[++that.index];
+    var ary, hash, num = 0, i = 0, iz, msb = 0, c, sign, exp, frac, key,
+        buf = _buf, type = buf[++_idx];
 
     if (type >= 0xe0) {         // Negative FixNum (111x xxxx) (-32 ~ -1)
         return type - 0x100;
@@ -220,24 +239,23 @@ function decode() { // @return Mix:
         return type;
     }
     if (type < 0x90) {          // FixMap (1000 xxxx)
-        size = type - 0x80;
-        type = 0x80;
+        num = type - (type = 0x80);
     } else if (type < 0xa0) {   // FixArray (1001 xxxx)
-        size = type - 0x90;
-        type = 0x90;
+        num = type - (type = 0x90);
     } else if (type < 0xc0) {   // FixRaw (101x xxxx)
-        size = type - 0xa0;
-        type = 0xa0;
+        num = type - (type = 0xa0);
     }
     switch (type) {
     case 0xc0:  return null;
     case 0xc2:  return false;
     case 0xc3:  return true;
-    case 0xca:  rv = readByte(that, 4);     // float
-                sign = rv & _sign[32];      //  1bit
-                exp  = (rv >> 23) & 0xff;   //  8bits
-                frac = rv & 0x7fffff;       // 23bits
-                if (!rv || rv === 0x80000000) { // 0.0 or -0.0
+    case 0xca:  // float
+                num = buf[++_idx] * 0x1000000 + (buf[++_idx] << 16) +
+                                                (buf[++_idx] <<  8) + buf[++_idx];
+                sign =  num & _sign[32];     //  1bit
+                exp  = (num >> 23) & 0xff;   //  8bits
+                frac =  num & 0x7fffff;      // 23bits
+                if (!num || num === 0x80000000) { // 0.0 or -0.0
                     return 0;
                 }
                 if (exp === 0xff) { // NaN or Infinity
@@ -245,88 +263,84 @@ function decode() { // @return Mix:
                 }
                 return (sign ? -1 : 1) *
                             (frac | 0x800000) * Math.pow(2, exp - 127 - 23); // 127: bias
-    case 0xcb:  rv = readByte(that, 4);     // double
-                sign = rv & _sign[32];      //  1bit
-                exp  = (rv >> 20) & 0x7ff;  // 11bits
-                frac = rv & 0xfffff;        // 52bits - 32bits (high word)
-                if (!rv || rv === 0x80000000) { // 0.0 or -0.0
+    case 0xcb:  // double
+                num = buf[++_idx] * 0x1000000 + (buf[++_idx] << 16) +
+                                                (buf[++_idx] <<  8) + buf[++_idx];
+                sign =  num & _sign[32];     //  1bit
+                exp  = (num >> 20) & 0x7ff;  // 11bits
+                frac =  num & 0xfffff;       // 52bits - 32bits (high word)
+                if (!num || num === 0x80000000) { // 0.0 or -0.0
+                    _idx += 4;
                     return 0;
                 }
                 if (exp === 0x7ff) { // NaN or Infinity
+                    _idx += 4;
                     return frac ? NaN : Infinity;
                 }
+                num = buf[++_idx] * 0x1000000 + (buf[++_idx] << 16) +
+                                                (buf[++_idx] <<  8) + buf[++_idx];
                 return (sign ? -1 : 1) *
-                            ((frac | 0x100000)   * Math.pow(2, exp - 1023 - 20) // 1023: bias
-                             + readByte(that, 4) * Math.pow(2, exp - 1023 - 52));
-    case 0xcf:  return readByte(that, 4) * Math.pow(2, 32) +
-                       readByte(that, 4);                       // uint 64
-    case 0xce:  return readByte(that, 4);                       // uint 32
-    case 0xcd:  return readByte(that, 2);                       // uint 16
-    case 0xcc:  return readByte(that, 1);                       // uint 8
-    case 0xd3:  return decodeInt64(that);                       // int 64
-    case 0xd2:  rv = readByte(that, 4);                         // int 32
-    case 0xd1:  rv === undef && (rv = readByte(that, 2));       // int 16
-    case 0xd0:  rv === undef && (rv = readByte(that, 1));       // int 8
+                            ((frac | 0x100000) * Math.pow(2, exp - 1023 - 20) // 1023: bias
+                             + num * Math.pow(2, exp - 1023 - 52));
+    // 0xcf: uint64, 0xce: uint32, 0xcd: uint16
+    case 0xcf:  num = buf[++_idx] * 0x1000000 + (buf[++_idx] << 16) +
+                                                (buf[++_idx] <<  8) + buf[++_idx];
+                return num * 0x100000000 +
+                       buf[++_idx] * 0x1000000 + (buf[++_idx] << 16) +
+                                                 (buf[++_idx] <<  8) + buf[++_idx];
+    case 0xce:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xcd:  num += buf[++_idx] << 8;
+    case 0xcc:  return num + buf[++_idx];
+    case 0xd3:  return decodeInt64();
+    // 0xd2: int32, 0xd1: int16, 0xd0: int8
+    case 0xd2:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xd1:  num += buf[++_idx] << 8;
+    case 0xd0:  num += buf[++_idx];
                 msb = 4 << ((type & 0x3) + 1); // 8, 16, 32
-                return rv < _sign[msb] ? rv : rv - _sign[msb] * 2;
-    case 0xdb:  size = readByte(that, 4);                       // raw 32
-    case 0xda:  size === undef && (size = readByte(that, 2));   // raw 16
-    case 0xa0:  i = that.index + 1;                             // raw
-                that.index += size;
+                return num < _sign[msb] ? num : num - _sign[msb] * 2;
+    // 0xdb: raw32, 0xda: raw16, 0xa0: raw
+    case 0xdb:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xda:  num += (buf[++_idx] << 8) + buf[++_idx];
+    case 0xa0:  i = _idx + 1;
                 // utf8.decode
-                _pooledArray = [];
-                ary = _pooledArray; // alias
-                for (iz = i + size; i < iz; ++i) {
-                    c = data[i]; // first byte
-                    if (c < 0x80) { // ASCII(0x00 ~ 0x7f)
-                        ary.push(c);
-                    } else if (c < 0xe0) {
-                        ary.push((c & 0x1f) <<  6 | (data[++i] & 0x3f));
-                    } else if (c < 0xf0) {
-                        ary.push((c & 0x0f) << 12 | (data[++i] & 0x3f) << 6
-                                                  | (data[++i] & 0x3f));
-                    }
+                _ary = [];
+                ary = _ary; // alias
+                for (iz = i + num; i < iz; ++i) {
+                    c = buf[i]; // first byte
+                    ary.push(c < 0x80 ? c : // ASCII(0x00 ~ 0x7f)
+                             c < 0xe0 ? ((c & 0x1f) <<  6 | (buf[++i] & 0x3f)) :
+                             c < 0xf0 ? ((c & 0x0f) << 12 | (buf[++i] & 0x3f) << 6
+                                                          | (buf[++i] & 0x3f)) : 0);
                 }
+                _idx += num;
                 return ary.length < 1024000 ? String.fromCharCode.apply(null, ary)
                                             : byteArrayToByteString(ary);
-    case 0xdf:  size = readByte(that, 4);                       // map 32
-    case 0xde:  size === undef && (size = readByte(that, 2));   // map 16
-    case 0x80:  for (rv = {}; i < size; ++i) {                  // map
-                    key = that.decode();
-                    rv[key] = that.decode(); // key/value pair
+    // 0xdf: map32, 0xde: map16, 0x80: map
+    case 0xdf:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xde:  num += (buf[++_idx] << 8) + buf[++_idx];
+    case 0x80:  for (hash = {}; i < num; ++i) {
+                    key = decode();
+                    hash[key] = decode(); // key/value pair
                 }
-                return rv;
-    case 0xdd:  size = readByte(that, 4);                       // array 32
-    case 0xdc:  size === undef && (size = readByte(that, 2));   // array 16
-    case 0x90:  for (rv = []; i < size; ++i) {                  // array
-                    rv.push(that.decode());
+                return hash;
+    // 0xdd: array32, 0xdc: array16, 0x90: array
+    case 0xdd:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xdc:  num += (buf[++_idx] << 8) + buf[++_idx];
+    case 0x90:  for (ary = []; i < num; ++i) {
+                    ary.push(decode());
                 }
+                return ary;
     }
-    return rv;
-}
-
-// inner - read byte
-function readByte(that,   // @param Object:
-                  size) { // @param Number:
-                          // @return Number:
-    var rv = 0, data = that.data, i = that.index;
-
-    switch (size) {
-    case 4: rv += data[++i] * 0x1000000 + (data[++i] << 16);
-    case 2: rv += data[++i] << 8;
-    case 1: rv += data[++i];
-    }
-    that.index = i;
-    return rv;
+    return;
 }
 
 // inner - decode int64
-function decodeInt64(that) { // @param Object:
+function decodeInt64() {
                              // @return Number:
     var rv, overflow = 0,
-        bytes = that.data.slice(that.index + 1, that.index + 9);
+        bytes = _buf.slice(_idx + 1, _idx + 9);
 
-    that.index += 8;
+    _idx += 8;
 
     // avoid overflow
     if (bytes[0] & 0x80) {
@@ -637,7 +651,6 @@ function base64encode(data) { // @param ByteArray:
 
     for (; i < 0x100; ++i) {
         v = String.fromCharCode(i);
-        _bit2num[("0000000" + i.toString(2)).slice(-8)] = i;
         _bin2num[v] = i; // "\00" -> 0x00
         _num2bin[i] = v; //     0 -> "\00"
     }
