@@ -239,11 +239,14 @@ function decode() { // @return Mix:
         return type;
     }
     if (type < 0x90) {          // FixMap (1000 xxxx)
-        num = type - (type = 0x80);
+        num  = type - 0x80;
+        type = 0x80;
     } else if (type < 0xa0) {   // FixArray (1001 xxxx)
-        num = type - (type = 0x90);
+        num  = type - 0x90;
+        type = 0x90;
     } else if (type < 0xc0) {   // FixRaw (101x xxxx)
-        num = type - (type = 0xa0);
+        num  = type - 0xa0;
+        type = 0xa0;
     }
     switch (type) {
     case 0xc0:  return null;
