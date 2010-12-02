@@ -1234,6 +1234,24 @@ uu.ready(function(uu) {
                 var rv = msgpack.unpack(pack);
 
                 return [rv, "is", data, hex(pack)];
+            },
+        "Cyclic Reference Error": "",
+            "Hash": function() {
+                var ary = [];
+                var hash = {
+                    ary: ary
+                };
+                ary[0] = hash;
+
+                var pack = msgpack.pack(hash);
+                var rv;
+
+                if (pack === false) {
+                    return [rv, "is false"];
+                } else {
+                    rv = msgpack.unpack(pack);
+                    return [rv, "==", 0, hex(pack)];
+                }
             }
     });
 });

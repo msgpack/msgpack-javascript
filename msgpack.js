@@ -1,4 +1,4 @@
-/*!{id:msgpack.js,ver:1.03,license:"MIT",author:"uupaa.js@gmail.com"}*/
+/*!{id:msgpack.js,ver:1.04,license:"MIT",author:"uupaa.js@gmail.com"}*/
 
 // === msgpack ===
 // MessagePack -> http://msgpack.sourceforge.net/
@@ -6,7 +6,7 @@
 this.msgpack || (function(globalScope) {
 
 globalScope.msgpack = {
-    pack:       msgpackpack,    // msgpack.pack(data:Mix, toString:Boolean = false):ByteArray/ByteString
+    pack:       msgpackpack,    // msgpack.pack(data:Mix, toString:Boolean = false):ByteArray/ByteString/false
                                 //  [1][mix to String]    msgpack.pack({}, true) -> "..."
                                 //  [2][mix to ByteArray] msgpack.pack({})       -> [...]
     unpack:     msgpackunpack,  // msgpack.unpack(data:BinaryString/ByteArray):Mix
@@ -25,8 +25,10 @@ var _ie         = /MSIE/.test(navigator.userAgent),
     _sign       = { 8: 0x80, 16: 0x8000, 32: 0x80000000 },
     _buf        = [], // decode buffer
     _idx        = 0,  // decode buffer[index]
+    _error      = 0,  // msgpack.pack() error code. 1 = CYCLIC_REFERENCE_ERROR
     _ary        = [], // pooled array
-    _toString   = Object.prototype.toString;
+    _toString   = Object.prototype.toString,
+    _MAX_DEPTH  = 512;
 
 // for WebWorkers Code Block
 self.importScripts && (onmessage = function(event) {
@@ -40,14 +42,18 @@ self.importScripts && (onmessage = function(event) {
 // msgpack.pack
 function msgpackpack(data,       // @param Mix:
                      toString) { // @param Boolean(= false):
-                                 // @return ByteArray/BinaryString:
+                                 // @return ByteArray/BinaryString/false:
+                                 //     false is Error
     //  [1][mix to String]    msgpack.pack({}, true) -> "..."
     //  [2][mix to ByteArray] msgpack.pack({})       -> [...]
 
-    var byteArray = encode([], data);
+    _error = 0;
 
-    return toString ? byteArrayToByteString(byteArray)
-                    : byteArray;
+    var byteArray = encode([], data, 0);
+
+    return _error ? false
+                  : toString ? byteArrayToByteString(byteArray)
+                             : byteArray;
 }
 
 // msgpack.unpack
@@ -62,10 +68,11 @@ function msgpackunpack(data) { // @param BinaryString/ByteArray:
 }
 
 // inner - encoder
-function encode(rv,    // @param ByteArray: result
-                mix) { // @param Mix: source data
-    var size = 0, i = 0, iz, c, pos,
-        high, low, i64 = 0, sign, exp, frac;
+function encode(rv,      // @param ByteArray: result
+                mix,     // @param Mix: source data
+                depth) { // @param Number: depth
+    var size = 0, i = 0, iz = 0, c = 0, pos = 0,
+        high = 0, low = 0, i64 = 0, sign = false, exp = 0, frac = 0;
 
     if (mix == null) { // null or undefined
         rv.push(0xc0);
@@ -148,7 +155,7 @@ function encode(rv,    // @param ByteArray: result
                 //  1      4    09  6
                 low  = frac & 0xffffffff;
                 high = ((frac / 0x100000000) & 0xfffff) | (exp << 20);
-                sign && (high += 0x80000000);
+                sign && (high |= 0x80000000);
 
                 rv.push(0xcb, (high >> 24) & 0xff, (high >> 16) & 0xff,
                               (high >>  8) & 0xff,  high        & 0xff,
@@ -192,11 +199,15 @@ function encode(rv,    // @param ByteArray: result
             }
             break;
         default: // array or hash
+            if (depth >= _MAX_DEPTH) {
+                _error = 1; // CYCLIC_REFERENCE_ERROR
+                return rv = [];
+            }
             if (_toString.call(mix) === "[object Array]") { // array
                 size = mix.length;
                 setType(rv, 16, size, [0x90, 0xdc, 0xdd]);
                 for (; i < size; ++i) {
-                    encode(rv, mix[i]);
+                    encode(rv, mix[i], depth + 1);
                 }
             } else { // hash
                 // http://d.hatena.ne.jp/uupaa/20101129
@@ -208,8 +219,8 @@ function encode(rv,    // @param ByteArray: result
 
                 for (i in mix) {
                     ++size;
-                    encode(rv, i);
-                    encode(rv, mix[i]);
+                    encode(rv, i, depth + 1);
+                    encode(rv, mix[i], depth + 1);
                 }
 
                 // rewrite hash type.
@@ -229,7 +240,8 @@ function encode(rv,    // @param ByteArray: result
 
 // inner - decoder
 function decode() { // @return Mix:
-    var ary, hash, num = 0, i = 0, iz, msb = 0, c, sign, exp, frac, key,
+    var ary, hash, num = 0, i = 0, iz = 0, msb = 0, c = 0, sign = 0,
+        exp = 0, frac = 0, key,
         buf = _buf, type = buf[++_idx];
 
     if (type >= 0xe0) {         // Negative FixNum (111x xxxx) (-32 ~ -1)
