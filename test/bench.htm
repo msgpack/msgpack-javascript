@@ -4,9 +4,7 @@
 <script src="../msgpack.js"></script>
 <script src="uupaa.js"></script>
 <script src="10000.js"></script>
-<!--
 <script src="100000.js"></script>
- -->
 <script>
 
 
@@ -119,13 +117,6 @@ function load10() {
 }
 </script>
 </head><body>
-<h1>Benchmark</h1>
-<div>
-    <input type="button" value="clear log" onclick="uu.log.clear()" />
-</div>
-
-
-<hr />
 <table>
 <tr>
     <td>Prepare Data</td>
@@ -134,33 +125,28 @@ function load10() {
 </tr>
 <tr>
     <td>
-<!--
         <input type="button" value="Load 100000" onclick="solid(solid100000, 100000)" />
- -->
         <input type="button" value="Load 10000" onclick="solid(solid10000, 10000)" />
         <input type="button" value="Load 10" onclick="load10()" />
         <br />
+        <input type="button" id="Biggest" value="Create 100000" onclick="create(100000)" />
+        <input type="button" value="Create 10000" onclick="create(10000)" />
+        <input type="button" value="Create 10" onclick="create(10)" />
     </td>
-    <td> -&gt; </td>
+    <td>
+        -&gt;
+    </td>
     <td>
         <input type="button" value="JSON.stringify + JSON.parse" onclick="test(1)" />
-    </td>
-</tr>
-<tr>
-    <td>
-    </td>
-    <td> -&gt; </td>
-    <td>
+        <br />
         <input type="button" value="msgpack.pack + msgpack.unpack" onclick="test(0)" />
     </td>
 </tr>
 </table>
 <textarea id="json" cols="40" rows="2"></textarea>
-<br />
-        <input type="button" id="Biggest" value="Create 100000" onclick="create(100000)" />
-        <input type="button" value="Create 10000" onclick="create(10000)" />
-        <input type="button" value="Create 1000" onclick="create(1000)" />
-        <input type="button" value="Create 10" onclick="create(10)" />
+<input type="button" value="clear log" onclick="uu.log.clear()" />
+
+
 
 
 

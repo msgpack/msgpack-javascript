@@ -154,8 +154,8 @@ function encode(rv,      // @param ByteArray: result
                 //  3      2    21  1        8        0
                 //  1      4    09  6
                 low  = frac & 0xffffffff;
+                sign && (exp |= 0x800);
                 high = ((frac / 0x100000000) & 0xfffff) | (exp << 20);
-                sign && (high |= 0x80000000);
 
                 rv.push(0xcb, (high >> 24) & 0xff, (high >> 16) & 0xff,
                               (high >>  8) & 0xff,  high        & 0xff,
