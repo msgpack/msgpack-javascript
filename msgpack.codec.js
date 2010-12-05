@@ -1,4 +1,4 @@
-/*!{id:msgpack.js,ver:1.05,license:"MIT",author:"uupaa.js@gmail.com"}*/
+/*!{id:msgpack.codec.js,ver:1.05,license:"MIT",author:"uupaa.js@gmail.com"}*/
 
 // === msgpack ===
 // MessagePack -> http://msgpack.sourceforge.net/
@@ -10,19 +10,13 @@ globalScope.msgpack = {
                                 //              toString:Boolean = false):ByteArray/ByteString/false
                                 //  [1][mix to String]    msgpack.pack({}, true) -> "..."
                                 //  [2][mix to ByteArray] msgpack.pack({})       -> [...]
-    unpack:     msgpackunpack,  // msgpack.unpack(data:BinaryString/ByteArray):Mix
+    unpack:     msgpackunpack   // msgpack.unpack(data:BinaryString/ByteArray):Mix
                                 //  [1][String to mix]    msgpack.unpack("...") -> {}
                                 //  [2][ByteArray to mix] msgpack.unpack([...]) -> {}
-    worker:     "msgpack.js",   // msgpack.worker - WebWorkers script filename
-    upload:     msgpackupload,  // msgpack.upload(url:String, option:Hash, callback:Function)
-    download:   msgpackdownload // msgpack.download(url:String, option:Hash, callback:Function)
 };
 
-var _ie         = /MSIE/.test(navigator.userAgent),
-    _bin2num    = {}, // BinaryStringToNumber   { "\00": 0, ... "\ff": 255 }
+var _bin2num    = {}, // BinaryStringToNumber   { "\00": 0, ... "\ff": 255 }
     _num2bin    = {}, // NumberToBinaryString   { 0: "\00", ... 255: "\ff" }
-    _num2b64    = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                   "abcdefghijklmnopqrstuvwxyz0123456789+/").split(""),
     _buf        = [], // decode buffer
     _idx        = 0,  // decode buffer[index]
     _error      = 0,  // msgpack.pack() error code. 1 = CYCLIC_REFERENCE_ERROR
@@ -31,15 +25,6 @@ var _ie         = /MSIE/.test(navigator.userAgent),
                   }),
     _toString   = String.fromCharCode, // CharCode/ByteArray to String
     _MAX_DEPTH  = 512;
-
-// for WebWorkers Code Block
-self.importScripts && (onmessage = function(event) {
-    if (event.data.method === "pack") {
-        postMessage(base64encode(msgpackpack(event.data.data)));
-    } else {
-        postMessage(msgpackunpack(event.data.data));
-    }
-});
 
 // msgpack.pack
 function msgpackpack(data,       // @param Mix:
@@ -401,165 +386,6 @@ function byteArrayToByteString(byteArray) { // @param ByteArray
     return rv.join("");
 }
 
-// msgpack.download - load from server
-function msgpackdownload(url,        // @param String:
-                         option,     // @param Hash: { worker, timeout, before, after }
-                                     //    option.worker - Boolean(= false): true is use WebWorkers
-                                     //    option.timeout - Number(= 10): timeout sec
-                                     //    option.before  - Function: before(xhr, option)
-                                     //    option.after   - Function: after(xhr, option, { status, ok })
-                         callback) { // @param Function: callback(data, option, { status, ok })
-                                     //    data   - Mix/null:
-                                     //    option - Hash:
-                                     //    status - Number: HTTP status code
-                                     //    ok     - Boolean:
-    option.method = "GET";
-    option.binary = true;
-    ajax(url, option, callback);
-}
-
-// msgpack.upload - save to server
-function msgpackupload(url,        // @param String:
-                       option,     // @param Hash: { data, worker, timeout, before, after }
-                                   //    option.data - Mix:
-                                   //    option.worker - Boolean(= false): true is use WebWorkers
-                                   //    option.timeout - Number(= 10): timeout sec
-                                   //    option.before  - Function: before(xhr, option)
-                                   //    option.after   - Function: after(xhr, option, { status, ok })
-                       callback) { // @param Function: callback(data, option, { status, ok })
-                                   //    data   - String: responseText
-                                   //    option - Hash:
-                                   //    status - Number: HTTP status code
-                                   //    ok     - Boolean:
-    option.method = "PUT";
-    option.binary = true;
-
-    if (option.worker && globalScope.Worker) {
-        var worker = new Worker(msgpack.worker);
-
-        worker.onmessage = function(event) {
-            option.data = event.data;
-            ajax(url, option, callback);
-        };
-        worker.postMessage({ method: "pack", data: option.data });
-    } else {
-        // pack and base64 encode
-        option.data = base64encode(msgpackpack(option.data));
-        ajax(url, option, callback);
-    }
-}
-
-// inner -
-function ajax(url,        // @param String:
-              option,     // @param Hash: { data, ifmod, method, timeout,
-                          //                header, binary, before, after, worker }
-                          //    option.data    - Mix: upload data
-                          //    option.ifmod   - Boolean: true is "If-Modified-Since" header
-                          //    option.method  - String: "GET", "POST", "PUT"
-                          //    option.timeout - Number(= 10): timeout sec
-                          //    option.header  - Hash(= {}): { key: "value", ... }
-                          //    option.binary  - Boolean(= false): true is binary data
-                          //    option.before  - Function: before(xhr, option)
-                          //    option.after   - Function: after(xhr, option, { status, ok })
-                          //    option.worker  - Boolean(= false): true is use WebWorkers
-              callback) { // @param Function: callback(data, option, { status, ok })
-                          //    data   - String/Mix/null:
-                          //    option - Hash:
-                          //    status - Number: HTTP status code
-                          //    ok     - Boolean:
-    function readyStateChange() {
-        if (xhr.readyState === 4) {
-            var data, status = xhr.status, worker, byteArray,
-                rv = { status: status, ok: status >= 200 && status < 300 };
-
-            if (!run++) {
-                if (method === "PUT") {
-                    data = rv.ok ? xhr.responseText : "";
-                } else {
-                    if (rv.ok) {
-                        if (option.worker && globalScope.Worker) {
-                            worker = new Worker(msgpack.worker);
-                            worker.onmessage = function(event) {
-                                callback(event.data, option, rv);
-                            };
-                            worker.postMessage({ method: "unpack",
-                                                 data: xhr.responseText });
-                            gc();
-                            return;
-                        } else {
-                            byteArray = _ie ? toByteArrayIE(xhr)
-                                            : toByteArray(xhr.responseText);
-                            data = msgpackunpack(byteArray);
-                        }
-                    }
-                }
-                after && after(xhr, option, rv);
-                callback(data, option, rv);
-                gc();
-            }
-        }
-    }
-
-    function ng(abort, status) {
-        if (!run++) {
-            var rv = { status: status || 400, ok: false };
-
-            after && after(xhr, option, rv);
-            callback(null, option, rv);
-            gc(abort);
-        }
-    }
-
-    function gc(abort) {
-        abort && xhr && xhr.abort && xhr.abort();
-        watchdog && (clearTimeout(watchdog), watchdog = 0);
-        xhr = null;
-        globalScope.addEventListener &&
-            globalScope.removeEventListener("beforeunload", ng, false);
-    }
-
-    var watchdog = 0,
-        method = option.method || "GET",
-        header = option.header || {},
-        before = option.before,
-        after = option.after,
-        data = option.data || null,
-        xhr = globalScope.XMLHttpRequest ? new XMLHttpRequest() :
-              globalScope.ActiveXObject  ? new ActiveXObject("Microsoft.XMLHTTP") :
-              null,
-        run = 0, i,
-        overrideMimeType = "overrideMimeType",
-        setRequestHeader = "setRequestHeader",
-        getbinary = method === "GET" && option.binary;
-
-    try {
-        xhr.onreadystatechange = readyStateChange;
-        xhr.open(method, url, true); // ASync
-
-        before && before(xhr, option);
-
-        getbinary && xhr[overrideMimeType] &&
-            xhr[overrideMimeType]("text/plain; charset=x-user-defined");
-        data &&
-            xhr[setRequestHeader]("Content-Type",
-                                  "application/x-www-form-urlencoded");
-
-        for (i in header) {
-            xhr[setRequestHeader](i, header[i]);
-        }
-
-        globalScope.addEventListener &&
-            globalScope.addEventListener("beforeunload", ng, false); // 400: Bad Request
-
-        xhr.send(data);
-        watchdog = setTimeout(function() {
-            ng(1, 408); // 408: Request Time-out
-        }, (option.timeout || 10) * 1000);
-    } catch (err) {
-        ng(0, 400); // 400: Bad Request
-    }
-}
-
 // inner - BinaryString To ByteArray
 function toByteArray(data) { // @param BinaryString: "\00\01"
                              // @return ByteArray: [0x00, 0x01]
@@ -584,70 +410,6 @@ function toByteArray(data) { // @param BinaryString: "\00\01"
     return rv;
 }
 
-// inner - BinaryString to ByteArray
-function toByteArrayIE(xhr) {
-    var rv = [], data, remain,
-        charCodeAt = "charCodeAt",
-        loop, v0, v1, v2, v3, v4, v5, v6, v7,
-        i = -1, iz;
-
-    iz = vblen(xhr);
-    data = vbstr(xhr);
-    loop = Math.ceil(iz / 2);
-    remain = loop % 8;
-
-    while (remain--) {
-        v0 = data[charCodeAt](++i); // 0x00,0x01 -> 0x0100
-        rv.push(v0 & 0xff, v0 >> 8);
-    }
-    remain = loop >> 3;
-    while (remain--) {
-        v0 = data[charCodeAt](++i);
-        v1 = data[charCodeAt](++i);
-        v2 = data[charCodeAt](++i);
-        v3 = data[charCodeAt](++i);
-        v4 = data[charCodeAt](++i);
-        v5 = data[charCodeAt](++i);
-        v6 = data[charCodeAt](++i);
-        v7 = data[charCodeAt](++i);
-        rv.push(v0 & 0xff, v0 >> 8, v1 & 0xff, v1 >> 8,
-                v2 & 0xff, v2 >> 8, v3 & 0xff, v3 >> 8,
-                v4 & 0xff, v4 >> 8, v5 & 0xff, v5 >> 8,
-                v6 & 0xff, v6 >> 8, v7 & 0xff, v7 >> 8);
-    }
-    iz % 2 && rv.pop();
-
-    return rv;
-}
-
-// inner - base64.encode
-function base64encode(data) { // @param ByteArray:
-                              // @return Base64String:
-    var rv = [],
-        c = 0, i = -1, iz = data.length,
-        pad = [0, 2, 1][data.length % 3],
-        num2bin = _num2bin,
-        num2b64 = _num2b64;
-
-    if (globalScope.btoa) {
-        while (i < iz) {
-            rv.push(num2bin[data[++i]]);
-        }
-        return btoa(rv.join(""));
-    }
-    --iz;
-    while (i < iz) {
-        c = (data[++i] << 16) | (data[++i] << 8) | (data[++i]); // 24bit
-        rv.push(num2b64[(c >> 18) & 0x3f],
-                num2b64[(c >> 12) & 0x3f],
-                num2b64[(c >>  6) & 0x3f],
-                num2b64[ c        & 0x3f]);
-    }
-    pad > 1 && (rv[rv.length - 2] = "=");
-    pad > 0 && (rv[rv.length - 1] = "=");
-    return rv.join("");
-}
-
 // --- init ---
 (function() {
     var i = 0, v;
@@ -662,9 +424,5 @@ function base64encode(data) { // @param ByteArray:
         _bin2num[_toString(0xf700 + i)] = i; // "\f780" -> 0x80
     }
 })();
-
-_ie && document.write('<script type="text/vbscript">\
-Function vblen(b)vblen=LenB(b.responseBody)End Function\n\
-Function vbstr(b)vbstr=CStr(b.responseBody)+chr(0)End Function</'+'script>');
 
 })(this);

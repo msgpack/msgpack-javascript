@@ -207,8 +207,7 @@ window.onload = function() {
     return rv;
   }
   function test5(input) {
-    var rv = [], mix = 0, sign = false, exp = 0, frac = 0, high = 0, low = 0,
-        LN2 = Math.LN2;
+    var rv = [], mix = 0, sign = false, exp = 0, frac = 0, high = 0, low = 0;
 
     for (var i = 0, l = input.length; i < l; i++) {
       mix = input[i];
@@ -219,7 +218,7 @@ window.onload = function() {
                 // exp => 11 bits
                 // add offset 1023 to ensure positive
                 // 0.6931471805599453 = Math.LN2;
-                exp  = ((Math.log(mix) / LN2) + 1023) | 0;
+                exp  = ((Math.log(mix) / Math.LN2) + 1023) | 0;
 
                 // frac => 53 bits
                 // shift 52 - (exp - 1023) bits to make integer part exactly 53 bits,
@@ -251,25 +250,85 @@ window.onload = function() {
     return rv;
   }
 
+  function test6(input) {
+    var rv = [], mix = 0, sign = false, exp = 0, frac = 0, high = 0, low = 0,
+        log = Math.log, LN2 = Math.LN2,
+        floor = Math.floor, pow = Math.pow;
+
+    for (var i = 0, l = input.length; i < l; i++) {
+      mix = input[i];
+
+                sign = mix < 0;
+                sign && (mix *= -1);
+
+                // exp => 11 bits
+                // add offset 1023 to ensure positive
+                // 0.6931471805599453 = Math.LN2;
+                exp  = ((log(mix) / LN2) + 1023) | 0;
+
+                // frac => 53 bits
+                // shift 52 - (exp - 1023) bits to make integer part exactly 53 bits,
+                // then throw away trash less than decimal point
+//                frac = floor(mix * pow(2, 52 + 1023 - exp));
+                frac = mix * pow(2, 52 + 1023 - exp);
+
+                //  S+-Exp(11)--++-----------------Fraction(52bits)-----------------------+
+                //  ||          ||                                                        |
+                //  v+----------++--------------------------------------------------------+
+                //  00000000|00000000|00000000|00000000|00000000|00000000|00000000|00000000
+                //  6      5    55  4        4        3        2        1        8        0
+                //  3      6    21  8        0        2        4        6
+                //
+                //  +----------high(32bits)-----------+ +----------low(32bits)------------+
+                //  |                                 | |                                 |
+                //  +---------------------------------+ +---------------------------------+
+                //  3      2    21  1        8        0
+                //  1      4    09  6
+                low  = frac & 0xffffffff;
+                sign && (exp |= 0x800);
+                high = ((frac / 0x100000000) & 0xfffff) | (exp << 20);
+
+                rv.push(0xcb, (high >> 24) & 0xff, (high >> 16) & 0xff,
+                              (high >>  8) & 0xff,  high        & 0xff,
+                              (low  >> 24) & 0xff, (low  >> 16) & 0xff,
+                              (low  >>  8) & 0xff,  low         & 0xff);
+    }
+
+    return rv;
+  }
+
+
   var t = new Date;
+  test1(input); test1(input);
   var rv = test1(input);
-  print('test1 took ' + (new Date - t) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
+  print('test1 took ' + ((new Date - t) / 3 | 0) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
 
   var t = new Date;
+  test2(input); test2(input);
   var rv = test2(input);
-  print('test2 took ' + (new Date - t) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
+  print('test2 took ' + ((new Date - t) / 3 | 0) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
 
   var t = new Date;
+  test3(input); test3(input);
   var rv = test3(input);
-  print('test3 took ' + (new Date - t) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
+  print('test3 took ' + ((new Date - t) / 3 | 0) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
 
   var t = new Date;
+  test4(input); test4(input);
   var rv = test4(input);
-  print('test4 took ' + (new Date - t) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
+  print('test4 took ' + ((new Date - t) / 3 | 0) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
 
   var t = new Date;
+  test5(input); test5(input);
   var rv = test5(input);
-  print('test5 took ' + (new Date - t) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
+  print('test5 took ' + ((new Date - t) / 3 | 0) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
+
+  var t = new Date;
+  test6(input); test6(input);
+  var rv = test6(input);
+  print('test6 took ' + ((new Date - t) / 3 | 0) + ' ms, results : ' + rv.slice(0, 10) + ' ...');
+
+
 
 };
 </script>
