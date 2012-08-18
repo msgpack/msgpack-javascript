@@ -245,7 +245,7 @@ function encode(rv,      // @param ByteArray: result
 // inner - decoder
 function decode() { // @return Mix:
     var size, i, iz, c, num = 0,
-        sign, exp, frac, ary, hash,
+        sign, exp, frac, ary, key, hash,
         buf = _buf, type = buf[++_idx];
 
     if (type >= 0xe0) {             // Negative FixNum (111x xxxx) (-32 ~ -1)
@@ -359,17 +359,8 @@ function decode() { // @return Mix:
     case 0x80:  hash = {};
                 while (num--) {
                     // make key/value pair
-                    size = buf[++_idx] - 0xa0;
-
-                    for (ary = [], i = _idx, iz = i + size; i < iz; ) {
-                        c = buf[++i]; // lead byte
-                        ary.push(c < 0x80 ? c : // ASCII(0x00 ~ 0x7f)
-                                 c < 0xe0 ? ((c & 0x1f) <<  6 | (buf[++i] & 0x3f)) :
-                                            ((c & 0x0f) << 12 | (buf[++i] & 0x3f) << 6
-                                                              | (buf[++i] & 0x3f)));
-                    }
-                    _idx = i;
-                    hash[_toString.apply(null, ary)] = decode();
+                    key = decode();
+                    hash[key] = decode();
                 }
                 return hash;
     // 0xdd: array32, 0xdc: array16, 0x90: array
