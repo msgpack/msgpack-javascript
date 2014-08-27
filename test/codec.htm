@@ -486,30 +486,51 @@ uu.ready(function(uu) {
 
                 return [rv, "==", -3.14159565358979, hex(pack)];
             },
-        "Raw (as String)": "",
-            "String('') -> [0xa0] (FixRaw)": function() {
+        "Str (as String)": "",
+            "String('') -> [0xa0] (FixStr)": function() {
                 var pack = msgpack.pack("");
                 var rv = msgpack.unpack(pack);
 
                 return [rv, "==", "", hex(pack)];
             },
-            "String('abc') -> [0xa3, 0x61, 0x62, 0x63] (FixRaw)": function() {
+            "String('abc') -> [0xa3, 0x61, 0x62, 0x63] (FixStr)": function() {
                 var pack = msgpack.pack("abc");
                 var rv = msgpack.unpack(pack);
 
                 return [rv, "==", "abc", hex(pack)];
             },
-            "String('あいう') -> [0xa9, 0xe3, 0x81, 0x82, 0xe3, 0x81, 0x84, 0xe3, 0x81, 0x86] (FixRaw)": function() {
+            "String('あいう') -> [0xa9, 0xe3, 0x81, 0x82, 0xe3, 0x81, 0x84, 0xe3, 0x81, 0x86] (FixStr)": function() {
                 var pack = msgpack.pack("あいう");
                 var rv = msgpack.unpack(pack);
 
                 return [rv, "==", "あいう", hex(pack)];
             },
-            "String('カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで') -> [] (Raw16)": function() {
+            "String('カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで') -> [] (Str8)": function() {
                 var pack = msgpack.pack("カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで");
                 var rv = msgpack.unpack(pack);
 
                 return [rv, "==", "カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで", hex(pack)];
+            },
+            "String('カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで、あとナポリタンと天丼、スープカレーに餃子とチャーハン、それからそれからビーフストロガノフとアクアパッツァ、すき焼きにざるそば') -> [] (Str16)": function() {
+                var pack = msgpack.pack("カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで、あとナポリタンと天丼、スープカレーに餃子とチャーハン、それからそれからビーフストロガノフとアクアパッツァ、すき焼きにざるそば");
+                var rv = msgpack.unpack(pack);
+
+                return [rv, "==", "カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで、あとナポリタンと天丼、スープカレーに餃子とチャーハン、それからそれからビーフストロガノフとアクアパッツァ、すき焼きにざるそば", hex(pack)];
+            },
+        "Bin (as Uint8Array)": "",
+            "Uint8Array(1,2,3) -> [1,2,3] (Bin8)": function() {
+                var pack = msgpack.pack(new Uint8Array([1,2,3]));
+                var rv = msgpack.unpack(pack);
+
+                return [rv, "==", [1,2,3], hex(pack)];
+            },
+            "Uint8Array(0..255) -> [0..255] (Bin16)": function() {
+                var expected = new Array(256);
+                for (var i = 0; i < 256; ++i) expected[i] = i;
+                var pack = msgpack.pack(new Uint8Array(expected));
+                var rv = msgpack.unpack(pack);
+
+                return [rv, "==", expected, hex(pack)];
             },
         "Map (as Hash)": "",
             "Hash({}) -> [0x80] (FixMap)": function() {
@@ -769,21 +790,28 @@ uu.ready(function(uu) {
                 return [rv, "==", -1.0, hex(result)];
             },
 
-            '[a1 61] "a" FixRaw': function() {
+            '[a1 61] "a" FixStr': function() {
                 var data = unescape('%a1%61');
                 var result = [0xa1, 0x61];
                 var rv = msgpack.unpack(data);
 
                 return [rv, "==", "a", hex(result)];
             },
-            '[da 00 01 61] "a" raw 16': function() {
+            '[d9 01 61] "a" str 8': function() {
+                var data = unescape('%d9%01%61');
+                var result = [0xda, 0x01, 0x61];
+                var rv = msgpack.unpack(data);
+
+                return [rv, "==", "a", hex(result)];
+            },
+            '[da 00 01 61] "a" str 16': function() {
                 var data = unescape('%da%00%01%61');
                 var result = [0xda, 0x00, 0x01, 0x61];
                 var rv = msgpack.unpack(data);
 
                 return [rv, "==", "a", hex(result)];
             },
-            '[db 00 00 00 01 61] "a" raw 32': function() {
+            '[db 00 00 00 01 61] "a" str 32': function() {
                 var data = unescape('%db%00%00%00%01%61');
                 var result = [0xdb, 0x00, 0x00, 0x00, 0x01, 0x61];
                 var rv = msgpack.unpack(data);
@@ -791,26 +819,55 @@ uu.ready(function(uu) {
                 return [rv, "==", "a", hex(result)];
             },
 
-            '[a0] "" FixRaw': function() {
+            '[a0] "" FixStr': function() {
                 var data = unescape('%a0');
                 var result = [0xa0];
                 var rv = msgpack.unpack(data);
 
                 return [rv, "==", "", hex(result)];
             },
-            '[da 00 00] "" raw 16': function() {
+            '[d9 00] "" str 8': function() {
+                var data = unescape('%d9%00');
+                var result = [0xd9, 0x00];
+                var rv = msgpack.unpack(data);
+
+                return [rv, "==", "", hex(result)];
+            },
+            '[da 00 00] "" str 16': function() {
                 var data = unescape('%da%00%00');
                 var result = [0xda, 0x00, 0x00];
                 var rv = msgpack.unpack(data);
 
                 return [rv, "==", "", hex(result)];
             },
-            '[db 00 00 00 00] "" raw 32': function() {
+            '[db 00 00 00 00] "" str 32': function() {
                 var data = unescape('%db%00%00%00%00');
                 var result = [0xdb, 0x00, 0x00, 0x00, 0x00];
                 var rv = msgpack.unpack(data);
 
                 return [rv, "==", "", hex(result)];
+            },
+
+            '[c4 00] "" bin 8': function() {
+                var data = unescape('%c4%00');
+                var result = [0xc4, 0x00];
+                var rv = msgpack.unpack(data);
+
+                return [rv, "==", [], hex(result)];
+            },
+            '[c5 00 00] "" bin 16': function() {
+                var data = unescape('%c5%00%00');
+                var result = [0xc5, 0x00, 0x00];
+                var rv = msgpack.unpack(data);
+
+                return [rv, "==", [], hex(result)];
+            },
+            '[c6 00 00 00 00] "" bin 32': function() {
+                var data = unescape('%c6%00%00%00%00');
+                var result = [0xc6, 0x00, 0x00, 0x00, 0x00];
+                var rv = msgpack.unpack(data);
+
+                return [rv, "==", [], hex(result)];
             },
 
             '[91 00] [0] FixArray': function() {
