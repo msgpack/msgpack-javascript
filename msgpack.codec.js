@@ -10,9 +10,10 @@ globalScope.msgpack = {
                                 //              toString:Boolean = false):ByteArray/ByteString/false
                                 //  [1][mix to String]    msgpack.pack({}, true) -> "..."
                                 //  [2][mix to ByteArray] msgpack.pack({})       -> [...]
-    unpack:     msgpackunpack   // msgpack.unpack(data:BinaryString/ByteArray):Mix
+    unpack:     msgpackunpack,  // msgpack.unpack(data:BinaryString/ByteArray):Mix
                                 //  [1][String to mix]    msgpack.unpack("...") -> {}
                                 //  [2][ByteArray to mix] msgpack.unpack([...]) -> {}
+    unpackedLength: msgpackunpackedLength  // msgpack.unpackedLength() -> Number
 };
 
 var _bin2num    = {}, // BinaryStringToNumber   { "\00": 0, ... "\ff": 255 }
@@ -53,6 +54,11 @@ function msgpackunpack(data) { // @param BinaryString/ByteArray:
     _buf = typeof data === "string" ? toByteArray(data) : data;
     _idx = -1;
     return decode(); // mix or undefined
+}
+
+// msgpack.unpackedLength
+function msgpackunpackedLength() { // @return Number: unpacked length
+    return _idx + 1;
 }
 
 // inner - encoder

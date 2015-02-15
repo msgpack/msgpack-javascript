@@ -15,7 +15,8 @@ globalScope.msgpack = {
                                 //  [2][ByteArray to mix] msgpack.unpack([...]) -> {}
     worker:     "msgpack.js",   // msgpack.worker - WebWorkers script filename
     upload:     msgpackupload,  // msgpack.upload(url:String, option:Hash, callback:Function)
-    download:   msgpackdownload // msgpack.download(url:String, option:Hash, callback:Function)
+    download:   msgpackdownload,// msgpack.download(url:String, option:Hash, callback:Function)
+    unpackedLength: msgpackunpackedLength  // msgpack.unpackedLength() -> Number
 };
 
 var _ie         = /MSIE/.test(navigator.userAgent),
@@ -68,6 +69,11 @@ function msgpackunpack(data) { // @param BinaryString/ByteArray:
     _buf = typeof data === "string" ? toByteArray(data) : data;
     _idx = -1;
     return decode(); // mix or undefined
+}
+
+// msgpack.unpackedLength
+function msgpackunpackedLength() { // @return Number: unpacked length
+    return _idx + 1;
 }
 
 // inner - encoder
