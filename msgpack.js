@@ -29,6 +29,9 @@ var _ie         = /MSIE/.test(navigator.userAgent),
     _isArray    = Array.isArray || (function(mix) {
                     return Object.prototype.toString.call(mix) === "[object Array]";
                   }),
+    _isUint8Array = function(mix) {
+                    return Object.prototype.toString.call(mix) === "[object Uint8Array]";
+                  },
     _toString   = String.fromCharCode, // CharCode/ByteArray to String
     _MAX_DEPTH  = 512;
 
@@ -191,6 +194,8 @@ function encode(rv,      // @param ByteArray: result
 
             if (size < 32) {
                 rv[pos] = 0xa0 + size; // rewrite
+            } else if (size < 0x100) { // 8
+                rv.splice(pos, 1, 0xd9, size);
             } else if (size < 0x10000) { // 16
                 rv.splice(pos, 1, 0xda, size >> 8, size & 0xff);
             } else if (size < 0x100000000) { // 32
@@ -199,7 +204,21 @@ function encode(rv,      // @param ByteArray: result
                                        (size >>  8) & 0xff, size & 0xff);
             }
             break;
-        default: // array or hash
+        default: // array, hash, or Uint8Array
+            if (_isUint8Array(mix)) {
+                size = mix.length;
+
+                if (size < 0x100) { // 8
+                    rv.push(0xc4, size);
+                } else if (size < 0x10000) { // 16
+                    rv.push(0xc5, size >> 8, size & 0xff);
+                } else if (size < 0x100000000) { // 32
+                    rv.push(0xc6, size >>> 24, (size >> 16) & 0xff,
+                            (size >>  8) & 0xff, size & 0xff);
+                }
+                Array.prototype.push.apply(rv, mix);
+                break;
+            }
             if (++depth >= _MAX_DEPTH) {
                 _error = 1; // CYCLIC_REFERENCE_ERROR
                 return rv = []; // clear
@@ -339,9 +358,10 @@ function decode() { // @return Mix:
                 return num < 0x8000 ? num : num - 0x10000; // 0x8000 * 2
     case 0xd0:  num  =  buf[++_idx];
                 return num < 0x80 ? num : num - 0x100; // 0x80 * 2
-    // 0xdb: raw32, 0xda: raw16, 0xa0: raw ( string )
-    case 0xdb:  num +=  buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
-    case 0xda:  num += (buf[++_idx] << 8)       +  buf[++_idx];
+    // 0xdb: str32, 0xda: str16, 0xd9: str8, 0xa0: fixstr
+    case 0xdb:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xda:  num += buf[++_idx] << 8;
+    case 0xd9:  num += buf[++_idx];
     case 0xa0:  // utf8.decode
                 for (ary = [], i = _idx, iz = i + num; i < iz; ) {
                     c = buf[++i]; // lead byte
@@ -353,6 +373,14 @@ function decode() { // @return Mix:
                 _idx = i;
                 return ary.length < 10240 ? _toString.apply(null, ary)
                                           : byteArrayToByteString(ary);
+    // 0xc6: bin32, 0xc5: bin16, 0xc4: bin8
+    case 0xc6:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xc5:  num += buf[++_idx] << 8;
+    case 0xc4:  num += buf[++_idx];
+                var end = ++_idx + num
+                var ret = buf.slice(_idx, end);
+                _idx += num;
+                return ret;
     // 0xdf: map32, 0xde: map16, 0x80: map
     case 0xdf:  num +=  buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
     case 0xde:  num += (buf[++_idx] << 8)       +  buf[++_idx];
