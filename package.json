@@ -1,0 +1,11 @@
+{
+  "name": "msgpack-javascript",
+  "version": "1.0.0",
+  "description": "MessagePack: It's like JSON. but fast and small.",
+  "main": "msgpack.codec.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/msgpack/msgpack-javascript.git"
+  },
+  "homepage": "https://github.com/msgpack/msgpack-javascript"
+}
