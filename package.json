@@ -1,0 +1,11 @@
+{
+  "name": "msgpack.codec",
+  "version": "1.0.0",
+  "description": "MessagePack serializer implementation for JavaScript",
+  "main": "msgpack.codec.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/msgpack/msgpack-javascript.git"
+  },
+  "homepage": "https://github.com/msgpack/msgpack-javascript"
+}
