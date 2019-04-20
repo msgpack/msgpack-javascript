@@ -1,0 +1,7 @@
+--require source-map-support/register
+
+--recursive
+--full-trace
+--timeout 2000
+
+test/**/*.spec.{js,ts}
