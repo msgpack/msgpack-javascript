@@ -1,0 +1,28 @@
+{
+  "name": "@msgpack/msgpack",
+  "version": "0.9.0",
+  "description": "MessagePack implementation in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/msgpack/msgpack-javascript.git"
+  },
+  "keywords": [
+    "msgpack"
+  ],
+  "author": "The MessagePack community",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/msgpack/msgpack-javascript/issues"
+  },
+  "homepage": "https://github.com/msgpack/msgpack-javascript#readme",
+  "devDependencies": {
+    "@types/mocha": "^5.2.6",
+    "mocha": "^6.1.4",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5"
+  }
+}
