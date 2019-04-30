@@ -1,8 +1,8 @@
 import { utf8Encode } from "./utils/uf8Encode";
 
 type Writable<T> = {
-  push(...items: T[]): number;
-}
+  push(...items: ReadonlyArray<T>): number;
+};
 
 type EncodeOptions = Readonly<{
   output?: Array<number>;
@@ -15,10 +15,7 @@ const DefaultOptions = {
   maxDepth: 100,
 };
 
-export function encode(
-  value: unknown,
-  options: EncodeOptions = DefaultOptions,
-): ReadonlyArray<number> {
+export function encode(value: unknown, options: EncodeOptions = DefaultOptions): Array<number> {
   const result = options.output || [];
 
   _encode(result, 1, value, options);
@@ -55,7 +52,7 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
           rv.push(0xce, object >>> 24, (object >> 16) & 0xff, (object >> 8) & 0xff, object & 0xff);
         } else {
           // uint64
-          const high = object >> 32;
+          const high = object / 0x100000000;
           const low = object & 0xffffffff;
           rv.push(
             0xcf,
@@ -86,7 +83,7 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
           rv.push(0xd2, object >>> 24, (object >> 16) & 0xff, (object >> 8) & 0xff, object & 0xff);
         } else {
           // int 64
-          const high = object >> 32;
+          const high = object / 0x100000000;
           const low = object & 0xffffffff;
           rv.push(
             0xd3,
@@ -104,33 +101,13 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
     } else if (Number.isFinite(object)) {
       // THX!! @edvakf
       // http://javascript.g.hatena.ne.jp/edvakf/20101128/1291000731
-      let sign = object < 0;
-      if (sign) {
-        object *= -1;
-      }
+      const negative = object === 0 ? Object.is(object, -0.0) : object < 0;
+      const value = negative ? -object : object;
 
-      // add offset 1023 to ensure positive
-      // 0.6931471805599453 = Math.LN2;
-      let exp = (Math.log(object) / 0.6931471805599453 + 1023) | 0;
-
-      // shift 52 - (exp - 1023) bits to make integer part exactly 53 bits,
-      // then throw away trash less than decimal point
-      let frac = object * Math.pow(2, 52 + 1023 - exp);
-
-      //  S+-Exp(11)--++-----------------Fraction(52bits)-----------------------+
-      //  ||          ||                                                        |
-      //  v+----------++--------------------------------------------------------+
-      //  00000000|00000000|00000000|00000000|00000000|00000000|00000000|00000000
-      //  6      5    55  4        4        3        2        1        8        0
-      //  3      6    21  8        0        2        4        6
-      //
-      //  +----------high(32bits)-----------+ +----------low(32bits)------------+
-      //  |                                 | |                                 |
-      //  +---------------------------------+ +---------------------------------+
-      //  3      2    21  1        8        0
-      //  1      4    09  6
+      let exp = (Math.log(value) / Math.LN2 + 1023) | 0;
+      const frac = value * Math.pow(2, 52 + 1023 - exp);
       const low = frac & 0xffffffff;
-      if (sign) {
+      if (negative) {
         exp |= 0x800;
       }
       const high = ((frac / 0x100000000) & 0xfffff) | (exp << 20);
@@ -148,11 +125,12 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
       );
     } else {
       rv.push(0xcb);
-      if (object === Number.POSITIVE_INFINITY) {
+      if (object === Infinity) {
         rv.push(0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-      } else if (object === Number.NEGATIVE_INFINITY) {
+      } else if (object === -Infinity) {
         rv.push(0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
       } else {
+        // NaN
         rv.push(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff);
       }
     }
@@ -180,7 +158,24 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
     rv.push(...bytes);
   } else if (ArrayBuffer.isView(object)) {
     // bin
-    throw new Error("FIXME: bin");
+    const size = object.byteLength;
+    if (size < 0x100) {
+      // bin 8
+      rv.push(0xc4, size);
+    } else if (size < 0x10000) {
+      // bin 16
+      rv.push(0xc5, size >> 8, size & 0xff);
+    } else if (size < 0x100000000) {
+      // bin 32
+      rv.push(0xc6, size >>> 24, (size >> 16) & 0xff, (size >> 8) & 0xff, size & 0xff);
+    } else {
+      throw new Error(`Too large binary: ${size}`);
+    }
+
+    const bytes = isNodeJsBuffer(object) ? object : new Uint8Array(object.buffer);
+    for (let i = 0; i < size; i++) {
+      rv.push(bytes[i]);
+    }
   } else if (Array.isArray(object)) {
     // array
 
@@ -195,7 +190,7 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
       // 32
       rv.push(0xdd, size >>> 24, (size >> 16) & 0xff, (size >> 8) & 0xff, size & 0xff);
     } else {
-      throw new Error(`Too large Array: ${size}`);
+      throw new Error(`Too large array: ${size}`);
     }
     for (const item of object) {
       _encode(rv, depth + 1, item, options);
@@ -230,4 +225,8 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
 
 function isObject(object: unknown): object is Record<string, unknown> {
   return typeof object === "object" && object !== null;
+}
+
+function isNodeJsBuffer(object: unknown): object is Buffer {
+  return typeof Buffer !== "undefined" && Buffer.isBuffer(object);
 }

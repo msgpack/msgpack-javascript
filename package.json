@@ -4,25 +4,35 @@
   "description": "MessagePack implementation in JavaScript",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "TS_NODE_FILES=true mocha 'test/**/*.test.ts'"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/msgpack/msgpack-javascript.git"
   },
   "keywords": [
-    "msgpack"
+    "msgpack",
+    "MessagePack",
+    "serialization"
   ],
   "author": "The MessagePack community",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/msgpack/msgpack-javascript/issues"
   },
-  "homepage": "https://github.com/msgpack/msgpack-javascript#readme",
+  "homepage": "https://github.com/msgpack/msgpack-javascript",
   "devDependencies": {
     "@types/mocha": "^5.2.6",
+    "@types/node": "^11.13.8",
+    "ieee754": "^1.1.13",
+    "long": "^4.0.0",
     "mocha": "^6.1.4",
+    "msgpack-lite": "^0.1.26",
+    "msgpack-test-js": "^1.0.0",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "tslib": "^1.9.3"
   }
 }

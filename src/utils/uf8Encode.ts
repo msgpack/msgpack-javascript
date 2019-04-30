@@ -54,4 +54,4 @@ function createNativeUtf8Encode() {
   };
 }
 
-export const utf8Encode: typeof _utf8Encode = USE_NATIVE_TEXT_ENCODER ? createNativeUtf8Encode() : _utf8Encode;
+export const utf8Encode = USE_NATIVE_TEXT_ENCODER ? createNativeUtf8Encode() : _utf8Encode;

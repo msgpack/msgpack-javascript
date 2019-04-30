@@ -1,2 +1,2 @@
 
-export type BufferType = ArrayBuffer | Uint8Array | ArrayLike<number>;
+export type BufferType = ArrayLike<number>;
