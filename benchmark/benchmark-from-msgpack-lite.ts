@@ -1,12 +1,14 @@
 // original: https://raw.githubusercontent.com/kawanet/msgpack-lite/master/lib/benchmark.js
 
+// automatically use the dist version if available
+var msgpack_msgpack = try_require("..") || require("../src");
+
 var msgpack_node = try_require("msgpack");
 var msgpack_lite = try_require("msgpack-lite");
 var msgpack_js = try_require("msgpack-js");
 var msgpack_js_v5 = try_require("msgpack-js-v5");
 var msgpack5 = try_require("msgpack5");
 var msgpack_unpack = try_require("msgpack-unpack");
-var msgpack_msgpack = try_require("../src"); // @mspgack/msgpack
 var notepack = try_require("notepack");
 
 msgpack5 = msgpack5 && msgpack5();

@@ -2,9 +2,21 @@ import assert from "assert";
 import util from "util";
 import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
-import { encode, decode } from "../src";
+import { encode as _encode, decode as _decode } from "../src";
 import { ExtensionCodec, EXT_TIMESTAMP, encodeTimestampFromTimeSpec } from "../src/ExtensionCodec";
 import { BufferType } from "../src/BufferType";
+
+const { encode, decode }: { encode: typeof _encode; decode: typeof _decode } = (() => {
+  if (process.env.TEST_DIST) {
+    console.log("# TEST_DIST is set");
+    return require("..");
+  } else {
+    return {
+      encode: _encode,
+      decode: _decode,
+    };
+  }
+})();
 
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({

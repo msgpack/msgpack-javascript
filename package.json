@@ -2,8 +2,10 @@
   "name": "@msgpack/msgpack",
   "version": "0.9.0",
   "description": "MessagePack implementation in JavaScript",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "prepare": "tsc -p tsconfig.production.json",
+    "prepublishOnly": "TEST_DIST=true npm run test",
     "test": "TS_NODE_FILES=true mocha 'test/**/*.test.ts'",
     "test:cover": "TS_NODE_FILES=true npx nyc mocha 'test/**/*.test.ts'",
     "profile:encode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-encode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
@@ -33,9 +35,12 @@
     "mocha": "^6.1.4",
     "msgpack-lite": "^0.1.26",
     "msgpack-test-js": "^1.0.0",
+    "ts-loader": "^5.4.5",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
   },
-  "dependencies": {
-  }
+  "dependencies": {},
+  "files": [
+    "dist/**/*.*"
+  ]
 }
