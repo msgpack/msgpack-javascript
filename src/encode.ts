@@ -2,10 +2,7 @@ import { utf8Encode } from "./utils/uf8Encode";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { encodeUint32, encodeInt64, encodeInt32, encodeUint64 } from "./utils/int";
 import { isObject, isNodeJsBuffer } from "./utils/is";
-
-export type Writable<T> = {
-  push(...bytes: ReadonlyArray<T>): void;
-};
+import { Writable } from "./utils/Writable";
 
 export type EncodeOptions = Readonly<{
   maxDepth: number;
@@ -57,11 +54,11 @@ export class Encoder {
           } else if (object < 0x100000000) {
             // uint 32
             rv.push(0xce);
-            rv.push(...encodeUint32(object));
+            encodeUint32(rv, object);
           } else {
             // uint 64
             rv.push(0xcf);
-            rv.push(...encodeUint64(object));
+            encodeUint64(rv, object);
           }
         } else {
           if (object >= -0x20) {
@@ -77,11 +74,11 @@ export class Encoder {
           } else if (object >= -0x80000000) {
             // int 32
             rv.push(0xd2);
-            rv.push(...encodeInt32(object));
+            encodeInt32(rv, object);
           } else {
             // int 64
             rv.push(0xd3);
-            rv.push(...encodeInt64(object));
+            encodeInt64(rv, object);
           }
         }
       } else if (Number.isFinite(object)) {
@@ -171,7 +168,10 @@ export class Encoder {
           rv.push(0xc8, size >> 8, size & 0xff, typeByte, ...ext.data);
         } else if (size < 0x100000000) {
           // ext 32
-          rv.push(0xc9, ...encodeUint32(size), typeByte, ...ext.data);
+          rv.push(0xc9)
+          encodeUint32(rv, size),
+          rv.push(typeByte);
+          rv.push(...ext.data);
         } else {
           throw new Error(`Too large extension object: ${size}`);
         }

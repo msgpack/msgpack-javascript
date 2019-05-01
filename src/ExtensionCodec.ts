@@ -4,13 +4,13 @@ import { encodeUint32, decodeUint32, encodeInt32, decodeInt32, decodeInt64, enco
 export const EXT_TIMESTAMP = -1;
 
 function isDate(object: unknown): object is Date {
-  return Object.prototype.toString.call(object) === '[object Date]';
+  return Object.prototype.toString.call(object) === "[object Date]";
 }
 
 export type TimeSpec = {
   sec: number;
   nsec: number;
-}
+};
 
 const TIMESTAMP32_MAX_SEC = 0x100000000; // 32-bit signed int
 const TIMESTAMP64_MAX_SEC = 0x400000000; // 34-bit unsigned int
@@ -20,21 +20,26 @@ export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): ReadonlyAr
     // Here sec >= 0 && nsec >= 0
     if (nsec === 0 && sec < TIMESTAMP32_MAX_SEC) {
       // timestamp 32 = { sec32 (unsigned) }
-      return encodeUint32(sec);
+      const rv: Array<number> = [];
+      encodeUint32(rv, sec);
+      return rv;
     } else {
       // timestamp 64 = { nsec30 (unsigned), sec34 (unsigned) }
       const secHigh = sec / 0x100000000;
       const secLow = sec & 0xffffffff;
-      return [
-        // nsec30 + secHigh2
-        ...encodeUint32((nsec << 2) | (secHigh & 0x3)),
-        // secLow32
-        ...encodeUint32(secLow),
-      ];
+      const rv: Array<number> = [];
+      // nsec30 + secHigh2
+      encodeUint32(rv, (nsec << 2) | (secHigh & 0x3));
+      // secLow32
+      encodeUint32(rv, secLow);
+      return rv;
     }
   } else {
     // timestamp 96 = { nsec32 (signed), sec64 (signed) }
-    return [...encodeInt32(nsec), ...encodeInt64(sec)];
+    const rv: Array<number> = [];
+    encodeInt32(rv, nsec);
+    encodeInt64(rv, sec);
+    return rv;
   }
 }
 

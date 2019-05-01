@@ -1,5 +1,7 @@
-export function encodeUint32(value: number): [number, number, number, number] {
-  return [(value >>> 24) & 0xff, (value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff];
+import { Writable } from "./Writable";
+
+export function encodeUint32<T extends Writable<number>>(rv: T, value: number): void {
+  rv.push((value >>> 24) & 0xff, (value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff);
 }
 
 export function decodeUint32(b1: number, b2: number, b3: number, b4: number) {
@@ -15,12 +17,12 @@ export function decodeInt32(b1: number, b2: number, b3: number, b4: number): num
 }
 
 // the actual range is int52 (a.k.a. safe integer)
-export function encodeInt64(value: number): [number, number, number, number, number, number, number, number] {
+export function encodeInt64<T extends Writable<number>>(rv: T, value: number): void {
   if (value < 0) {
     const absMinusOne = -value - 1;
     const high = absMinusOne / 0x100000000;
     const low = absMinusOne & 0xffffffff;
-    return [
+    rv.push(
       (((high >> 24) & 0xff) ^ 0xff) | 0x80,
       ((high >> 16) & 0xff) ^ 0xff,
       ((high >> 8) & 0xff) ^ 0xff,
@@ -29,11 +31,11 @@ export function encodeInt64(value: number): [number, number, number, number, num
       ((low >> 16) & 0xff) ^ 0xff,
       ((low >> 8) & 0xff) ^ 0xff,
       (low & 0xff) ^ 0xff,
-    ];
+    );
   } else {
     const high = value / 0x100000000;
     const low = value & 0xffffffff;
-    return [
+    rv.push(
       (high >> 24) & 0xff,
       (high >> 16) & 0xff,
       (high >> 8) & 0xff,
@@ -42,7 +44,7 @@ export function encodeInt64(value: number): [number, number, number, number, num
       (low >> 16) & 0xff,
       (low >> 8) & 0xff,
       low & 0xff,
-    ];
+    );
   }
 }
 
@@ -82,11 +84,11 @@ export function decodeInt64(
   );
 }
 
-export function encodeUint64(value: number): [number, number, number, number, number, number, number, number] {
+export function encodeUint64<T extends Writable<number>>(rv: T, value: number): void {
   const high = value / 0x100000000;
   const low = value & 0xffffffff;
 
-  return [
+  rv.push(
     (high >> 24) & 0xff,
     (high >> 16) & 0xff,
     (high >> 8) & 0xff,
@@ -95,5 +97,5 @@ export function encodeUint64(value: number): [number, number, number, number, nu
     (low >> 16) & 0xff,
     (low >> 8) & 0xff,
     low & 0xff,
-  ];
+  );
 }
