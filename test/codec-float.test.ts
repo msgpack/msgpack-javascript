@@ -1,7 +1,6 @@
 import * as ieee754 from "ieee754";
 import assert from "assert";
 import { decode } from "../src";
-//const { decode } = require("msgpack-lite");
 
 const FLOAT32_TYPE = 0xca;
 const FLOAT64_TYPE = 0xcb;

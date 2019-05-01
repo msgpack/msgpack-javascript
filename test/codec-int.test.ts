@@ -1,6 +1,5 @@
 import assert from "assert";
 import { encodeInt64, decodeInt64, encodeInt32, decodeInt32 } from '../src/utils/int';
-//const { decode } = require("msgpack-lite");
 
 const INT32SPECS = {
   ZERO: 0,

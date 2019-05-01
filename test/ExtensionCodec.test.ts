@@ -1,7 +1,6 @@
 import assert from "assert";
 import util from "util";
 import { ExtensionCodec, EXT_TIMESTAMP } from "../src/ExtensionCodec";
-import { encodeUint32 } from '../src/utils/int';
 
 describe("ExtensionCodec", () => {
 
