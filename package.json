@@ -4,7 +4,8 @@
   "description": "MessagePack implementation in JavaScript",
   "main": "index.js",
   "scripts": {
-    "test": "TS_NODE_FILES=true mocha 'test/**/*.test.ts'"
+    "test": "TS_NODE_FILES=true mocha 'test/**/*.test.ts'",
+    "test:cover": "TS_NODE_FILES=true npx nyc mocha 'test/**/*.test.ts'"
   },
   "repository": {
     "type": "git",
