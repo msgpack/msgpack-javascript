@@ -1,18 +1,30 @@
 import { prettyByte } from "./utils/prettyByte";
+import { ExtensionCodecType, ExtensionCodec } from './ExtensionCodec';
+import { decodeUint32, decodeInt64 } from './utils/int';
 
 export type InputBufferType = ReadonlyArray<number> | Uint8Array;
 
-export function decode(blob: InputBufferType): unknown {
-  const context = new DecodeContext(blob);
+export type DecodeOptions = Readonly<{
+  extensionCodec: ExtensionCodecType;
+}>;
+
+const DefaultOptions: DecodeOptions = {
+  extensionCodec: ExtensionCodec.defaultCodec,
+}
+
+export function decode(blob: InputBufferType, options: DecodeOptions = DefaultOptions): unknown {
+  const context = new DecodeContext(blob, options);
   return context.decode();
 }
 
 class DecodeContext {
   readonly buffer: InputBufferType;
+  readonly extensionCodec: ExtensionCodecType;
   pos = 0;
 
-  constructor(buffer: InputBufferType) {
+  constructor(buffer: InputBufferType, { extensionCodec }: DecodeOptions) {
     this.buffer = buffer;
+    this.extensionCodec = extensionCodec;
   }
 
   decode() {
@@ -61,6 +73,18 @@ class DecodeContext {
       // bin 32
       const size = this.next32();
       return this.decodeBinary(size);
+    } else if (type === 0xc7) {
+      // ext 8
+      const size = this.next8();
+      return this.decodeExtension(size);
+    } else if (type === 0xc8) {
+      // ext 16
+      const size = this.next16();
+      return this.decodeExtension(size);
+    } else if (type === 0xc9) {
+      // ext 32
+      const size = this.next32();
+      return this.decodeExtension(size);
     } else if (type === 0xca) {
       // float 32
       return this.decodeFloat(23, 4);
@@ -102,30 +126,22 @@ class DecodeContext {
       const b7 = this.next8();
       const b8 = this.next8();
 
-      if (b1 & 0x80) {
-        // to avoid overflow
-        return -(
-          (b1 ^ 0xff) * 0x100000000000000 +
-          (b2 ^ 0xff) * 0x1000000000000 +
-          (b3 ^ 0xff) * 0x10000000000 +
-          (b4 ^ 0xff) * 0x100000000 +
-          (b5 ^ 0xff) * 0x1000000 +
-          (b6 ^ 0xff) * 0x10000 +
-          (b7 ^ 0xff) * 0x100 +
-          (b8 ^ 0xff) +
-          1
-        );
-      }
-      return (
-        b1 * 0x100000000000000 +
-        b2 * 0x1000000000000 +
-        b3 * 0x10000000000 +
-        b4 * 0x100000000 +
-        b5 * 0x1000000 +
-        b6 * 0x10000 +
-        b7 * 0x100 +
-        b8
-      );
+      return decodeInt64(b1, b2, b3, b4, b5, b6, b7, b8);
+    } else if (type === 0xd4) {
+      // fixext 1
+      return this.decodeExtension(1);
+    } else if (type === 0xd5) {
+      // fixext 2
+      return this.decodeExtension(2);
+    } else if (type === 0xd6) {
+      // fixext 4
+      return this.decodeExtension(4);
+    } else if (type === 0xd7) {
+      // fixext 8
+      return this.decodeExtension(8);
+    } else if (type === 0xd8) {
+      // fixext 16
+      return this.decodeExtension(16);
     } else if (type === 0xd9) {
       // str 8
       const length = this.next8();
@@ -154,6 +170,10 @@ class DecodeContext {
       // map 32
       const size = this.next32();
       return this.decodeMap(size);
+    } else if (type === 0xc7) {
+      // ext 8
+    } else {
+      throw new Error(`Unrecognized first byte: ${prettyByte(type)}`);
     }
   }
 
@@ -264,6 +284,16 @@ class DecodeContext {
     return result;
   }
 
+  decodeExtension(size: number) {
+    const byte = this.next8();
+    const extType = byte < 0x80 ? byte : byte - 0x100;
+    const data = new Array<number>(size);
+    for (let i = 0; i < size; i++) {
+      data[i] = this.next8();
+    }
+    return this.extensionCodec.decode(extType, data);
+  }
+
   next8(): number {
     return this.buffer[this.pos++];
   }
@@ -279,7 +309,7 @@ class DecodeContext {
     const b2 = this.next8();
     const b3 = this.next8();
     const b4 = this.next8();
-    return b1 * 0x1000000 + (b2 << 16) + (b3 << 8) + b4;
+    return decodeUint32(b1, b2, b3, b4);
   }
 
   next64(): number {

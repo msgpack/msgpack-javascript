@@ -28,7 +28,7 @@ const SPECS = {
   MIN_VALUE: Number.MIN_VALUE,
 } as Record<string, number>;
 
-describe("decode: float", () => {
+describe("codec: float 32/64", () => {
   context("float 32", () => {
     for (const name of Object.keys(SPECS)) {
       const value = SPECS[name];

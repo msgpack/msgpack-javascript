@@ -1,4 +1,6 @@
 import { utf8Encode } from "./utils/uf8Encode";
+import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
+import { encodeUint32, encodeInt64, encodeInt32, encodeUint64 } from "./utils/int";
 
 type Writable<T> = {
   push(...items: ReadonlyArray<T>): number;
@@ -8,11 +10,12 @@ type EncodeOptions = Readonly<{
   output?: Array<number>;
   maxDepth?: number;
 
-  // TODO: to handle extension types
+  extensionCodec: ExtensionCodecType;
 }>;
 
 const DefaultOptions = {
   maxDepth: 100,
+  extensionCodec: ExtensionCodec.defaultCodec,
 };
 
 export function encode(value: unknown, options: EncodeOptions = DefaultOptions): Array<number> {
@@ -49,22 +52,12 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
           rv.push(0xcd, object >> 8, object & 0xff);
         } else if (object < 0x100000000) {
           // uint 32
-          rv.push(0xce, object >>> 24, (object >> 16) & 0xff, (object >> 8) & 0xff, object & 0xff);
+          rv.push(0xce);
+          rv.push(...encodeUint32(object));
         } else {
-          // uint64
-          const high = object / 0x100000000;
-          const low = object & 0xffffffff;
-          rv.push(
-            0xcf,
-            (high >> 24) & 0xff,
-            (high >> 16) & 0xff,
-            (high >> 8) & 0xff,
-            high & 0xff,
-            (low >> 24) & 0xff,
-            (low >> 16) & 0xff,
-            (low >> 8) & 0xff,
-            low & 0xff,
-          );
+          // uint 64
+          rv.push(0xcf);
+          rv.push(...encodeUint64(object));
         }
       } else {
         if (object >= -0x20) {
@@ -79,23 +72,12 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
           rv.push(0xd1, object >> 8, object & 0xff);
         } else if (object >= -0x80000000) {
           // int 32
-          object += 0x100000000;
-          rv.push(0xd2, object >>> 24, (object >> 16) & 0xff, (object >> 8) & 0xff, object & 0xff);
+          rv.push(0xd2);
+          rv.push(...encodeInt32(object));
         } else {
           // int 64
-          const high = object / 0x100000000;
-          const low = object & 0xffffffff;
-          rv.push(
-            0xd3,
-            (high >> 24) & 0xff,
-            (high >> 16) & 0xff,
-            (high >> 8) & 0xff,
-            high & 0xff,
-            (low >> 24) & 0xff,
-            (low >> 16) & 0xff,
-            (low >> 8) & 0xff,
-            low & 0xff,
-          );
+          rv.push(0xd3);
+          rv.push(...encodeInt64(object));
         }
       }
     } else if (Number.isFinite(object)) {
@@ -156,70 +138,102 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
     }
 
     rv.push(...bytes);
-  } else if (ArrayBuffer.isView(object)) {
-    // bin
-    const size = object.byteLength;
-    if (size < 0x100) {
-      // bin 8
-      rv.push(0xc4, size);
-    } else if (size < 0x10000) {
-      // bin 16
-      rv.push(0xc5, size >> 8, size & 0xff);
-    } else if (size < 0x100000000) {
-      // bin 32
-      rv.push(0xc6, size >>> 24, (size >> 16) & 0xff, (size >> 8) & 0xff, size & 0xff);
-    } else {
-      throw new Error(`Too large binary: ${size}`);
-    }
-
-    const bytes = isNodeJsBuffer(object) ? object : new Uint8Array(object.buffer);
-    for (let i = 0; i < size; i++) {
-      rv.push(bytes[i]);
-    }
-  } else if (Array.isArray(object)) {
-    // array
-
-    const size = object.length;
-    if (size < 16) {
-      // fixarray
-      rv.push(0x90 + size);
-    } else if (size < 0x10000) {
-      // array 16
-      rv.push(0xdc, size >> 8, size & 0xff);
-    } else if (size < 0x100000000) {
-      // 32
-      rv.push(0xdd, size >>> 24, (size >> 16) & 0xff, (size >> 8) & 0xff, size & 0xff);
-    } else {
-      throw new Error(`Too large array: ${size}`);
-    }
-    for (const item of object) {
-      _encode(rv, depth + 1, item, options);
-    }
-  } else if (isObject(object)) {
-    // FIXME: extensions
-
-    const keys = Object.keys(object);
-    const size = keys.length;
-
-    // map
-    if (size < 16) {
-      // fixmap
-      rv.push(0x80 + size);
-    } else if (size < 0x10000) {
-      // map 16
-      rv.push(0xde, size >> 8, size & 0xff);
-    } else if (size < 0x100000000) {
-      // map 32
-      rv.push(0xdf, size >>> 24, (size >> 16) & 0xff, (size >> 8) & 0xff, size & 0xff);
-    }
-
-    for (const key of keys) {
-      _encode(rv, depth + 1, key, options);
-      _encode(rv, depth + 1, object[key], options);
-    }
   } else {
-    // symbol, function, etc.
-    throw new Error(`Unknown object: ${Object.prototype.toString.apply(object)}`);
+    // try to encode objects with custom codec
+    const ext = options.extensionCodec.tryToEncode(object);
+    if (ext != null) {
+      const size = ext.data.length;
+      const typeByte = ext.type < 0 ? ext.type + 0x100 : ext.type;
+      if (size === 1) {
+        // fixext 1
+        rv.push(0xd4, typeByte, ...ext.data);
+      } else if (size === 2) {
+        // fixext 2
+        rv.push(0xd5, typeByte, ...ext.data);
+      } else if (size === 4) {
+        // fixext 4
+        rv.push(0xd6, typeByte, ...ext.data);
+      } else if (size === 8) {
+        // fixext 8
+        rv.push(0xd7, typeByte, ...ext.data);
+      } else if (size === 16) {
+        // fixext 16
+        rv.push(0xd8, typeByte, ...ext.data);
+      } else if (size < 0x100) {
+        // ext 8
+        rv.push(0xc7, size, typeByte, ...ext.data);
+      } else if (size < 0x10000) {
+        // ext 16
+        rv.push(0xc8, size >> 8, size & 0xff, typeByte, ...ext.data);
+      } else if (size < 0x100000000) {
+        // ext 32
+        rv.push(0xc9, ...encodeUint32(size), typeByte, ...ext.data);
+      } else {
+        throw new Error(`Too large extension object: ${size}`);
+      }
+    } else if (ArrayBuffer.isView(object)) {
+      // bin
+      const size = object.byteLength;
+      if (size < 0x100) {
+        // bin 8
+        rv.push(0xc4, size);
+      } else if (size < 0x10000) {
+        // bin 16
+        rv.push(0xc5, size >> 8, size & 0xff);
+      } else if (size < 0x100000000) {
+        // bin 32
+        rv.push(0xc6, size >>> 24, (size >> 16) & 0xff, (size >> 8) & 0xff, size & 0xff);
+      } else {
+        throw new Error(`Too large binary: ${size}`);
+      }
+
+      const bytes = isNodeJsBuffer(object) ? object : new Uint8Array(object.buffer);
+      for (let i = 0; i < size; i++) {
+        rv.push(bytes[i]);
+      }
+    } else if (Array.isArray(object)) {
+      // array
+
+      const size = object.length;
+      if (size < 16) {
+        // fixarray
+        rv.push(0x90 + size);
+      } else if (size < 0x10000) {
+        // array 16
+        rv.push(0xdc, size >> 8, size & 0xff);
+      } else if (size < 0x100000000) {
+        // array 32
+        rv.push(0xdd, size >>> 24, (size >> 16) & 0xff, (size >> 8) & 0xff, size & 0xff);
+      } else {
+        throw new Error(`Too large array: ${size}`);
+      }
+      for (const item of object) {
+        _encode(rv, depth + 1, item, options);
+      }
+    } else if (isObject(object)) {
+      const keys = Object.keys(object);
+      const size = keys.length;
+
+      // map
+      if (size < 16) {
+        // fixmap
+        rv.push(0x80 + size);
+      } else if (size < 0x10000) {
+        // map 16
+        rv.push(0xde, size >> 8, size & 0xff);
+      } else if (size < 0x100000000) {
+        // map 32
+        rv.push(0xdf, size >>> 24, (size >> 16) & 0xff, (size >> 8) & 0xff, size & 0xff);
+      }
+
+      for (const key of keys) {
+        _encode(rv, depth + 1, key, options);
+        _encode(rv, depth + 1, object[key], options);
+      }
+    } else {
+      // symbol, function, etc.
+      throw new Error(`Unknown object: ${Object.prototype.toString.apply(object)}`);
+    }
   }
 }
 
