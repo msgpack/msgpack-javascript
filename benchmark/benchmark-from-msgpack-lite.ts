@@ -27,11 +27,12 @@ var limit = 5;
 if (argv[0] - 0) limit = argv.shift() - 0;
 limit *= 1000;
 
-var COL1 = 70;
-var COL2 = 6;
+var COL1 = 65;
+var COL2 = 7;
 var COL3 = 5;
-var COL4 = 6;
+var COL4 = 7;
 
+console.log(`Benchmark on NodeJS/${process.version}\n`)
 console.log(rpad("operation", COL1), "|", "  op  ", "|", "  ms ", "|", " op/s ");
 console.log(rpad("", COL1, "-"), "|", lpad(":", COL2, "-"), "|", lpad(":", COL3, "-"), "|", lpad(":", COL4, "-"));
 

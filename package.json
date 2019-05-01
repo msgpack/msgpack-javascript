@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "TS_NODE_FILES=true mocha 'test/**/*.test.ts'",
-    "test:cover": "TS_NODE_FILES=true npx nyc mocha 'test/**/*.test.ts'"
+    "test:cover": "TS_NODE_FILES=true npx nyc mocha 'test/**/*.test.ts'",
+    "benchmark": "npx ts-node benchmark/benchmark-from-msgpack-lite.ts"
   },
   "repository": {
     "type": "git",
