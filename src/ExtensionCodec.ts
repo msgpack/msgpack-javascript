@@ -41,11 +41,6 @@ export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): ReadonlyAr
 export const encodeTimestampExtension: ExtensionEncoderType = (object: unknown) => {
   if (isDate(object)) {
     const time = object.getTime();
-    if (typeof time !== "number") {
-      console.warn(`Invalid type of getTime(): ${time} (${typeof time})`);
-      return null;
-    }
-    // Like Math.floor() but trims decmals even for negative numbers
     const sec = time < 0 ? Math.ceil(time / 1000) : Math.floor(time / 1000);
     const nsec = (time - sec * 1000) * 1e6;
     return encodeTimestampFromTimeSpec({ sec, nsec });

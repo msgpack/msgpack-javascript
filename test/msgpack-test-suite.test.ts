@@ -3,7 +3,7 @@ import util from "util";
 import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
 import { encode, decode } from "../src";
-import { ExtensionCodec, EXT_TIMESTAMP, encodeTimestampExtension, encodeTimestampFromTimeSpec } from "../src/ExtensionCodec";
+import { ExtensionCodec, EXT_TIMESTAMP, encodeTimestampFromTimeSpec } from "../src/ExtensionCodec";
 import { BufferType } from "../src/BufferType";
 
 const extensionCodec = new ExtensionCodec();
@@ -72,5 +72,37 @@ describe("msgpack-test-suite", () => {
         }
       });
     });
+  });
+
+  context("specs not covered by msgpack-test-js", () => {
+    // by detecting test coverage
+    const SPECS = {
+      FLOAT64_POSITIVE_INF: Number.POSITIVE_INFINITY,
+      FLOAT64_NEGATIVE_INF: Number.NEGATIVE_INFINITY,
+      FLOAT64_NaN: Number.NaN,
+      STR16: "x".repeat(0x100),
+      STR32: "x".repeat(0x10000),
+      BIN16: new Uint8Array(0x100).fill(0xff),
+      BIN32: new Uint8Array(0x10000).fill(0xff),
+      ARRAY16: new Array<boolean>(0x100).fill(true),
+      ARRAY32: new Array<boolean>(0x10000).fill(true),
+      MAP16: new Array<null>(0x100).fill(null).reduce<Record<string, number>>((acc, _val, i) => {
+        acc[`k${i}`] = i;
+        return acc;
+      }, {}),
+      MAP32: new Array<null>(0x10000).fill(null).reduce<Record<string, number>>((acc, _val, i) => {
+        acc[`k${i}`] = i;
+        return acc;
+      }, {}),
+    } as Record<string, any>;
+
+    for (const name of Object.keys(SPECS)) {
+      const value = SPECS[name];
+
+      it(`encodes and decodes ${name}`, () => {
+        const encoded = encode(value);
+        assert.deepStrictEqual(decode(new Uint8Array(encoded)), value);
+      });
+    }
   });
 });

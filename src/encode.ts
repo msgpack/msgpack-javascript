@@ -27,7 +27,7 @@ export function encode(value: unknown, options: EncodeOptions = DefaultOptions):
 }
 function _encode(rv: Writable<number>, depth: number, object: unknown, options: EncodeOptions) {
   if (depth > options.maxDepth!) {
-    throw new Error("Too deep object!");
+    throw new Error(`Too deep objects in depth ${depth}`);
   }
 
   if (object == null) {
@@ -231,8 +231,10 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
         _encode(rv, depth + 1, object[key], options);
       }
     } else {
-      // symbol, function, etc.
-      throw new Error(`Unknown object: ${Object.prototype.toString.apply(object)}`);
+      // not encodable unless ExtensionCodec handles it,
+      // for example Symbol, Function, and so on.
+      // Note that some objects, for example Symbol, throws errors by its own toString() method
+      throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
     }
   }
 }

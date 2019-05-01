@@ -173,7 +173,7 @@ class DecodeContext {
     } else if (type === 0xc7) {
       // ext 8
     } else {
-      throw new Error(`Unrecognized first byte: ${prettyByte(type)}`);
+      throw new Error(`Unrecognized type byte: ${prettyByte(type)}`);
     }
   }
 
