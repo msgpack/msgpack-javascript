@@ -1,7 +1,7 @@
 {
   "include": ["src/**/*.ts"],
   "extension": [".ts"],
-  "reporter": ["text", "html"],
+  "reporter": ["text-summary", "html"],
   "sourceMap": true,
   "instrument": true
 }
