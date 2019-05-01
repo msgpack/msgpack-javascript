@@ -7,28 +7,28 @@ type Writable<T> = {
 };
 
 type EncodeOptions = Readonly<{
-  output?: Array<number>;
-  maxDepth?: number;
-
+  output: Array<number>;
+  maxDepth: number;
   extensionCodec: ExtensionCodecType;
 }>;
 
-const DefaultOptions = {
-  maxDepth: 100,
-  extensionCodec: ExtensionCodec.defaultCodec,
-};
+const DEFAULT_MAX_DEPTH = 100;
 
-export function encode(value: unknown, options: EncodeOptions = DefaultOptions): Array<number> {
-  const result = options.output || [];
+export function encode(value: unknown, options: Partial<EncodeOptions> = {}): Array<number> {
+  const output = options.output || [];
+  const maxDepth = options.maxDepth || DEFAULT_MAX_DEPTH;
+  const extensionCodec = options.extensionCodec || ExtensionCodec.defaultCodec;
 
-  _encode(result, 1, value, options);
+  _encode(value, 1, { output, maxDepth, extensionCodec, });
 
-  return result;
+  return output;
 }
-function _encode(rv: Writable<number>, depth: number, object: unknown, options: EncodeOptions) {
+function _encode(object: unknown, depth: number, options: EncodeOptions) {
   if (depth > options.maxDepth!) {
     throw new Error(`Too deep objects in depth ${depth}`);
   }
+
+  const rv: Writable<number> = options.output;
 
   if (object == null) {
     rv.push(0xc0);
@@ -208,7 +208,7 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
         throw new Error(`Too large array: ${size}`);
       }
       for (const item of object) {
-        _encode(rv, depth + 1, item, options);
+        _encode(item, depth + 1, options);
       }
     } else if (isObject(object)) {
       const keys = Object.keys(object);
@@ -227,8 +227,8 @@ function _encode(rv: Writable<number>, depth: number, object: unknown, options: 
       }
 
       for (const key of keys) {
-        _encode(rv, depth + 1, key, options);
-        _encode(rv, depth + 1, object[key], options);
+        _encode(key, depth + 1, options);
+        _encode(object[key], depth + 1, options);
       }
     } else {
       // not encodable unless ExtensionCodec handles it,
