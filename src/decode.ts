@@ -1,6 +1,6 @@
 import { prettyByte } from "./utils/prettyByte";
-import { ExtensionCodecType, ExtensionCodec } from './ExtensionCodec';
-import { decodeUint32, decodeInt64 } from './utils/int';
+import { ExtensionCodecType, ExtensionCodec } from "./ExtensionCodec";
+import { decodeUint32, decodeInt64 } from "./utils/int";
 
 export type InputBufferType = ReadonlyArray<number> | Uint8Array;
 
@@ -8,24 +8,15 @@ export type DecodeOptions = Readonly<{
   extensionCodec: ExtensionCodecType;
 }>;
 
-const DefaultOptions: DecodeOptions = {
-  extensionCodec: ExtensionCodec.defaultCodec,
-}
-
-export function decode(blob: InputBufferType, options: DecodeOptions = DefaultOptions): unknown {
-  const context = new DecodeContext(blob, options);
+export function decode(blob: InputBufferType, options: Partial<DecodeOptions> = {}): unknown {
+  const context = new Decoder(blob, options.extensionCodec || ExtensionCodec.defaultCodec);
   return context.decode();
 }
 
-class DecodeContext {
-  readonly buffer: InputBufferType;
-  readonly extensionCodec: ExtensionCodecType;
+export class Decoder {
   pos = 0;
 
-  constructor(buffer: InputBufferType, { extensionCodec }: DecodeOptions) {
-    this.buffer = buffer;
-    this.extensionCodec = extensionCodec;
-  }
+  constructor(readonly buffer: InputBufferType, readonly extensionCodec: ExtensionCodecType) {}
 
   decode() {
     const type = this.next8();
