@@ -16,7 +16,7 @@ const TIMESTAMP32_MAX_SEC = 0x100000000; // 32-bit signed int
 const TIMESTAMP64_MAX_SEC = 0x400000000; // 34-bit unsigned int
 
 export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): ReadonlyArray<number> {
-  if (sec >= 0 && sec < TIMESTAMP64_MAX_SEC) {
+  if (sec >= 0 && nsec >= 0 && sec < TIMESTAMP64_MAX_SEC) {
     // Here sec >= 0 && nsec >= 0
     if (nsec === 0 && sec < TIMESTAMP32_MAX_SEC) {
       // timestamp 32 = { sec32 (unsigned) }
@@ -28,7 +28,7 @@ export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): ReadonlyAr
       const secHigh = sec / 0x100000000;
       const secLow = sec & 0xffffffff;
       const rv: Array<number> = [];
-      // nsec30 + secHigh2
+      // nsec30 | secHigh2
       encodeUint32(rv, (nsec << 2) | (secHigh & 0x3));
       // secLow32
       encodeUint32(rv, secLow);
@@ -67,7 +67,7 @@ export const decodeTimestampExtension: ExtensionDecoderType = (data: BufferType)
       // timestamp 64 = { nsec30, sec34 }
       const nsec30AndSecHigh2 = decodeUint32(data[0], data[1], data[2], data[3]);
       const secLow32 = decodeUint32(data[4], data[5], data[6], data[7]);
-      const nsec = nsec30AndSecHigh2 >> 2;
+      const nsec = nsec30AndSecHigh2 >>> 2;
       const sec = (nsec30AndSecHigh2 & 0x3) * 0x100000000 + secLow32;
       return new Date(sec * 1000 + nsec / 1e6);
     }
@@ -86,18 +86,38 @@ export const decodeTimestampExtension: ExtensionDecoderType = (data: BufferType)
 // extensionType is signed 8-bit integer
 export type ExtensionDecoderType = (data: BufferType, extensionType: number) => any;
 
-export type ExtensionEncoderType = (input: unknown) => ReadonlyArray<number> | null;
+export type ExtensionEncoderType = (input: unknown) => BufferType | null;
 
 // immutable interfce to ExtensionCodec
 export type ExtensionCodecType = {
-  tryToEncode(object: unknown): { type: number; data: ReadonlyArray<number> } | null;
+  tryToEncode(object: unknown): ExtDataType | null;
   decode(data: BufferType, extType: number): any;
+};
+
+const $Extension = Symbol("MessagePack.extension");
+
+export type ExtDataType = {
+  [$Extension]: true;
+  type: number;
+  data: BufferType;
 };
 
 export class ExtensionCodec implements ExtensionCodecType {
   public static readonly defaultCodec: ExtensionCodecType = new ExtensionCodec();
 
-  public static readonly Extension = Symbol("MessagePack.extension");
+  public static readonly Extension = $Extension;
+
+  public static createExtData(type: number, data: BufferType): ExtDataType {
+    return {
+      [$Extension]: true,
+      type,
+      data,
+    };
+  }
+
+  public static isExtData(object: any): object is ExtDataType {
+    return object != null && !!object[ExtensionCodec.Extension];
+  }
 
   // built-in extensions
   private readonly builtInEncoders: Array<ExtensionEncoderType> = [];
@@ -136,7 +156,7 @@ export class ExtensionCodec implements ExtensionCodecType {
     }
   }
 
-  public tryToEncode(object: unknown): { type: number; data: ReadonlyArray<number> } | null {
+  public tryToEncode(object: unknown): ExtDataType | null {
     // built-in extensions
     for (let i = 0; i < this.builtInEncoders.length; i++) {
       const encoder = this.builtInEncoders[i];
@@ -144,10 +164,7 @@ export class ExtensionCodec implements ExtensionCodecType {
         const data = encoder(object);
         if (data != null) {
           const type = -1 - i;
-          return {
-            type,
-            data,
-          };
+          return ExtensionCodec.createExtData(type, data);
         }
       }
     }
@@ -159,26 +176,25 @@ export class ExtensionCodec implements ExtensionCodecType {
         const data = encoder(object);
         if (data != null) {
           const type = i;
-          return {
-            type,
-            data,
-          };
+          return ExtensionCodec.createExtData(type, data);
         }
       }
+    }
+
+    if (ExtensionCodec.isExtData(object)) {
+      // to keep ExtData as is
+      return object;
     }
     return null;
   }
 
-  public decode(data: BufferType, type: number): any {
+  public decode(data: BufferType, type: number): unknown {
     const decoder = type < 0 ? this.builtInDecoders[-1 - type] : this.decoders[type];
     if (decoder) {
       return decoder(data, type);
     } else {
-      return {
-        [ExtensionCodec.Extension]: true,
-        type,
-        data,
-      };
+      // decode() does not fail, returns ExtData instead.
+      return ExtensionCodec.createExtData(type, Array.from(data));
     }
   }
 }

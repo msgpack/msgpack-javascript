@@ -1,5 +1,5 @@
 import { utf8Encode } from "./utils/uf8Encode";
-import { ExtensionCodecType } from "./ExtensionCodec";
+import { ExtensionCodecType, ExtDataType } from "./ExtensionCodec";
 import { encodeUint32, encodeInt64, encodeInt32, encodeUint64 } from "./utils/int";
 import { isNodeJsBuffer } from "./utils/is";
 import { Writable } from "./Writable";
@@ -112,10 +112,12 @@ export class Encoder<OutputType extends Writable<number>> {
       }
     }
   }
+
   encodeBigInt(_rv: OutputType, _object: bigint) {
     // BigInt literals is not available here!
     throw new Error("BigInt is not yet implemented!");
   }
+
   encodeString(rv: OutputType, object: string) {
     const bytes = utf8Encode(object);
     const size = bytes.length;
@@ -137,6 +139,7 @@ export class Encoder<OutputType extends Writable<number>> {
     }
     rv.push(...bytes);
   }
+
   encodeObject(rv: OutputType, object: object | null, depth: number) {
     if (object === null) {
       this.encodeNil(rv);
@@ -154,6 +157,7 @@ export class Encoder<OutputType extends Writable<number>> {
       this.encodeMap(rv, object as Record<string, unknown>, depth);
     }
   }
+
   encodeBinary(rv: OutputType, object: ArrayBufferView) {
     const size = object.byteLength;
     if (size < 0x100) {
@@ -174,6 +178,7 @@ export class Encoder<OutputType extends Writable<number>> {
       rv.push(bytes[i]);
     }
   }
+
   encodeArray(rv: OutputType, object: Array<unknown>, depth: number) {
     const size = object.length;
     if (size < 16) {
@@ -193,6 +198,7 @@ export class Encoder<OutputType extends Writable<number>> {
       this.encode(rv, item, depth + 1);
     }
   }
+
   encodeMap(rv: OutputType, object: Record<string, unknown>, depth: number) {
     const keys = Object.keys(object);
     const size = keys.length;
@@ -213,13 +219,8 @@ export class Encoder<OutputType extends Writable<number>> {
       this.encode(rv, object[key], depth + 1);
     }
   }
-  encodeExtension(
-    rv: OutputType,
-    ext: {
-      type: number;
-      data: ReadonlyArray<number>;
-    },
-  ) {
+
+  encodeExtension(rv: OutputType, ext: ExtDataType) {
     const size = ext.data.length;
     const typeByte = ext.type < 0 ? ext.type + 0x100 : ext.type;
     if (size === 1) {
