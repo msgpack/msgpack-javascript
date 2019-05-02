@@ -1,1 +1,1 @@
-export type BufferType = ArrayLike<number> | Uint8Array;
+export type BufferType = ReadonlyArray<number> | Uint8Array;

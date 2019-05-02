@@ -1,4 +1,4 @@
-import { Writable } from "./Writable";
+import { Writable } from "../Writable";
 
 export function encodeUint32<T extends Writable<number>>(rv: T, value: number): void {
   rv.push((value >>> 24) & 0xff, (value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff);
