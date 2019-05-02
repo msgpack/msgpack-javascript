@@ -31,7 +31,7 @@ extensionCodec.register({
       return null;
     }
   },
-  decode: (_type: number, data: BufferType) => {
+  decode: (data: BufferType) => {
     return MsgTimestamp.parse(Buffer.from(data as any));
   },
 });

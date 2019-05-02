@@ -55,7 +55,7 @@ export const encodeTimestampExtension: ExtensionEncoderType = (object: unknown) 
 };
 
 // https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type
-export const decodeTimestampExtension: ExtensionDecoderType = (_type: number, data: BufferType) => {
+export const decodeTimestampExtension: ExtensionDecoderType = (data: BufferType) => {
   // data may be 32, 64, or 96 bits
   switch (data.length) {
     case 4: {
@@ -83,14 +83,15 @@ export const decodeTimestampExtension: ExtensionDecoderType = (_type: number, da
   }
 };
 
-export type ExtensionDecoderType = (type: number, data: BufferType) => any;
+// extensionType is signed 8-bit integer
+export type ExtensionDecoderType = (data: BufferType, extensionType: number) => any;
 
 export type ExtensionEncoderType = (input: unknown) => ReadonlyArray<number> | null;
 
 // immutable interfce to ExtensionCodec
 export type ExtensionCodecType = {
   tryToEncode(object: unknown): { type: number; data: ReadonlyArray<number> } | null;
-  decode(type: number, data: BufferType): any;
+  decode(data: BufferType, extType: number): any;
 };
 
 export class ExtensionCodec implements ExtensionCodecType {
@@ -168,10 +169,10 @@ export class ExtensionCodec implements ExtensionCodecType {
     return null;
   }
 
-  public decode(type: number, data: BufferType): any {
+  public decode(data: BufferType, type: number): any {
     const decoder = type < 0 ? this.builtInDecoders[-1 - type] : this.decoders[type];
     if (decoder) {
-      return decoder(type, data);
+      return decoder(data, type);
     } else {
       return {
         [ExtensionCodec.Extension]: true,
