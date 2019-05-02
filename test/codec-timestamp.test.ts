@@ -13,6 +13,8 @@ const SPECS = {
   TIMESTAMP64: new Date(TIME),
   TIMESTAMP96_SEC_OVER_UINT32: new Date(0x400000000 * 1000),
   TIMESTAMP96_SEC_OVER_UINT32_WITH_NS: new Date(0x400000000 * 1000 + 2),
+
+  ISSUE_WITH_SYNOPSIS: new Date(1556799054803),
 } as Record<string, Date>;
 
 describe("codec: timestamp 32/64/96", () => {
@@ -21,7 +23,7 @@ describe("codec: timestamp 32/64/96", () => {
 
     it(`encodes and decodes ${name} (${value.toISOString()})`, () => {
       const encoded = encode(value);
-      assert.deepStrictEqual(decode(encoded), value, `encoded: ${util.inspect(encoded)}`);
+      assert.deepStrictEqual(decode(encoded), value, `encoded: ${util.inspect(Buffer.from(encoded))}`);
     });
   }
 });

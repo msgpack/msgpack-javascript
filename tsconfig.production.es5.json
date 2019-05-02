@@ -3,6 +3,7 @@
   "compilerOptions": {
     "target": "es5",
     "outDir": "./build/es5",
-    "declaration": false
+    "declaration": false,
+    "downlevelIteration": true
   }
 }

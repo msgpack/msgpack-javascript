@@ -6,6 +6,7 @@ import { BufferType } from "./BufferType";
 export class Decoder {
   pos = 0;
   constructor(readonly buffer: BufferType, readonly extensionCodec: ExtensionCodecType) {}
+
   decode() {
     const type = this.next8();
     if (type >= 0xe0) {
@@ -152,11 +153,13 @@ export class Decoder {
       throw new Error(`Unrecognized type byte: ${prettyByte(type)}`);
     }
   }
+
   decodeBinary(size: number): ArrayLike<number> {
     const start = this.pos;
     this.pos += size;
     return this.buffer.slice(start, start + size);
   }
+
   decodeFloat(mLen: number, nBytes: number): number {
     const eLen = nBytes * 8 - mLen - 1;
     const eMax = (1 << eLen) - 1;
@@ -188,6 +191,7 @@ export class Decoder {
     const value = frac * Math.pow(2, exp - mLen);
     return sign ? -value : value;
   }
+
   decodeUtf8String(length: number): string {
     const out: Array<number> = [];
     const end = this.pos + length;
@@ -226,6 +230,7 @@ export class Decoder {
     }
     return String.fromCharCode(...out);
   }
+
   decodeMap(size: number): Record<string, any> {
     const result: Record<string, any> = {};
     for (let i = 0; i < size; i++) {
@@ -245,6 +250,7 @@ export class Decoder {
     }
     return result;
   }
+
   decodeExtension(size: number) {
     const byte = this.next8();
     const extType = byte < 0x80 ? byte : byte - 0x100;
@@ -254,14 +260,17 @@ export class Decoder {
     }
     return this.extensionCodec.decode(data, extType);
   }
+
   next8(): number {
     return this.buffer[this.pos++];
   }
+
   next16(): number {
     const b1 = this.next8();
     const b2 = this.next8();
     return (b1 << 8) + b2;
   }
+
   next32(): number {
     const b1 = this.next8();
     const b2 = this.next8();
@@ -269,6 +278,7 @@ export class Decoder {
     const b4 = this.next8();
     return decodeUint32(b1, b2, b3, b4);
   }
+
   next64(): number {
     const high = this.next32();
     const low = this.next32();
