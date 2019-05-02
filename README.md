@@ -1,4 +1,4 @@
-# MessagePack for JavaScript [![Build Status](https://travis-ci.org/msgpack/msgpack-javascript.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-javascript)
+# MessagePack for JavaScript [![npm version](https://badge.fury.io/js/%40msgpack%2Fmsgpack.svg)](https://badge.fury.io/js/%40msgpack%2Fmsgpack) [![Build Status](https://travis-ci.org/msgpack/msgpack-javascript.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-javascript)
 
 This is the pure-JavaScript implementation of *MessagePack*, an efficient binary serilization format:
 
@@ -33,9 +33,7 @@ deepStrictEqual(decode(encoded), object);
 
 ## Install
 
-This library is publised as [@msgpack/msgpack](
-https://www.npmjs.com/package/@msgpack/msgpack
-) in npmjs.com.
+This library is publised as [@msgpack/msgpack](https://www.npmjs.com/package/@msgpack/msgpack) in npmjs.com.
 
 ```shell
 npm install @msgpack/msgpack
