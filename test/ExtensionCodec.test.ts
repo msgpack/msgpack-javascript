@@ -9,7 +9,7 @@ describe("ExtensionCodec", () => {
       const date = new Date(1556633024000);
       const encoded = defaultCodec.tryToEncode(date);
       assert.deepStrictEqual(
-        defaultCodec.decode(EXT_TIMESTAMP, encoded!.data),
+        defaultCodec.decode(encoded!.data, EXT_TIMESTAMP),
         date,
         `date: ${date.toISOString()}, encoded: ${util.inspect(encoded)}`,
       );
@@ -19,7 +19,7 @@ describe("ExtensionCodec", () => {
       const date = new Date(1556633024123);
       const encoded = defaultCodec.tryToEncode(date);
       assert.deepStrictEqual(
-        defaultCodec.decode(EXT_TIMESTAMP, encoded!.data),
+        defaultCodec.decode(encoded!.data, EXT_TIMESTAMP),
         date,
         `date: ${date.toISOString()}, encoded: ${util.inspect(encoded)}`,
       );
@@ -29,7 +29,7 @@ describe("ExtensionCodec", () => {
       const date = new Date(0x400000000 * 1000);
       const encoded = defaultCodec.tryToEncode(date);
       assert.deepStrictEqual(
-        defaultCodec.decode(EXT_TIMESTAMP, encoded!.data),
+        defaultCodec.decode(encoded!.data, EXT_TIMESTAMP),
         date,
         `date: ${date.toISOString()}, encoded: ${util.inspect(encoded)}`,
       );

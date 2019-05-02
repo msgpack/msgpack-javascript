@@ -252,7 +252,7 @@ export class Decoder {
     for (let i = 0; i < size; i++) {
       data[i] = this.next8();
     }
-    return this.extensionCodec.decode(extType, data);
+    return this.extensionCodec.decode(data, extType);
   }
   next8(): number {
     return this.buffer[this.pos++];
