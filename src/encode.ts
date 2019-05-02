@@ -1,7 +1,7 @@
 import { utf8Encode } from "./utils/uf8Encode";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { encodeUint32, encodeInt64, encodeInt32, encodeUint64 } from "./utils/int";
-import { isObject, isNodeJsBuffer } from "./utils/is";
+import { isNodeJsBuffer } from "./utils/is";
 import { Writable } from "./utils/Writable";
 
 export type EncodeOptions = Readonly<{
@@ -23,45 +23,44 @@ export function encode(value: unknown, options: Partial<EncodeOptions> = {}): Ar
   return output;
 }
 
-export class Encoder {
+export class Encoder<OutputType extends Writable<number>> {
+  readonly typeofMap = {
+    "undefined": this.encodeNil,
+    "boolean": this.encodeBoolean,
+    "number": this.encodeNumber,
+    "bigint": this.encodeBigInt,
+    "string": this.encodeString,
+    "object": this.encodeObject,
+  } as Record<string, (this: Encoder<OutputType>, rv: OutputType, object: unknown, depth: number) => void>;
+
   constructor(readonly maxDepth: number, readonly extensionCodec: ExtensionCodecType) {}
 
-  encode<OutputType extends Writable<number>>(rv: OutputType, object: unknown, depth: number): void {
+  encode(rv: OutputType, object: unknown, depth: number): void {
     if (depth > this.maxDepth) {
       throw new Error(`Too deep objects in depth ${depth}`);
     }
 
-    if (object == null) {
-      rv.push(0xc0);
-    } else if (object === false) {
+    const encodeFunc = this.typeofMap[typeof object];
+    if (!encodeFunc) {
+      throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
+    }
+
+    encodeFunc.call(this, rv, object, depth);
+  }
+
+  encodeNil(rv: OutputType) {
+    rv.push(0xc0);
+  }
+
+  encodeBoolean(rv: OutputType, object: boolean) {
+    if (object === false) {
       rv.push(0xc2);
-    } else if (object === true) {
-      rv.push(0xc3);
-    } else if (typeof object === "number") {
-      this.encodeNumber(rv, object);
-    } else if (typeof object === "string") {
-      this.encodeString(rv, object);
     } else {
-      // try to encode objects with custom codec first of non-primitives
-      const ext = this.extensionCodec.tryToEncode(object);
-      if (ext != null) {
-        this.encodeExtension(rv, ext);
-      } else if (ArrayBuffer.isView(object)) {
-        this.encodeBinary(rv, object);
-      } else if (Array.isArray(object)) {
-        this.encodeArray(rv, object, depth);
-      } else if (isObject(object)) {
-        this.encodeMap(rv, object, depth);
-      } else {
-        // not encodable unless ExtensionCodec handles it,
-        // for example Symbol, Function, and so on.
-        // Note that some objects, for example Symbol, throws errors by its own toString() method
-        throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
-      }
+      rv.push(0xc3);
     }
   }
 
-  encodeNumber<OutputType extends Writable<number>>(rv: OutputType, object: number) {
+  encodeNumber(rv: OutputType, object: number) {
     if (Number.isSafeInteger(object)) {
       if (object >= 0) {
         if (object < 0x80) {
@@ -133,7 +132,12 @@ export class Encoder {
     }
   }
 
-  encodeString<OutputType extends Writable<number>>(rv: OutputType, object: string) {
+  encodeBigInt(_rv: OutputType, _object: bigint) {
+    // BigInt literals is not available here!
+    throw new Error("BigInt is not yet implemented!");
+  }
+
+  encodeString(rv: OutputType, object: string) {
     const bytes = utf8Encode(object);
     const size = bytes.length;
     if (size < 32) {
@@ -152,10 +156,30 @@ export class Encoder {
     } else {
       throw new Error(`Too long string: ${size} bytes in UTF-8`);
     }
+
     rv.push(...bytes);
   }
 
-  encodeBinary<OutputType extends Writable<number>>(rv: OutputType, object: ArrayBufferView) {
+  encodeObject(rv: OutputType, object: object | null, depth: number) {
+    if (object === null) {
+      this.encodeNil(rv);
+      return;
+    }
+
+    // try to encode objects with custom codec first of non-primitives
+    const ext = this.extensionCodec.tryToEncode(object);
+    if (ext != null) {
+      this.encodeExtension(rv, ext);
+    } else if (ArrayBuffer.isView(object)) {
+      this.encodeBinary(rv, object);
+    } else if (Array.isArray(object)) {
+      this.encodeArray(rv, object, depth);
+    } else {
+      this.encodeMap(rv, object as Record<string, unknown>, depth);
+    }
+  }
+
+  encodeBinary(rv: OutputType, object: ArrayBufferView) {
     const size = object.byteLength;
     if (size < 0x100) {
       // bin 8
@@ -176,7 +200,7 @@ export class Encoder {
     }
   }
 
-  encodeArray<OutputType extends Writable<number>>(rv: OutputType, object: Array<unknown>, depth: number) {
+  encodeArray(rv: OutputType, object: Array<unknown>, depth: number) {
     const size = object.length;
     if (size < 16) {
       // fixarray
@@ -196,7 +220,7 @@ export class Encoder {
     }
   }
 
-  encodeMap<OutputType extends Writable<number>>(rv: OutputType, object: Record<string, unknown>, depth: number) {
+  encodeMap(rv: OutputType, object: Record<string, unknown>, depth: number) {
     const keys = Object.keys(object);
     const size = keys.length;
     // map
@@ -217,10 +241,7 @@ export class Encoder {
     }
   }
 
-  encodeExtension<OutputType extends Writable<number>>(
-    rv: OutputType,
-    ext: { type: number; data: ReadonlyArray<number> },
-  ) {
+  encodeExtension(rv: OutputType, ext: { type: number; data: ReadonlyArray<number> }) {
     const size = ext.data.length;
     const typeByte = ext.type < 0 ? ext.type + 0x100 : ext.type;
     if (size === 1) {
