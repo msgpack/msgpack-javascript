@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.production.es2019.json",
+  "compilerOptions": {
+    "target": "es5",
+    "outDir": "./build/es5",
+    "declaration": false
+  }
+}
