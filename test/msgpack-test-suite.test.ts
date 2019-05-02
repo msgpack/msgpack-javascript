@@ -9,7 +9,7 @@ import { BufferType } from "../src/BufferType";
 const { encode, decode }: { encode: typeof _encode; decode: typeof _decode } = (() => {
   if (process.env.TEST_DIST) {
     console.log("# TEST_DIST is set");
-    return require("..");
+    return require("../dist.es5/msgpack.js");
   } else {
     return {
       encode: _encode,
