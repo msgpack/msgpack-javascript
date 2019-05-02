@@ -4,6 +4,10 @@ This is the pure-JavaScript implementation of MessagePack:
 
 https://msgpack.org/
 
+## Stability
+
+This is under development until v1.0.0. Any API will change without notice.
+
 ## Usage
 
 TBD
