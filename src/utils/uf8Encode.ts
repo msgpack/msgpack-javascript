@@ -1,8 +1,10 @@
 import { prettyByte } from "./prettyByte";
 
-const USE_NATIVE_TEXT_ENCODER = typeof TextEncoder !== "undefined";
+// USE_TEXT_ENOCDER is opt-in because NodeJS v12's impl is much slower than pure-JavaScript version (i.e. _utf8Encode).
+// Set `USE_TEXT_ENOCDER=true` to use TextEncoder.
+const USE_TEXT_ENCODER = (process.env.USE_TEXT_ENOCDER === 'true' && typeof TextEncoder !== "undefined");
 
-function _utf8Encode(str: string): Array<number> {
+function _utf8Encode(str: string): ReadonlyArray<number> {
   const len = str.length;
 
   const bytes: Array<number> = [];
@@ -46,12 +48,17 @@ function _utf8Encode(str: string): Array<number> {
   return bytes;
 }
 
-function createNativeUtf8Encode() {
-  const encoder = new TextEncoder();
+function createUtf8Encode() {
+  if (USE_TEXT_ENCODER) {
+    const encoder = new TextEncoder();
 
-  return (str: string): Array<number> => {
-    return Array.from(encoder.encode(str));
-  };
+    return (str: string): ReadonlyArray<number> => {
+      // convert to array to avoid --downlevelIteration on the caller
+      return Array.from(encoder.encode(str));
+    };
+  } else {
+    return _utf8Encode;
+  }
 }
 
-export const utf8Encode = USE_NATIVE_TEXT_ENCODER ? createNativeUtf8Encode() : _utf8Encode;
+export const utf8Encode = createUtf8Encode();
