@@ -18,6 +18,15 @@ TBD
 npm install @msgpack/msgpack
 ```
 
+## Distrubition
+
+The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
+
+* `/dist` is compiled into ES2015+
+* `/dist.es5` is compiled into ES5 and bundled to singile file
+
+If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
+
 ## License
 
 Copyright 2019 The MessagePack Community.

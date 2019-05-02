@@ -3,10 +3,12 @@
   "version": "0.9.0",
   "description": "MessagePack implementation in JavaScript",
   "main": "dist/index.js",
+  "browser": "dist.es5/msgpack.js",
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "tsc -p tsconfig.production.json",
+    "prepare": "tsc -p tsconfig.production.es2019.json && webpack",
     "prepublishOnly": "TEST_DIST=true npm run test",
+    "clean": "rm -rf build dist dist.es5",
     "test": "TS_NODE_FILES=true mocha 'test/**/*.test.ts'",
     "test:cover": "TS_NODE_FILES=true npx nyc mocha 'test/**/*.test.ts'",
     "lint": "eslint --ext .ts src test",
@@ -14,7 +16,7 @@
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "profile:encode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-encode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
     "profile:decode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-decode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
-    "benchmark": "npx ts-node benchmark/benchmark-from-msgpack-lite.ts"
+    "benchmark": "ts-node benchmark/benchmark-from-msgpack-lite.ts"
   },
   "repository": {
     "type": "git",
@@ -32,6 +34,7 @@
   },
   "homepage": "https://github.com/msgpack/msgpack-javascript",
   "devDependencies": {
+    "@bitjourney/check-es-version-webpack-plugin": "^1.0.2",
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.13.8",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
@@ -46,10 +49,13 @@
     "prettier": "^1.17.0",
     "ts-loader": "^5.4.5",
     "ts-node": "^8.1.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
   },
   "dependencies": {},
   "files": [
-    "dist/**/*.*"
+    "dist/**/*.*",
+    "dist.es5/**/*.*"
   ]
 }
