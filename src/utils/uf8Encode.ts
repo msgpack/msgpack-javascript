@@ -1,8 +1,8 @@
 import { prettyByte } from "./prettyByte";
 
-// USE_TEXT_ENOCDER is opt-in because NodeJS v12's impl is much slower than pure-JavaScript version (i.e. _utf8Encode).
-// Set `USE_TEXT_ENOCDER=true` to use TextEncoder.
-const USE_TEXT_ENCODER = (process.env.USE_TEXT_ENOCDER === 'true' && typeof TextEncoder !== "undefined");
+// Using TextEncoder is opt-in because NodeJS v12's impl is much slower than pure-JavaScript version (i.e. _utf8Encode).
+// Set `PREFER_TEXT_ENOCDER=true` to use TextEncoder if available.
+const USE_TEXT_ENCODER = (process.env.PREFER_TEXT_ENOCDER === 'true' && typeof TextEncoder !== "undefined");
 
 function _utf8Encode(str: string): ReadonlyArray<number> {
   const len = str.length;

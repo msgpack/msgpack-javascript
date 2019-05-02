@@ -32,7 +32,6 @@
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.13.8",
     "ieee754": "^1.1.13",
-    "long": "^4.0.0",
     "mocha": "^6.1.4",
     "msgpack-lite": "^0.1.26",
     "msgpack-test-js": "^1.0.0",
