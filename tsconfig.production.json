@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "target": "es5",
     "outDir": "./dist",
     "declaration": true,
     "noEmitOnError": true,
