@@ -91,7 +91,7 @@ describe("msgpack-test-suite", () => {
     const SPECS = {
       FLOAT64_POSITIVE_INF: Number.POSITIVE_INFINITY,
       FLOAT64_NEGATIVE_INF: Number.NEGATIVE_INFINITY,
-      FLOAT64_NaN: Number.NaN,
+      FLOAT64_NAN: Number.NaN,
       STR16: "x".repeat(0x100),
       STR32: "x".repeat(0x10000),
       BIN16: new Uint8Array(0x100).fill(0xff),
