@@ -61,7 +61,6 @@ if (msgpack_node) {
 
 if (msgpack_msgpack) {
   buf = bench('buf = require("@msgpack/msgpack").encode(obj);', msgpack_msgpack.encode, data);
-  buf = bench('buf = Buffer.from(require("@msgpack/msgpack").encode(obj));', msgpack_msgpack_encode, data);
   obj = bench('obj = require("@msgpack/msgpack").decode(buf);', msgpack_msgpack.decode, buf);
   runTest(obj);
 }
@@ -97,10 +96,6 @@ if (msgpack_unpack) {
 
 function JSON_stringify(src: any) {
   return Buffer.from(JSON.stringify(src));
-}
-
-function msgpack_msgpack_encode(data: any) {
-  return Buffer.from(msgpack_msgpack.encode(data));
 }
 
 function bench(name: string, func: (...args: any[]) => any, src: any) {
