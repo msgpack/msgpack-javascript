@@ -1,6 +1,6 @@
 # MessagePack for JavaScript [![Build Status](https://travis-ci.org/msgpack/msgpack-javascript.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-javascript)
 
-This is the pure-JavaScript implementation of MessagePack:
+This is the pure-JavaScript implementation of *MessagePack*, an efficient binary serilization format:
 
 https://msgpack.org/
 
@@ -33,11 +33,65 @@ deepStrictEqual(decode(encoded), object);
 
 ## Install
 
+This library is publised as [@msgpack/msgpack](
+https://www.npmjs.com/package/@msgpack/msgpack
+) in npmjs.com.
+
 ```shell
 npm install @msgpack/msgpack
 ```
 
-## Custom Extension
+## Extension Types
+
+To handle [MessagePack Extension Types](https://github.com/msgpack/msgpack/blob/master/spec.md#extension-types), this library provides `ExtensionCodec` class.
+
+Here is an example to setup custom extension types that handles `Map` and `Set` classes in TypeScript:
+
+```typescript
+import { ExtensionCodec } from "@msgpack/msgpack";
+
+const extensionCodec = new ExtensionCodec();
+
+// Set<T>
+extensionCodec.register({
+  type: 0,
+  encode: (object: unknown) => {
+    if (object instanceof Set) {
+      return encode([...object]);
+    } else {
+      return null;
+    }
+  },
+  decode: (data) => {
+    const array = decode(data) as Array<any>;
+    return new Set(array);
+  },
+});
+
+// Map<T>
+extensionCodec.register({
+  type: 1,
+  encode: (object: unknown) => {
+    if (object instanceof Map) {
+      return encode([...object]);
+    } else {
+      return null;
+    }
+  },
+  decode: (data) => {
+    const array = decode(data) as Array<[unknown, unknown]>;
+    return new Map(array);
+  },
+});
+
+// and later
+import { encode, decode } from "@msgpack/msgpack";
+
+const encoded = = encode([new Set<any>(), new Map<any, any>()], { extensionCodec });
+const decoded = decode(encoded, { extensionCodec });
+```
+
+Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved to MessagePack itself.
 
 ## Distrubition
 
