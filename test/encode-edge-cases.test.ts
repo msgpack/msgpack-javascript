@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode } from '../src';
+import { encode, decode } from "../src";
 
 describe("edge cases", () => {
   context("try to encode trycyclic refs", () => {
@@ -9,15 +9,15 @@ describe("edge cases", () => {
       assert.throws(() => {
         encode(cyclicRefs);
       }, /too deep/i);
-    })
+    });
   });
 
   context("try to encode non-encodable objects", () => {
     it("throws errors", () => {
       assert.throws(() => {
-        encode(Symbol('this is a symbol!'));
+        encode(Symbol("this is a symbol!"));
       }, /unrecognized object/i);
-    })
+    });
   });
 
   context("try to decode invlid MessagePack binary", () => {

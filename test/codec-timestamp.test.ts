@@ -16,12 +16,12 @@ const SPECS = {
 } as Record<string, Date>;
 
 describe("codec: timestamp 32/64/96", () => {
-    for (const name of Object.keys(SPECS)) {
-      const value = SPECS[name];
+  for (const name of Object.keys(SPECS)) {
+    const value = SPECS[name];
 
-      it(`encodes and decodes ${name} (${value.toISOString()})`, () => {
-        const encoded = encode(value);
-        assert.deepStrictEqual(decode(encoded), value, `encoded: ${util.inspect(encoded)}`);
-      });
-    }
+    it(`encodes and decodes ${name} (${value.toISOString()})`, () => {
+      const encoded = encode(value);
+      assert.deepStrictEqual(decode(encoded), value, `encoded: ${util.inspect(encoded)}`);
+    });
+  }
 });
