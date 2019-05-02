@@ -4,6 +4,7 @@
   "description": "MessagePack implementation in JavaScript",
   "main": "dist/index.js",
   "scripts": {
+    "build": "npm publish --dry-run",
     "prepare": "tsc -p tsconfig.production.json",
     "prepublishOnly": "TEST_DIST=true npm run test",
     "test": "TS_NODE_FILES=true mocha 'test/**/*.test.ts'",
