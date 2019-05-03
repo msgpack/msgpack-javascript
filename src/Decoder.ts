@@ -39,30 +39,6 @@ export class Decoder {
     } else if (type === 0xc3) {
       // true
       return true;
-    } else if (type === 0xc4) {
-      // bin 8
-      const size = this.nextU8();
-      return this.decodeBinary(size);
-    } else if (type === 0xc5) {
-      // bin 16
-      const size = this.nextU16();
-      return this.decodeBinary(size);
-    } else if (type === 0xc6) {
-      // bin 32
-      const size = this.nextU32();
-      return this.decodeBinary(size);
-    } else if (type === 0xc7) {
-      // ext 8
-      const size = this.nextU8();
-      return this.decodeExtension(size);
-    } else if (type === 0xc8) {
-      // ext 16
-      const size = this.nextU16();
-      return this.decodeExtension(size);
-    } else if (type === 0xc9) {
-      // ext 32
-      const size = this.nextU32();
-      return this.decodeExtension(size);
     } else if (type === 0xca) {
       // float 32
       return this.nextFloat32();
@@ -93,21 +69,6 @@ export class Decoder {
     } else if (type === 0xd3) {
       // int 64
       return this.nextI64();
-    } else if (type === 0xd4) {
-      // fixext 1
-      return this.decodeExtension(1);
-    } else if (type === 0xd5) {
-      // fixext 2
-      return this.decodeExtension(2);
-    } else if (type === 0xd6) {
-      // fixext 4
-      return this.decodeExtension(4);
-    } else if (type === 0xd7) {
-      // fixext 8
-      return this.decodeExtension(8);
-    } else if (type === 0xd8) {
-      // fixext 16
-      return this.decodeExtension(16);
     } else if (type === 0xd9) {
       // str 8
       const length = this.nextU8();
@@ -136,8 +97,45 @@ export class Decoder {
       // map 32
       const size = this.nextU32();
       return this.decodeMap(size);
+    } else if (type === 0xc4) {
+      // bin 8
+      const size = this.nextU8();
+      return this.decodeBinary(size);
+    } else if (type === 0xc5) {
+      // bin 16
+      const size = this.nextU16();
+      return this.decodeBinary(size);
+    } else if (type === 0xc6) {
+      // bin 32
+      const size = this.nextU32();
+      return this.decodeBinary(size);
+    } else if (type === 0xd4) {
+      // fixext 1
+      return this.decodeExtension(1);
+    } else if (type === 0xd5) {
+      // fixext 2
+      return this.decodeExtension(2);
+    } else if (type === 0xd6) {
+      // fixext 4
+      return this.decodeExtension(4);
+    } else if (type === 0xd7) {
+      // fixext 8
+      return this.decodeExtension(8);
+    } else if (type === 0xd8) {
+      // fixext 16
+      return this.decodeExtension(16);
     } else if (type === 0xc7) {
       // ext 8
+      const size = this.nextU8();
+      return this.decodeExtension(size);
+    } else if (type === 0xc8) {
+      // ext 16
+      const size = this.nextU16();
+      return this.decodeExtension(size);
+    } else if (type === 0xc9) {
+      // ext 32
+      const size = this.nextU32();
+      return this.decodeExtension(size);
     } else {
       throw new Error(`Unrecognized type byte: ${prettyByte(type)}`);
     }
