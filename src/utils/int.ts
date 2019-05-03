@@ -1,6 +1,4 @@
-import { Writable } from "../Writable";
-
-export function encodeUint32<T extends Writable<number>>(rv: T, value: number): void {
+export function encodeUint32(rv: Array<number>, value: number): void {
   rv.push((value >>> 24) & 0xff, (value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff);
 }
 
@@ -17,7 +15,7 @@ export function decodeInt32(b1: number, b2: number, b3: number, b4: number): num
 }
 
 // the actual range is int52 (a.k.a. safe integer)
-export function encodeInt64<T extends Writable<number>>(rv: T, value: number): void {
+export function encodeInt64(rv: Array<number>, value: number): void {
   if (value < 0) {
     const absMinusOne = -value - 1;
     const high = absMinusOne / 0x100000000;
@@ -84,7 +82,7 @@ export function decodeInt64(
   );
 }
 
-export function encodeUint64<T extends Writable<number>>(rv: T, value: number): void {
+export function encodeUint64(rv: Array<number>, value: number): void {
   const high = value / 0x100000000;
   const low = value & 0xffffffff;
 

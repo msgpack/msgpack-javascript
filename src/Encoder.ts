@@ -1,17 +1,11 @@
 import { utf8Encode } from "./utils/uf8Encode";
 import { ExtensionCodecType, ExtDataType } from "./ExtensionCodec";
-import { encodeUint32, encodeInt64, encodeInt32, encodeUint64 } from "./utils/int";
+import { encodeInt64, encodeUint64 } from "./utils/int";
 import { isNodeJsBuffer } from "./utils/is";
-import { Writable } from "./Writable";
 
-type EncodeMethodType<OutputType extends Writable<number>> = (
-  this: Encoder<OutputType>,
-  rv: OutputType,
-  object: unknown,
-  depth: number,
-) => void;
+type EncodeMethodType = (this: Encoder, object: unknown, depth: number) => void;
 
-export class Encoder<OutputType extends Writable<number>> {
+export class Encoder {
   readonly typeofMap = {
     "undefined": this.encodeNil,
     "boolean": this.encodeBoolean,
@@ -19,11 +13,14 @@ export class Encoder<OutputType extends Writable<number>> {
     "bigint": this.encodeBigInt,
     "string": this.encodeString,
     "object": this.encodeObject,
-  } as Record<string, EncodeMethodType<OutputType>>;
+  } as Record<string, EncodeMethodType>;
+
+  private pos = 0;
+  private view = new DataView(new ArrayBuffer(64));
 
   constructor(readonly maxDepth: number, readonly extensionCodec: ExtensionCodecType) {}
 
-  encode(rv: OutputType, object: unknown, depth: number): void {
+  encode(object: unknown, depth: number): void {
     if (depth > this.maxDepth) {
       throw new Error(`Too deep objects in depth ${depth}`);
     }
@@ -31,225 +28,304 @@ export class Encoder<OutputType extends Writable<number>> {
     if (!encodeFunc) {
       throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
     }
-    encodeFunc.call(this, rv, object, depth);
+    encodeFunc.call(this, object, depth);
   }
-  encodeNil(rv: OutputType) {
-    rv.push(0xc0);
+
+  getArrayBuffer(): ArrayBuffer {
+    return this.view.buffer.slice(0, this.pos);
   }
-  encodeBoolean(rv: OutputType, object: boolean) {
-    if (object === false) {
-      rv.push(0xc2);
-    } else {
-      rv.push(0xc3);
+
+  getUint8Array(): Uint8Array {
+    return new Uint8Array(this.getArrayBuffer());
+  }
+
+  ensureBufferSizeToWrite(sizeToWrite: number) {
+    const newSize = this.pos + sizeToWrite;
+
+    if (this.view.byteLength < newSize) {
+      // TODO: ensure the size to be multiple of 4 and use Uint32Array for performance
+      const newBuffer = new ArrayBuffer(newSize * 2);
+
+      new Uint8Array(newBuffer).set(new Uint8Array(this.view.buffer));
+
+      const newView = new DataView(newBuffer);
+      this.view = newView;
     }
   }
-  encodeNumber(rv: OutputType, object: number) {
+
+  encodeNil() {
+    this.writeU8(0xc0);
+  }
+
+  encodeBoolean(object: boolean) {
+    if (object === false) {
+      this.writeU8(0xc2);
+    } else {
+      this.writeU8(0xc3);
+    }
+  }
+  encodeNumber(object: number) {
     if (Number.isSafeInteger(object)) {
       if (object >= 0) {
         if (object < 0x80) {
           // positive fixint
-          rv.push(object);
+          this.writeU8(object);
         } else if (object < 0x100) {
           // uint 8
-          rv.push(0xcc, object);
+          this.writeU8v(0xcc, object);
         } else if (object < 0x10000) {
           // uint 16
-          rv.push(0xcd, object >> 8, object & 0xff);
+          this.writeU8(0xcd);
+          this.writeU16(object);
         } else if (object < 0x100000000) {
           // uint 32
-          rv.push(0xce);
-          encodeUint32(rv, object);
+          this.writeU8(0xce);
+          this.writeU32(object);
         } else {
           // uint 64
-          rv.push(0xcf);
+          this.writeU8(0xcf);
+          const rv: Array<number> = [];
           encodeUint64(rv, object);
+          this.writeU8v(...rv);
         }
       } else {
         if (object >= -0x20) {
           // nagative fixint
-          rv.push(0xe0 | (object + 0x20));
+          this.writeU8(0xe0 | (object + 0x20));
         } else if (object > -0x80) {
           // int 8
-          rv.push(0xd0, object + 0x100);
+          this.writeU8(0xd0);
+          this.writeI8(object);
         } else if (object >= -0x8000) {
           // int 16
-          object += 0x10000;
-          rv.push(0xd1, object >> 8, object & 0xff);
+          this.writeU8(0xd1);
+          this.writeI16(object);
         } else if (object >= -0x80000000) {
           // int 32
-          rv.push(0xd2);
-          encodeInt32(rv, object);
+          this.writeU8(0xd2);
+          this.writeI32(object);
         } else {
           // int 64
-          rv.push(0xd3);
+          this.writeU8(0xd3);
+          const rv: Array<number> = [];
           encodeInt64(rv, object);
+          this.writeU8v(...rv);
         }
       }
-    } else if (Number.isFinite(object)) {
-      // THX!! @edvakf
-      // http://javascript.g.hatena.ne.jp/edvakf/20101128/1291000731
-      const negative = object === 0 ? Object.is(object, -0.0) : object < 0;
-      const value = negative ? -object : object;
-      let exp = (Math.log(value) / Math.LN2 + 1023) | 0;
-      const frac = value * Math.pow(2, 52 + 1023 - exp);
-      const low = frac & 0xffffffff;
-      if (negative) {
-        exp |= 0x800;
-      }
-      const high = ((frac / 0x100000000) & 0xfffff) | (exp << 20);
-      rv.push(0xcb);
-      encodeUint32(rv, high);
-      encodeUint32(rv, low);
     } else {
-      rv.push(0xcb);
-      if (object === Infinity) {
-        rv.push(0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-      } else if (object === -Infinity) {
-        rv.push(0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-      } else {
-        // NaN
-        rv.push(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff);
-      }
+      this.writeU8(0xcb);
+      this.writeF64(object);
     }
   }
 
-  encodeBigInt(_rv: OutputType, _object: bigint) {
+  encodeBigInt(_object: bigint) {
     // BigInt literals is not available here!
     throw new Error("BigInt is not yet implemented!");
   }
 
-  encodeString(rv: OutputType, object: string) {
+  encodeString(object: string) {
     const bytes = utf8Encode(object);
     const size = bytes.length;
     if (size < 32) {
       // fixstr
-      rv.push(0xa0 + size);
+      this.writeU8(0xa0 + size);
     } else if (size < 0x100) {
       // str 8
-      rv.push(0xd9, size);
+      this.writeU8(0xd9);
+      this.writeU8(size);
     } else if (size < 0x10000) {
       // str 16
-      rv.push(0xda, size >> 8, size & 0xff);
+      this.writeU8(0xda);
+      this.writeU16(size);
     } else if (size < 0x100000000) {
       // str 32
-      rv.push(0xdb);
-      encodeUint32(rv, size);
+      this.writeU8(0xdb);
+      this.writeU32(size);
     } else {
       throw new Error(`Too long string: ${size} bytes in UTF-8`);
     }
-    rv.push(...bytes);
+
+    this.writeU8v(...bytes);
   }
 
-  encodeObject(rv: OutputType, object: object | null, depth: number) {
+  encodeObject(object: object | null, depth: number) {
     if (object === null) {
-      this.encodeNil(rv);
+      this.encodeNil();
       return;
     }
     // try to encode objects with custom codec first of non-primitives
     const ext = this.extensionCodec.tryToEncode(object);
     if (ext != null) {
-      this.encodeExtension(rv, ext);
+      this.encodeExtension(ext);
     } else if (ArrayBuffer.isView(object)) {
-      this.encodeBinary(rv, object);
+      this.encodeBinary(object);
     } else if (Array.isArray(object)) {
-      this.encodeArray(rv, object, depth);
+      this.encodeArray(object, depth);
     } else {
-      this.encodeMap(rv, object as Record<string, unknown>, depth);
+      this.encodeMap(object as Record<string, unknown>, depth);
     }
   }
 
-  encodeBinary(rv: OutputType, object: ArrayBufferView) {
+  encodeBinary(object: ArrayBufferView) {
     const size = object.byteLength;
     if (size < 0x100) {
       // bin 8
-      rv.push(0xc4, size);
+      this.writeU8(0xc4);
+      this.writeU8(size);
     } else if (size < 0x10000) {
       // bin 16
-      rv.push(0xc5, size >> 8, size & 0xff);
+      this.writeU8(0xc5);
+      this.writeU16(size);
     } else if (size < 0x100000000) {
       // bin 32
-      rv.push(0xc6);
-      encodeUint32(rv, size);
+      this.writeU8(0xc6);
+      this.writeU32(size);
     } else {
       throw new Error(`Too large binary: ${size}`);
     }
     const bytes = isNodeJsBuffer(object) ? object : new Uint8Array(object.buffer);
-    for (let i = 0; i < size; i++) {
-      rv.push(bytes[i]);
-    }
+    this.writeU8v(...bytes);
   }
 
-  encodeArray(rv: OutputType, object: Array<unknown>, depth: number) {
+  encodeArray(object: Array<unknown>, depth: number) {
     const size = object.length;
     if (size < 16) {
       // fixarray
-      rv.push(0x90 + size);
+      this.writeU8(0x90 + size);
     } else if (size < 0x10000) {
       // array 16
-      rv.push(0xdc, size >> 8, size & 0xff);
+      this.writeU8(0xdc);
+      this.writeU16(size);
     } else if (size < 0x100000000) {
       // array 32
-      rv.push(0xdd);
-      encodeUint32(rv, size);
+      this.writeU8(0xdd);
+      this.writeU32(size);
     } else {
       throw new Error(`Too large array: ${size}`);
     }
     for (const item of object) {
-      this.encode(rv, item, depth + 1);
+      this.encode(item, depth + 1);
     }
   }
 
-  encodeMap(rv: OutputType, object: Record<string, unknown>, depth: number) {
+  encodeMap(object: Record<string, unknown>, depth: number) {
     const keys = Object.keys(object);
     const size = keys.length;
     // map
     if (size < 16) {
       // fixmap
-      rv.push(0x80 + size);
+      this.writeU8(0x80 + size);
     } else if (size < 0x10000) {
       // map 16
-      rv.push(0xde, size >> 8, size & 0xff);
+      this.writeU8(0xde);
+      this.writeU16(size);
     } else if (size < 0x100000000) {
       // map 32
-      rv.push(0xdf);
-      encodeUint32(rv, size);
+      this.writeU8(0xdf);
+      this.writeU32(size);
     }
     for (const key of keys) {
-      this.encodeString(rv, key);
-      this.encode(rv, object[key], depth + 1);
+      this.encodeString(key);
+      this.encode(object[key], depth + 1);
     }
   }
 
-  encodeExtension(rv: OutputType, ext: ExtDataType) {
+  encodeExtension(ext: ExtDataType) {
     const size = ext.data.length;
-    const typeByte = ext.type < 0 ? ext.type + 0x100 : ext.type;
     if (size === 1) {
       // fixext 1
-      rv.push(0xd4, typeByte, ...ext.data);
+      this.writeU8(0xd4);
     } else if (size === 2) {
       // fixext 2
-      rv.push(0xd5, typeByte, ...ext.data);
+      this.writeU8(0xd5);
     } else if (size === 4) {
       // fixext 4
-      rv.push(0xd6, typeByte, ...ext.data);
+      this.writeU8(0xd6);
     } else if (size === 8) {
       // fixext 8
-      rv.push(0xd7, typeByte, ...ext.data);
+      this.writeU8(0xd7);
     } else if (size === 16) {
       // fixext 16
-      rv.push(0xd8, typeByte, ...ext.data);
+      this.writeU8(0xd8);
     } else if (size < 0x100) {
       // ext 8
-      rv.push(0xc7, size, typeByte, ...ext.data);
+      this.writeU8(0xc7);
+      this.writeU8(size);
     } else if (size < 0x10000) {
       // ext 16
-      rv.push(0xc8, size >> 8, size & 0xff, typeByte, ...ext.data);
+      this.writeU8(0xc8);
+      this.writeU16(size);
     } else if (size < 0x100000000) {
       // ext 32
-      rv.push(0xc9);
-      encodeUint32(rv, size), rv.push(typeByte, ...ext.data);
+      this.writeU8(0xc9);
+      this.writeU32(size);
     } else {
       throw new Error(`Too large extension object: ${size}`);
     }
+    this.writeI8(ext.type);
+    this.writeU8v(...ext.data);
+  }
+
+  writeU8(value: number) {
+    this.ensureBufferSizeToWrite(1);
+
+    this.view.setUint8(this.pos++, value);
+  }
+
+  writeU8v(...values: ReadonlyArray<number>) {
+    const size = values.length;
+    this.ensureBufferSizeToWrite(size);
+
+    const pos = this.pos;
+    for (let i = 0; i < size; i++) {
+      this.view.setUint8(pos + i, values[i]);
+    }
+    this.pos += size;
+  }
+
+  writeI8(value: number) {
+    this.ensureBufferSizeToWrite(1);
+
+    this.view.setInt8(this.pos++, value);
+  }
+
+  writeU16(value: number) {
+    this.ensureBufferSizeToWrite(2);
+
+    const pos = this.pos;
+    this.pos += 2;
+    this.view.setUint16(pos, value);
+  }
+
+  writeI16(value: number) {
+    this.ensureBufferSizeToWrite(2);
+
+    const pos = this.pos;
+    this.pos += 2;
+    this.view.setInt16(pos, value);
+  }
+
+  writeU32(value: number) {
+    this.ensureBufferSizeToWrite(4);
+
+    const pos = this.pos;
+    this.pos += 4;
+    this.view.setUint32(pos, value);
+  }
+
+  writeI32(value: number) {
+    this.ensureBufferSizeToWrite(4);
+
+    const pos = this.pos;
+    this.pos += 4;
+    this.view.setInt32(pos, value);
+  }
+
+  writeF64(value: number) {
+    this.ensureBufferSizeToWrite(8);
+
+    const pos = this.pos;
+    this.pos += 8;
+    this.view.setFloat64(pos, value);
   }
 }
