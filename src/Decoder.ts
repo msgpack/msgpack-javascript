@@ -1,11 +1,11 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodecType } from "./ExtensionCodec";
 import { decodeInt64 } from "./utils/int";
+import { ensureUint8Array } from "./utils/typedArrays";
 
 export class Decoder {
   pos = 0;
-  constructor(readonly view: DataView, readonly extensionCodec: ExtensionCodecType) {
-  }
+  constructor(readonly view: DataView, readonly extensionCodec: ExtensionCodecType) {}
 
   decode() {
     const type = this.nextU8();
@@ -146,7 +146,7 @@ export class Decoder {
   decodeBinary(size: number): Uint8Array {
     const start = this.pos;
     this.pos += size;
-    return new Uint8Array(this.view.buffer).subarray(start, start + size);
+    return new Uint8Array(this.view.buffer, this.view.byteOffset, this.view.byteLength).subarray(start, start + size);
   }
 
   decodeUtf8String(length: number): string {
@@ -200,6 +200,7 @@ export class Decoder {
     }
     return result;
   }
+
   decodeArray(size: number): Array<any> {
     const result = new Array<any>(size);
     for (let i = 0; i < size; i++) {

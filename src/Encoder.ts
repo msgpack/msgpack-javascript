@@ -1,7 +1,7 @@
 import { utf8Encode } from "./utils/uf8Encode";
 import { ExtensionCodecType, ExtDataType } from "./ExtensionCodec";
 import { encodeInt64, encodeUint64 } from "./utils/int";
-import { isNodeJsBuffer } from "./utils/is";
+import { ensureUint8Array } from "./utils/typedArrays";
 
 type EncodeMethodType = (this: Encoder, object: unknown, depth: number) => void;
 
@@ -183,7 +183,7 @@ export class Encoder {
     } else {
       throw new Error(`Too large binary: ${size}`);
     }
-    const bytes = isNodeJsBuffer(object) ? object : new Uint8Array(object.buffer);
+    const bytes = ensureUint8Array(object);
     this.writeU8v(...bytes);
   }
 
