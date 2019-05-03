@@ -1,14 +1,13 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodecType } from "./ExtensionCodec";
 import { decodeInt64 } from "./utils/int";
-import { ensureUint8Array } from "./utils/typedArrays";
 
 export class Decoder {
   pos = 0;
   constructor(readonly view: DataView, readonly extensionCodec: ExtensionCodecType) {}
 
   decode() {
-    const type = this.nextU8();
+    const type = this.readU8();
     if (type >= 0xe0) {
       // negative fixint (111x xxxx) 0xe0 - 0xff
       return type - 0x100;
@@ -41,73 +40,73 @@ export class Decoder {
       return true;
     } else if (type === 0xca) {
       // float 32
-      return this.nextFloat32();
+      return this.readF32();
     } else if (type === 0xcb) {
       // float 64
-      return this.nextFloat64();
+      return this.readF64();
     } else if (type === 0xcc) {
       // uint 8
-      return this.nextU8();
+      return this.readU8();
     } else if (type === 0xcd) {
       // uint 16
-      return this.nextU16();
+      return this.readU16();
     } else if (type === 0xce) {
       // uint 32
-      return this.nextU32();
+      return this.readU32();
     } else if (type === 0xcf) {
       // uint 64
-      return this.nextU64();
+      return this.readU64();
     } else if (type === 0xd0) {
       // int 8
-      return this.nextI8();
+      return this.readI8();
     } else if (type === 0xd1) {
       // int 16
-      return this.nextI16();
+      return this.readI16();
     } else if (type === 0xd2) {
       // int 32
-      return this.nextI32();
+      return this.readI32();
     } else if (type === 0xd3) {
       // int 64
-      return this.nextI64();
+      return this.readI64();
     } else if (type === 0xd9) {
       // str 8
-      const length = this.nextU8();
+      const length = this.readU8();
       return this.decodeUtf8String(length);
     } else if (type === 0xda) {
       // str 16
-      const length = this.nextU16();
+      const length = this.readU16();
       return this.decodeUtf8String(length);
     } else if (type === 0xdb) {
       // str 32
-      const length = this.nextU32();
+      const length = this.readU32();
       return this.decodeUtf8String(length);
     } else if (type === 0xdc) {
       // array 16
-      const size = this.nextU16();
+      const size = this.readU16();
       return this.decodeArray(size);
     } else if (type === 0xdd) {
       // array 32
-      const size = this.nextU32();
+      const size = this.readU32();
       return this.decodeArray(size);
     } else if (type === 0xde) {
       // map 16
-      const size = this.nextU16();
+      const size = this.readU16();
       return this.decodeMap(size);
     } else if (type === 0xdf) {
       // map 32
-      const size = this.nextU32();
+      const size = this.readU32();
       return this.decodeMap(size);
     } else if (type === 0xc4) {
       // bin 8
-      const size = this.nextU8();
+      const size = this.readU8();
       return this.decodeBinary(size);
     } else if (type === 0xc5) {
       // bin 16
-      const size = this.nextU16();
+      const size = this.readU16();
       return this.decodeBinary(size);
     } else if (type === 0xc6) {
       // bin 32
-      const size = this.nextU32();
+      const size = this.readU32();
       return this.decodeBinary(size);
     } else if (type === 0xd4) {
       // fixext 1
@@ -126,15 +125,15 @@ export class Decoder {
       return this.decodeExtension(16);
     } else if (type === 0xc7) {
       // ext 8
-      const size = this.nextU8();
+      const size = this.readU8();
       return this.decodeExtension(size);
     } else if (type === 0xc8) {
       // ext 16
-      const size = this.nextU16();
+      const size = this.readU16();
       return this.decodeExtension(size);
     } else if (type === 0xc9) {
       // ext 32
-      const size = this.nextU32();
+      const size = this.readU32();
       return this.decodeExtension(size);
     } else {
       throw new Error(`Unrecognized type byte: ${prettyByte(type)}`);
@@ -151,7 +150,7 @@ export class Decoder {
     const out: Array<number> = [];
     const end = this.pos + length;
     while (this.pos < end) {
-      const byte1 = this.nextU8();
+      const byte1 = this.readU8();
       if (byte1 == null) {
         throw new Error(`Invalid null at ${this.pos} in decoding ${length} bytes of buffer`);
       }
@@ -160,18 +159,18 @@ export class Decoder {
         out.push(byte1);
       } else if ((byte1 & 0xe0) === 0xc0) {
         // 2 bytes
-        const byte2 = this.nextU8() & 0x3f;
+        const byte2 = this.readU8() & 0x3f;
         out.push(((byte1 & 0x1f) << 6) | byte2);
       } else if ((byte1 & 0xf0) === 0xe0) {
         // 3 bytes
-        const byte2 = this.nextU8() & 0x3f;
-        const byte3 = this.nextU8() & 0x3f;
+        const byte2 = this.readU8() & 0x3f;
+        const byte3 = this.readU8() & 0x3f;
         out.push(((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
       } else if ((byte1 & 0xf8) === 0xf0) {
         // 4 bytes
-        const byte2 = this.nextU8() & 0x3f;
-        const byte3 = this.nextU8() & 0x3f;
-        const byte4 = this.nextU8() & 0x3f;
+        const byte2 = this.readU8() & 0x3f;
+        const byte3 = this.readU8() & 0x3f;
+        const byte4 = this.readU8() & 0x3f;
         let codepoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
         if (codepoint > 0xffff) {
           codepoint -= 0x10000;
@@ -208,71 +207,71 @@ export class Decoder {
   }
 
   decodeExtension(size: number) {
-    const extType = this.nextI8();
+    const extType = this.readI8();
     const data = new Array<number>(size);
     for (let i = 0; i < size; i++) {
-      data[i] = this.nextU8();
+      data[i] = this.readU8();
     }
     return this.extensionCodec.decode(data, extType);
   }
 
-  nextU8(): number {
+  readU8(): number {
     return this.view.getUint8(this.pos++);
   }
 
-  nextI8(): number {
+  readI8(): number {
     return this.view.getInt8(this.pos++);
   }
 
-  nextU16(): number {
+  readU16(): number {
     const pos = this.pos;
     this.pos += 2;
     return this.view.getUint16(pos);
   }
 
-  nextI16(): number {
+  readI16(): number {
     const pos = this.pos;
     this.pos += 2;
     return this.view.getInt16(pos);
   }
 
-  nextU32(): number {
+  readU32(): number {
     const pos = this.pos;
     this.pos += 4;
     return this.view.getUint32(pos);
   }
 
-  nextI32(): number {
+  readI32(): number {
     const pos = this.pos;
     this.pos += 4;
     return this.view.getInt32(pos);
   }
 
-  nextU64(): number {
-    const high = this.nextU32();
-    const low = this.nextU32();
+  readU64(): number {
+    const high = this.readU32();
+    const low = this.readU32();
     return high * 0x100000000 + low;
   }
 
-  nextI64(): number {
-    const b1 = this.nextU8();
-    const b2 = this.nextU8();
-    const b3 = this.nextU8();
-    const b4 = this.nextU8();
-    const b5 = this.nextU8();
-    const b6 = this.nextU8();
-    const b7 = this.nextU8();
-    const b8 = this.nextU8();
+  readI64(): number {
+    const b1 = this.readU8();
+    const b2 = this.readU8();
+    const b3 = this.readU8();
+    const b4 = this.readU8();
+    const b5 = this.readU8();
+    const b6 = this.readU8();
+    const b7 = this.readU8();
+    const b8 = this.readU8();
     return decodeInt64(b1, b2, b3, b4, b5, b6, b7, b8);
   }
 
-  nextFloat32() {
+  readF32() {
     const pos = this.pos;
     this.pos += 4;
     return this.view.getFloat32(pos);
   }
 
-  nextFloat64() {
+  readF64() {
     const pos = this.pos;
     this.pos += 8;
     return this.view.getFloat64(pos);

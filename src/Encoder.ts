@@ -6,13 +6,13 @@ import { ensureUint8Array } from "./utils/typedArrays";
 type EncodeMethodType = (this: Encoder, object: unknown, depth: number) => void;
 
 export class Encoder {
-  readonly typeofMap = {
-    "undefined": this.encodeNil,
-    "boolean": this.encodeBoolean,
-    "number": this.encodeNumber,
-    "bigint": this.encodeBigInt,
-    "string": this.encodeString,
-    "object": this.encodeObject,
+  static readonly typeofMap = {
+    "undefined": Encoder.prototype.encodeNil,
+    "boolean": Encoder.prototype.encodeBoolean,
+    "number": Encoder.prototype.encodeNumber,
+    "bigint": Encoder.prototype.encodeBigInt,
+    "string": Encoder.prototype.encodeString,
+    "object": Encoder.prototype.encodeObject,
   } as Record<string, EncodeMethodType>;
 
   private pos = 0;
@@ -24,7 +24,7 @@ export class Encoder {
     if (depth > this.maxDepth) {
       throw new Error(`Too deep objects in depth ${depth}`);
     }
-    const encodeFunc = this.typeofMap[typeof object];
+    const encodeFunc = Encoder.typeofMap[typeof object];
     if (!encodeFunc) {
       throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
     }
