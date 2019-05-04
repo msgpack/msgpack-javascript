@@ -1,7 +1,6 @@
 // original: https://raw.githubusercontent.com/kawanet/msgpack-lite/master/lib/benchmark.js
 
-// automatically use the dist version if available
-var msgpack_msgpack = try_require("..") || require("../src");
+var msgpack_msgpack = require("../src");
 
 var msgpack_node = try_require("msgpack");
 var msgpack_lite = try_require("msgpack-lite");
