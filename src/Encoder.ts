@@ -121,24 +121,24 @@ export class Encoder {
 
   encodeString(object: string) {
     const bytes = utf8Encode(object);
-    const size = bytes.length;
-    if (size < 32) {
+    const byteLength = bytes.length;
+    if (byteLength < 32) {
       // fixstr
-      this.writeU8(0xa0 + size);
-    } else if (size < 0x100) {
+      this.writeU8(0xa0 + byteLength);
+    } else if (byteLength < 0x100) {
       // str 8
       this.writeU8(0xd9);
-      this.writeU8(size);
-    } else if (size < 0x10000) {
+      this.writeU8(byteLength);
+    } else if (byteLength < 0x10000) {
       // str 16
       this.writeU8(0xda);
-      this.writeU16(size);
-    } else if (size < 0x100000000) {
+      this.writeU16(byteLength);
+    } else if (byteLength < 0x100000000) {
       // str 32
       this.writeU8(0xdb);
-      this.writeU32(size);
+      this.writeU32(byteLength);
     } else {
-      throw new Error(`Too long string: ${size} bytes in UTF-8`);
+      throw new Error(`Too long string: ${byteLength} bytes in UTF-8`);
     }
 
     this.writeU8v(...bytes);
