@@ -31,12 +31,8 @@ export class Encoder {
     }
   }
 
-  getArrayBuffer(): ArrayBuffer {
-    return this.view.buffer.slice(0, this.pos);
-  }
-
   getUint8Array(): Uint8Array {
-    return new Uint8Array(this.getArrayBuffer());
+    return new Uint8Array(this.view.buffer, this.view.byteOffset, this.pos);
   }
 
   ensureBufferSizeToWrite(sizeToWrite: number) {

@@ -140,20 +140,11 @@ export class Decoder {
     }
   }
 
-  decodeBinary(size: number): Uint8Array {
-    const start = this.pos;
-    this.pos += size;
-    return new Uint8Array(this.view.buffer, this.view.byteOffset, this.view.byteLength).subarray(start, start + size);
-  }
-
   decodeUtf8String(length: number): string {
     const out: Array<number> = [];
     const end = this.pos + length;
     while (this.pos < end) {
       const byte1 = this.readU8();
-      if (byte1 == null) {
-        throw new Error(`Invalid null at ${this.pos} in decoding ${length} bytes of buffer`);
-      }
       if ((byte1 & 0x80) === 0) {
         // 1 byte
         out.push(byte1);
@@ -185,7 +176,7 @@ export class Decoder {
     return String.fromCharCode(...out);
   }
 
-  decodeMap(size: number): Record<string, any> {
+  decodeMap(size: number): Record<string, unknown> {
     const result: Record<string, any> = {};
     for (let i = 0; i < size; i++) {
       const key = this.decode();
@@ -198,20 +189,23 @@ export class Decoder {
     return result;
   }
 
-  decodeArray(size: number): Array<any> {
-    const result = new Array<any>(size);
+  decodeArray(size: number): Array<unknown> {
+    const result: Array<unknown> = [];
     for (let i = 0; i < size; i++) {
-      result[i] = this.decode();
+      result.push(this.decode());
     }
     return result;
   }
 
-  decodeExtension(size: number) {
+  decodeBinary(size: number): Uint8Array {
+    const start = this.pos;
+    this.pos += size;
+    return new Uint8Array(this.view.buffer, this.view.byteOffset + start, size);
+  }
+
+  decodeExtension(size: number): unknown {
     const extType = this.readI8();
-    const data = new Array<number>(size);
-    for (let i = 0; i < size; i++) {
-      data[i] = this.readU8();
-    }
+    const data = this.decodeBinary(size);
     return this.extensionCodec.decode(data, extType);
   }
 

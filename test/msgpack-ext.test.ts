@@ -2,12 +2,12 @@ import assert from "assert";
 import { encode, decode } from "../src";
 import { ExtensionCodec, ExtDataType } from "../src/ExtensionCodec";
 
-function seq(n: number): ReadonlyArray<number> {
+function seq(n: number) {
   const a: Array<number> = [];
   for (let i = 0; i < n; i++) {
     a.push((i + 1) % 0xff);
   }
-  return a;
+  return Uint8Array.from(a);
 }
 
 describe("msgpack-ext", () => {

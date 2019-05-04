@@ -31,8 +31,8 @@ extensionCodec.register({
       return null;
     }
   },
-  decode: (data: BufferType) => {
-    return MsgTimestamp.parse(Buffer.from(data as any));
+  decode: (data: Uint8Array) => {
+    return MsgTimestamp.parse(Buffer.from(data));
   },
 });
 

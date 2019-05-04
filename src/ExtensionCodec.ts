@@ -1,4 +1,3 @@
-import { BufferType } from "./BufferType";
 import { decodeInt64, encodeInt64 } from "./utils/int";
 
 export const EXT_TIMESTAMP = -1;
@@ -58,20 +57,18 @@ export const encodeTimestampExtension: ExtensionEncoderType = (object: unknown) 
 };
 
 // https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type
-export const decodeTimestampExtension: ExtensionDecoderType = (data: BufferType) => {
+export const decodeTimestampExtension: ExtensionDecoderType = (data: Uint8Array) => {
   // data may be 32, 64, or 96 bits
-  switch (data.length) {
+  switch (data.byteLength) {
     case 4: {
       // timestamp 32 = { sec32 }
-      const a = Uint8Array.from(data);
-      const view = new DataView(a.buffer);
+      const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
       const sec = view.getUint32(0);
       return new Date(sec * 1000);
     }
     case 8: {
       // timestamp 64 = { nsec30, sec34 }
-      const a = Uint8Array.from(data);
-      const view = new DataView(a.buffer);
+      const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
       const nsec30AndSecHigh2 = view.getUint32(0);
       const secLow32 = view.getUint32(4);
@@ -81,8 +78,7 @@ export const decodeTimestampExtension: ExtensionDecoderType = (data: BufferType)
     }
     case 12: {
       // timestamp 96 = { nsec32 (signed), sec64 (signed) }
-      const a = Uint8Array.from(data);
-      const view = new DataView(a.buffer);
+      const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
       const nsec = view.getInt32(0)
       const sec = decodeInt64(data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]);
@@ -95,14 +91,14 @@ export const decodeTimestampExtension: ExtensionDecoderType = (data: BufferType)
 };
 
 // extensionType is signed 8-bit integer
-export type ExtensionDecoderType = (data: BufferType, extensionType: number) => any;
+export type ExtensionDecoderType = (data: Uint8Array, extensionType: number) => any;
 
-export type ExtensionEncoderType = (input: unknown) => BufferType | null;
+export type ExtensionEncoderType = (input: unknown) => Uint8Array | null;
 
 // immutable interfce to ExtensionCodec
 export type ExtensionCodecType = {
   tryToEncode(object: unknown): ExtDataType | null;
-  decode(data: BufferType, extType: number): any;
+  decode(data: Uint8Array, extType: number): unknown;
 };
 
 const $Extension = Symbol("MessagePack.extension");
@@ -110,7 +106,7 @@ const $Extension = Symbol("MessagePack.extension");
 export type ExtDataType = {
   [$Extension]: true;
   type: number;
-  data: BufferType;
+  data: Uint8Array;
 };
 
 export class ExtensionCodec implements ExtensionCodecType {
@@ -118,7 +114,7 @@ export class ExtensionCodec implements ExtensionCodecType {
 
   public static readonly Extension = $Extension;
 
-  public static createExtData(type: number, data: BufferType): ExtDataType {
+  public static createExtData(type: number, data: Uint8Array): ExtDataType {
     return {
       [$Extension]: true,
       type,
@@ -199,13 +195,13 @@ export class ExtensionCodec implements ExtensionCodecType {
     return null;
   }
 
-  public decode(data: BufferType, type: number): unknown {
+  public decode(data: Uint8Array, type: number): unknown {
     const decoder = type < 0 ? this.builtInDecoders[-1 - type] : this.decoders[type];
     if (decoder) {
       return decoder(data, type);
     } else {
       // decode() does not fail, returns ExtData instead.
-      return ExtensionCodec.createExtData(type, Array.from(data));
+      return ExtensionCodec.createExtData(type, data);
     }
   }
 }
