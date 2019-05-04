@@ -40,17 +40,21 @@ export class Encoder {
   }
 
   ensureBufferSizeToWrite(sizeToWrite: number) {
-    const newSize = this.pos + sizeToWrite;
+    const requiredSize = this.pos + sizeToWrite;
 
-    if (this.view.byteLength < newSize) {
+    if (this.view.byteLength < requiredSize) {
+      this.resizeBuffer(requiredSize * 2);
+    }
+  }
+
+  resizeBuffer(newSize: number) {
       // TODO: ensure the size to be multiple of 4 and use Uint32Array for performance
-      const newBuffer = new ArrayBuffer(newSize * 2);
+      const newBuffer = new ArrayBuffer(newSize);
 
       new Uint8Array(newBuffer).set(new Uint8Array(this.view.buffer));
 
       const newView = new DataView(newBuffer);
       this.view = newView;
-    }
   }
 
   encodeNil() {
