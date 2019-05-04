@@ -44,14 +44,14 @@ describe("ExtensionCodec", () => {
     // Set<T>
     extensionCodec.register({
       type: 0,
-      encode: (object: unknown) => {
+      encode: (object: unknown): Uint8Array | null => {
         if (object instanceof Set) {
           return encode([...object]);
         } else {
           return null;
         }
       },
-      decode: (data) => {
+      decode: (data: Uint8Array) => {
         const array = decode(data) as Array<any>;
         return new Set(array);
       },
@@ -60,14 +60,14 @@ describe("ExtensionCodec", () => {
     // Map<T>
     extensionCodec.register({
       type: 1,
-      encode: (object: unknown) => {
+      encode: (object: unknown): Uint8Array | null => {
         if (object instanceof Map) {
           return encode([...object]);
         } else {
           return null;
         }
       },
-      decode: (data) => {
+      decode: (data: Uint8Array) => {
         const array = decode(data) as Array<[unknown, unknown]>;
         return new Map(array);
       },

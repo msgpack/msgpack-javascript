@@ -53,14 +53,14 @@ const extensionCodec = new ExtensionCodec();
 // Set<T>
 extensionCodec.register({
   type: 0,
-  encode: (object: unknown) => {
+  encode: (object: unknown): Uint8Array | null => {
     if (object instanceof Set) {
       return encode([...object]);
     } else {
       return null;
     }
   },
-  decode: (data) => {
+  decode: (data: Uint8Array) => {
     const array = decode(data) as Array<any>;
     return new Set(array);
   },
@@ -69,14 +69,14 @@ extensionCodec.register({
 // Map<T>
 extensionCodec.register({
   type: 1,
-  encode: (object: unknown) => {
+  encode: (object: unknown): Uint8Array => {
     if (object instanceof Map) {
       return encode([...object]);
     } else {
       return null;
     }
   },
-  decode: (data) => {
+  decode: (data: Uint8Array) => {
     const array = decode(data) as Array<[unknown, unknown]>;
     return new Map(array);
   },
@@ -90,6 +90,18 @@ const decoded = decode(encoded, { extensionCodec });
 ```
 
 Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved to MessagePack itself.
+
+## Prerequsites
+
+* ES5 language features
+* Typed Arrays (ES2015; [Can I use Typed Arrays?](https://caniuse.com/#feat=typedarrays))
+* String.prototype.padStart (ES2017; [caniuse](https://caniuse.com/#feat=pad-start-end))
+
+You can use polyfills for them.
+
+### NodeJS
+
+If you use this library in NodeJS, v10 or later is required.
 
 ## Distrubition
 

@@ -44,7 +44,6 @@ export class Encoder {
   }
 
   resizeBuffer(newSize: number) {
-      // TODO: ensure the size to be multiple of 4 and use Uint32Array for performance
       const newBuffer = new ArrayBuffer(newSize);
 
       new Uint8Array(newBuffer).set(new Uint8Array(this.view.buffer));
