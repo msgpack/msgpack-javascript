@@ -1,6 +1,5 @@
 import assert from "assert";
-import { encode, decode } from "../src";
-import { ExtensionCodec, ExtDataType } from "../src/ExtensionCodec";
+import { encode, decode, ExtensionCodec, ExtDataType } from "../src";
 
 function seq(n: number) {
   const a: Array<number> = [];

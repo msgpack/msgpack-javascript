@@ -1,7 +1,6 @@
 import assert from "assert";
 import util from "util";
-import { ExtensionCodec, EXT_TIMESTAMP } from "../src/ExtensionCodec";
-import { encode, decode } from "../src";
+import { encode, decode, ExtensionCodec, EXT_TIMESTAMP } from "../src";
 
 describe("ExtensionCodec", () => {
   context("timestamp", () => {
