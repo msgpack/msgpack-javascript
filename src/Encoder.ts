@@ -1,4 +1,4 @@
-import { utf8Encode } from "./utils/uf8Encode";
+import { utf8Encode, utf8Count } from "./utils/utf8";
 import { ExtensionCodecType, ExtDataType } from "./ExtensionCodec";
 import { encodeInt64, encodeUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
@@ -119,8 +119,7 @@ export class Encoder {
   }
 
   encodeString(object: string) {
-    const bytes = utf8Encode(object);
-    const byteLength = bytes.length;
+    const byteLength = utf8Count(object);
     if (byteLength < 32) {
       // fixstr
       this.writeU8(0xa0 + byteLength);
@@ -140,7 +139,9 @@ export class Encoder {
       throw new Error(`Too long string: ${byteLength} bytes in UTF-8`);
     }
 
-    this.writeU8v(...bytes);
+    this.ensureBufferSizeToWrite(byteLength);
+    utf8Encode(object, this.view, this.pos);
+    this.pos += byteLength;
   }
 
   encodeObject(object: object, depth: number) {

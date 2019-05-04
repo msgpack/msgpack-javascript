@@ -1,6 +1,7 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodecType } from "./ExtensionCodec";
 import { decodeInt64 } from "./utils/int";
+import { utf8Decode } from "./utils/utf8";
 
 export class Decoder {
   pos = 0;
@@ -140,40 +141,10 @@ export class Decoder {
     }
   }
 
-  decodeUtf8String(length: number): string {
-    const out: Array<number> = [];
-    const end = this.pos + length;
-    while (this.pos < end) {
-      const byte1 = this.readU8();
-      if ((byte1 & 0x80) === 0) {
-        // 1 byte
-        out.push(byte1);
-      } else if ((byte1 & 0xe0) === 0xc0) {
-        // 2 bytes
-        const byte2 = this.readU8() & 0x3f;
-        out.push(((byte1 & 0x1f) << 6) | byte2);
-      } else if ((byte1 & 0xf0) === 0xe0) {
-        // 3 bytes
-        const byte2 = this.readU8() & 0x3f;
-        const byte3 = this.readU8() & 0x3f;
-        out.push(((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
-      } else if ((byte1 & 0xf8) === 0xf0) {
-        // 4 bytes
-        const byte2 = this.readU8() & 0x3f;
-        const byte3 = this.readU8() & 0x3f;
-        const byte4 = this.readU8() & 0x3f;
-        let codepoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
-        if (codepoint > 0xffff) {
-          codepoint -= 0x10000;
-          out.push(((codepoint >>> 10) & 0x3ff) | 0xd800);
-          codepoint = 0xdc00 | (codepoint & 0x3ff);
-        }
-        out.push(codepoint);
-      } else {
-        throw new Error(`Invalid UTF-8 byte ${prettyByte(byte1)} at ${this.pos}`);
-      }
-    }
-    return String.fromCharCode(...out);
+  decodeUtf8String(byteLength: number): string {
+    const pos = this.pos;
+    this.pos += byteLength;
+    return utf8Decode(this.view, pos, byteLength);
   }
 
   decodeMap(size: number): Record<string, unknown> {
