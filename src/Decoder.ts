@@ -26,8 +26,8 @@ export class Decoder {
         return this.decodeArray(size);
       } else {
         // fixstr (101x xxxx) 0xa0 - 0xbf
-        const length = type - 0xa0;
-        return this.decodeUtf8String(length);
+        const byteLength = type - 0xa0;
+        return this.decodeUtf8String(byteLength);
       }
     }
     if (type === 0xc0) {
@@ -148,7 +148,7 @@ export class Decoder {
   }
 
   decodeMap(size: number): Record<string, unknown> {
-    const result: Record<string, any> = {};
+    const result: Record<string, unknown> = {};
     for (let i = 0; i < size; i++) {
       const key = this.decode();
       if (typeof key !== "string") {
