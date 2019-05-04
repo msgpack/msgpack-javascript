@@ -1,6 +1,5 @@
 import { ExtensionCodecType, ExtensionCodec } from "./ExtensionCodec";
 import { Decoder } from "./Decoder";
-import { BufferType } from "./BufferType";
 import { createDataView } from "./utils/typedArrays";
 
 export type DecodeOptions = Partial<
@@ -9,7 +8,7 @@ export type DecodeOptions = Partial<
   }>
 >;
 
-export function decode(buffer: BufferType, options: DecodeOptions = {}): unknown {
+export function decode(buffer: ReadonlyArray<number> | Uint8Array, options: DecodeOptions = {}): unknown {
   const view = createDataView(buffer);
 
   const context = new Decoder(view, options.extensionCodec || ExtensionCodec.defaultCodec);
