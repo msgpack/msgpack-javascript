@@ -5,6 +5,7 @@ build/
 package-lock.json
 .nyc_output/
 coverage/
+benchmark/sandbox.ts
 
 # v8 profiler logs
 isolate-*.log

@@ -1,12 +1,17 @@
 import { ExtensionCodecType, ExtensionCodec } from "./ExtensionCodec";
 import { Decoder } from "./Decoder";
 import { BufferType } from "./BufferType";
+import { createDataView } from "./utils/typedArrays";
 
-export type DecodeOptions = Readonly<{
-  extensionCodec: ExtensionCodecType;
-}>;
+export type DecodeOptions = Partial<
+  Readonly<{
+    extensionCodec: ExtensionCodecType;
+  }>
+>;
 
-export function decode(blob: BufferType, options: Partial<DecodeOptions> = {}): unknown {
-  const context = new Decoder(blob, options.extensionCodec || ExtensionCodec.defaultCodec);
+export function decode(buffer: BufferType, options: DecodeOptions = {}): unknown {
+  const view = createDataView(buffer);
+
+  const context = new Decoder(view, options.extensionCodec || ExtensionCodec.defaultCodec);
   return context.decode();
 }
