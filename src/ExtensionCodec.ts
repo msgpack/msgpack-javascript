@@ -1,5 +1,5 @@
 import { BufferType } from "./BufferType";
-import { encodeUint32, decodeUint32, encodeInt32, decodeInt32, decodeInt64, encodeInt64 } from "./utils/int";
+import { decodeInt64, encodeInt64 } from "./utils/int";
 
 export const EXT_TIMESTAMP = -1;
 
@@ -15,30 +15,33 @@ export type TimeSpec = {
 const TIMESTAMP32_MAX_SEC = 0x100000000; // 32-bit signed int
 const TIMESTAMP64_MAX_SEC = 0x400000000; // 34-bit unsigned int
 
-export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): ReadonlyArray<number> {
+export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): Uint8Array {
   if (sec >= 0 && nsec >= 0 && sec < TIMESTAMP64_MAX_SEC) {
     // Here sec >= 0 && nsec >= 0
     if (nsec === 0 && sec < TIMESTAMP32_MAX_SEC) {
       // timestamp 32 = { sec32 (unsigned) }
-      const rv: Array<number> = [];
-      encodeUint32(rv, sec);
+      const rv = new Uint8Array(4);
+      const view = new DataView(rv.buffer);
+      view.setUint32(0, sec);
       return rv;
     } else {
       // timestamp 64 = { nsec30 (unsigned), sec34 (unsigned) }
       const secHigh = sec / 0x100000000;
       const secLow = sec & 0xffffffff;
-      const rv: Array<number> = [];
+      const rv = new Uint8Array(8);
+      const view = new DataView(rv.buffer);
       // nsec30 | secHigh2
-      encodeUint32(rv, (nsec << 2) | (secHigh & 0x3));
+      view.setUint32(0, (nsec << 2) | (secHigh & 0x3));
       // secLow32
-      encodeUint32(rv, secLow);
+      view.setUint32(4, secLow);
       return rv;
     }
   } else {
     // timestamp 96 = { nsec32 (signed), sec64 (signed) }
-    const rv: Array<number> = [];
-    encodeInt32(rv, nsec);
-    encodeInt64(rv, sec);
+    const rv = new Uint8Array(12);
+    const view = new DataView(rv.buffer);
+    view.setInt32(0, nsec);
+    encodeInt64(sec, view, 4);
     return rv;
   }
 }
@@ -60,20 +63,28 @@ export const decodeTimestampExtension: ExtensionDecoderType = (data: BufferType)
   switch (data.length) {
     case 4: {
       // timestamp 32 = { sec32 }
-      const sec = decodeUint32(data[0], data[1], data[2], data[3]);
+      const a = Uint8Array.from(data);
+      const view = new DataView(a.buffer);
+      const sec = view.getUint32(0);
       return new Date(sec * 1000);
     }
     case 8: {
       // timestamp 64 = { nsec30, sec34 }
-      const nsec30AndSecHigh2 = decodeUint32(data[0], data[1], data[2], data[3]);
-      const secLow32 = decodeUint32(data[4], data[5], data[6], data[7]);
+      const a = Uint8Array.from(data);
+      const view = new DataView(a.buffer);
+
+      const nsec30AndSecHigh2 = view.getUint32(0);
+      const secLow32 = view.getUint32(4);
       const nsec = nsec30AndSecHigh2 >>> 2;
       const sec = (nsec30AndSecHigh2 & 0x3) * 0x100000000 + secLow32;
       return new Date(sec * 1000 + nsec / 1e6);
     }
     case 12: {
       // timestamp 96 = { nsec32 (signed), sec64 (signed) }
-      const nsec = decodeInt32(data[0], data[1], data[2], data[3]);
+      const a = Uint8Array.from(data);
+      const view = new DataView(a.buffer);
+
+      const nsec = view.getInt32(0)
       const sec = decodeInt64(data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]);
 
       return new Date(sec * 1000 + nsec / 1e6);

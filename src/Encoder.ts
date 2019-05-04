@@ -3,18 +3,7 @@ import { ExtensionCodecType, ExtDataType } from "./ExtensionCodec";
 import { encodeInt64, encodeUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 
-type EncodeMethodType = (this: Encoder, object: unknown, depth: number) => void;
-
 export class Encoder {
-  static readonly typeofMap = {
-    "undefined": Encoder.prototype.encodeNil,
-    "boolean": Encoder.prototype.encodeBoolean,
-    "number": Encoder.prototype.encodeNumber,
-    "bigint": Encoder.prototype.encodeBigInt,
-    "string": Encoder.prototype.encodeString,
-    "object": Encoder.prototype.encodeObject,
-  } as Record<string, EncodeMethodType>;
-
   private pos = 0;
   private view = new DataView(new ArrayBuffer(64));
 
@@ -24,11 +13,22 @@ export class Encoder {
     if (depth > this.maxDepth) {
       throw new Error(`Too deep objects in depth ${depth}`);
     }
-    const encodeFunc = Encoder.typeofMap[typeof object];
-    if (!encodeFunc) {
+
+    if (object == null) {
+      this.encodeNil();
+    } else if (typeof object === "boolean") {
+      this.encodeBoolean(object);
+    } else if (typeof object === "number") {
+      this.encodeNumber(object);
+    } else if (typeof object === "bigint") {
+      this.encodeBigInt(object);
+    } else if (typeof object === "string") {
+      this.encodeString(object);
+    } else if (typeof object === "object") {
+      this.encodeObject(object!, depth);
+    } else {
       throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
     }
-    encodeFunc.call(this, object, depth);
   }
 
   getArrayBuffer(): ArrayBuffer {
@@ -84,9 +84,7 @@ export class Encoder {
         } else {
           // uint 64
           this.writeU8(0xcf);
-          const rv: Array<number> = [];
-          encodeUint64(rv, object);
-          this.writeU8v(...rv);
+          this.writeU64(object);
         }
       } else {
         if (object >= -0x20) {
@@ -107,9 +105,7 @@ export class Encoder {
         } else {
           // int 64
           this.writeU8(0xd3);
-          const rv: Array<number> = [];
-          encodeInt64(rv, object);
-          this.writeU8v(...rv);
+          this.writeI64(object);
         }
       }
     } else {
@@ -148,11 +144,7 @@ export class Encoder {
     this.writeU8v(...bytes);
   }
 
-  encodeObject(object: object | null, depth: number) {
-    if (object === null) {
-      this.encodeNil();
-      return;
-    }
+  encodeObject(object: object, depth: number) {
     // try to encode objects with custom codec first of non-primitives
     const ext = this.extensionCodec.tryToEncode(object);
     if (ext != null) {
@@ -327,5 +319,21 @@ export class Encoder {
     const pos = this.pos;
     this.pos += 8;
     this.view.setFloat64(pos, value);
+  }
+
+  writeU64(value: number) {
+    this.ensureBufferSizeToWrite(8);
+
+    const pos = this.pos;
+    this.pos += 8;
+    encodeUint64(value, this.view, pos);
+  }
+
+  writeI64(value: number) {
+    this.ensureBufferSizeToWrite(8);
+
+    const pos = this.pos;
+    this.pos += 8;
+    encodeInt64(value, this.view, pos);
   }
 }

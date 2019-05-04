@@ -1,51 +1,24 @@
-export function encodeUint32(rv: Array<number>, value: number): void {
-  rv.push((value >>> 24) & 0xff, (value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff);
-}
-
-export function decodeUint32(b1: number, b2: number, b3: number, b4: number) {
-  // do not use `b1 << 32` because JavaScript only handles 32-bit integer for bitwise operations
-  return b1 * 0x1000000 + (b2 << 16) + (b3 << 8) + b4;
-}
-
-export const encodeInt32 = encodeUint32;
-
-export function decodeInt32(b1: number, b2: number, b3: number, b4: number): number {
-  const v = decodeUint32(b1, b2, b3, b4);
-  return v < 0x80000000 ? v : v - 0x100000000;
-}
-
-// the actual range is int52 (a.k.a. safe integer)
-export function encodeInt64(rv: Array<number>, value: number): void {
+// the actual range is int53 (a.k.a. safe integer)
+export function encodeInt64(value: number, view: DataView, offset: number): void {
   if (value < 0) {
     const absMinusOne = -value - 1;
     const high = absMinusOne / 0x100000000;
     const low = absMinusOne & 0xffffffff;
-    rv.push(
-      (((high >> 24) & 0xff) ^ 0xff) | 0x80,
-      ((high >> 16) & 0xff) ^ 0xff,
-      ((high >> 8) & 0xff) ^ 0xff,
-      (high & 0xff) ^ 0xff,
-      ((low >> 24) & 0xff) ^ 0xff,
-      ((low >> 16) & 0xff) ^ 0xff,
-      ((low >> 8) & 0xff) ^ 0xff,
-      (low & 0xff) ^ 0xff,
-    );
+
+    view.setUint8(offset, (((high >> 24) & 0xff) ^ 0xff) | 0x80);
+    view.setUint8(offset + 1, ((high >> 16) & 0xff) ^ 0xff);
+    view.setUint8(offset + 2, ((high >> 8) & 0xff) ^ 0xff);
+    view.setUint8(offset + 3, (high & 0xff) ^ 0xff);
+    view.setUint8(offset + 4, ((low >> 24) & 0xff) ^ 0xff);
+    view.setUint8(offset + 5, ((low >> 16) & 0xff) ^ 0xff);
+    view.setUint8(offset + 6, ((low >> 8) & 0xff) ^ 0xff);
+    view.setUint8(offset + 7, (low & 0xff) ^ 0xff);
   } else {
-    const high = value / 0x100000000;
-    const low = value & 0xffffffff;
-    rv.push(
-      (high >> 24) & 0xff,
-      (high >> 16) & 0xff,
-      (high >> 8) & 0xff,
-      high & 0xff,
-      (low >> 24) & 0xff,
-      (low >> 16) & 0xff,
-      (low >> 8) & 0xff,
-      low & 0xff,
-    );
+    encodeUint64(value, view, offset);
   }
 }
 
+// the actual range is int53 (a.k.a. safe integer)
 export function decodeInt64(
   b1: number,
   b2: number,
@@ -82,18 +55,11 @@ export function decodeInt64(
   );
 }
 
-export function encodeUint64(rv: Array<number>, value: number): void {
+// the actual range is int53 (a.k.a. safe integer)
+export function encodeUint64(value: number, view: DataView, offset: number): void {
   const high = value / 0x100000000;
   const low = value & 0xffffffff;
 
-  rv.push(
-    (high >> 24) & 0xff,
-    (high >> 16) & 0xff,
-    (high >> 8) & 0xff,
-    high & 0xff,
-    (low >> 24) & 0xff,
-    (low >> 16) & 0xff,
-    (low >> 8) & 0xff,
-    low & 0xff,
-  );
+  view.setUint32(offset, high);
+  view.setUint32(offset + 4, low);
 }

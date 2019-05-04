@@ -106,6 +106,7 @@ describe("msgpack-test-suite", () => {
         acc[`k${i}`] = i;
         return acc;
       }, {}),
+      MIXED: new Array(0x10).fill(Number.MAX_SAFE_INTEGER),
     } as Record<string, any>;
 
     for (const name of Object.keys(SPECS)) {
