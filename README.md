@@ -94,8 +94,8 @@ Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128
 ## Prerequsites
 
 * ES5 language features
-* Typed Arrays (ES2015; [Can I use Typed Arrays?](https://caniuse.com/#feat=typedarrays))
-* String.prototype.padStart (ES2017; [caniuse](https://caniuse.com/#feat=pad-start-end))
+* Typed Arrays (ES2015; [caniuse: typedarrays](https://caniuse.com/#feat=typedarrays))
+* String.prototype.padStart (ES2017; [caniuse: pad-start-end](https://caniuse.com/#feat=pad-start-end))
 
 You can use polyfills for them.
 
