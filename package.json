@@ -2,8 +2,9 @@
   "name": "@msgpack/msgpack",
   "version": "0.11.1",
   "description": "MessagePack implementation in JavaScript",
-  "main": "dist/index.js",
-  "browser": "dist.es5/msgpack.js",
+  "main": "./dist/index.js",
+  "browser": "./dist.es5/msgpack.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "npm publish --dry-run",
     "prepare": "rm -rf dist dist.* ; tsc -p tsconfig.production.es2019.json && webpack",
@@ -55,6 +56,7 @@
   },
   "dependencies": {},
   "files": [
+    "src/**/*.*",
     "dist/**/*.*",
     "dist.es5/**/*.*"
   ]
