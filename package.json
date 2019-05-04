@@ -6,7 +6,7 @@
   "browser": "dist.es5/msgpack.js",
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "tsc -p tsconfig.production.es2019.json && webpack",
+    "prepare": "rm -rf dist dist.* ; tsc -p tsconfig.production.es2019.json && webpack",
     "prepublishOnly": "TEST_DIST=true npm run test",
     "clean": "rm -rf build dist dist.es5",
     "test": "mocha 'test/**/*.test.ts'",
