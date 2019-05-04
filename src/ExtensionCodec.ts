@@ -11,7 +11,7 @@ export type TimeSpec = {
   nsec: number;
 };
 
-const TIMESTAMP32_MAX_SEC = 0x100000000; // 32-bit signed int
+const TIMESTAMP32_MAX_SEC = 0x100000000; // 32-bit unsigned int
 const TIMESTAMP64_MAX_SEC = 0x400000000; // 34-bit unsigned int
 
 export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): Uint8Array {
