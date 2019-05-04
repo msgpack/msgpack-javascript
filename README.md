@@ -103,6 +103,20 @@ You can use polyfills for them.
 
 If you use this library in NodeJS, v10 or later is required.
 
+## Benchmark
+
+Benchmark on NodeJS/v12.1.0 (macOS 10.14.4):
+
+operation                                                         |   op   |   ms  |  op/s
+----------------------------------------------------------------- | ------: | ----: | ------:
+buf = Buffer.from(JSON.stringify(obj));                           |  496800 |  5000 |   99360
+buf = JSON.stringify(obj);                                        |  911800 |  5000 |  182360
+obj = JSON.parse(buf);                                            |  350600 |  5000 |   70120
+buf = require("msgpack-lite").encode(obj);                        |  350900 |  5000 |   70180
+obj = require("msgpack-lite").decode(buf);                        |  270800 |  5000 |   54160
+buf = require("@msgpack/msgpack").encode(obj);                    |  576700 |  5000 |  115340
+obj = require("@msgpack/msgpack").decode(buf);                    |  340800 |  5001 |   68146
+
 ## Distrubition
 
 The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
