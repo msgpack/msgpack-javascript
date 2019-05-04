@@ -80,7 +80,7 @@ export const decodeTimestampExtension: ExtensionDecoderType = (data: Uint8Array)
       // timestamp 96 = { nsec32 (signed), sec64 (signed) }
       const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
-      const nsec = view.getInt32(0)
+      const nsec = view.getInt32(0);
       const sec = decodeInt64(data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]);
 
       return new Date(sec * 1000 + nsec / 1e6);

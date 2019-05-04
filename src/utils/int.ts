@@ -1,4 +1,13 @@
 // the actual range is int53 (a.k.a. safe integer)
+export function encodeUint64(value: number, view: DataView, offset: number): void {
+  const high = value / 0x100000000;
+  const low = value & 0xffffffff;
+
+  view.setUint32(offset, high);
+  view.setUint32(offset + 4, low);
+}
+
+// the actual range is int53 (a.k.a. safe integer)
 export function encodeInt64(value: number, view: DataView, offset: number): void {
   if (value < 0) {
     const absMinusOne = -value - 1;
@@ -53,13 +62,4 @@ export function decodeInt64(
     b7 * 0x100 +
     b8
   );
-}
-
-// the actual range is int53 (a.k.a. safe integer)
-export function encodeUint64(value: number, view: DataView, offset: number): void {
-  const high = value / 0x100000000;
-  const low = value & 0xffffffff;
-
-  view.setUint32(offset, high);
-  view.setUint32(offset + 4, low);
 }

@@ -44,12 +44,12 @@ export class Encoder {
   }
 
   resizeBuffer(newSize: number) {
-      const newBuffer = new ArrayBuffer(newSize);
+    const newBuffer = new ArrayBuffer(newSize);
 
-      new Uint8Array(newBuffer).set(new Uint8Array(this.view.buffer));
+    new Uint8Array(newBuffer).set(new Uint8Array(this.view.buffer));
 
-      const newView = new DataView(newBuffer);
-      this.view = newView;
+    const newView = new DataView(newBuffer);
+    this.view = newView;
   }
 
   encodeNil() {

@@ -19,6 +19,7 @@ module.exports = {
     "no-constant-condition": ["warn", { checkLoops: false }],
     "no-useless-escape": "warn",
     "no-console": "warn",
+    "valid-typeof": "warn", // "bigint" is not yet supported
 
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_|^intl$" }],
     "@typescript-eslint/array-type": ["error", "generic"],

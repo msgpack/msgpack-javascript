@@ -4,7 +4,6 @@ import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
 import { encode as _encode, decode as _decode } from "../src";
 import { ExtensionCodec, EXT_TIMESTAMP, encodeTimestampFromTimeSpec } from "../src/ExtensionCodec";
-import { BufferType } from "../src/BufferType";
 
 const { encode, decode }: { encode: typeof _encode; decode: typeof _decode } = (() => {
   if (process.env.TEST_DIST) {
