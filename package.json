@@ -37,7 +37,7 @@
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "^1.0.2",
     "@types/mocha": "^5.2.6",
-    "@types/node": "^11.13.8",
+    "@types/node": "^11.13.10",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
     "@typescript-eslint/parser": "^1.7.0",
     "eslint": "^5.16.0",
