@@ -46,7 +46,7 @@ To handle [MessagePack Extension Types](https://github.com/msgpack/msgpack/blob/
 Here is an example to setup custom extension types that handles `Map` and `Set` classes in TypeScript:
 
 ```typescript
-import { ExtensionCodec } from "@msgpack/msgpack";
+import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
 
 const extensionCodec = new ExtensionCodec();
 
