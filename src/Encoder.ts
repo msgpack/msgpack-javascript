@@ -3,9 +3,11 @@ import { ExtensionCodecType, ExtDataType } from "./ExtensionCodec";
 import { encodeInt64, encodeUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 
+const initialBufferSize = 1024;
+
 export class Encoder {
   private pos = 0;
-  private view = new DataView(new ArrayBuffer(64));
+  private view = new DataView(new ArrayBuffer(initialBufferSize));
 
   constructor(readonly maxDepth: number, readonly extensionCodec: ExtensionCodecType) {}
 
