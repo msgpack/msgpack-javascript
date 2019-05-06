@@ -81,32 +81,32 @@ describe("decodeAsync", () => {
     assert.deepStrictEqual(object, new Uint8Array(0));
   });
 
-  // it("decodes mixed object byte-by-byte", async () => {
-  //   const object = {
-  //     nil: null,
-  //     true: true,
-  //     false: false,
-  //     int: -42,
-  //     uint64: Number.MAX_SAFE_INTEGER,
-  //     int64: Number.MIN_SAFE_INTEGER,
-  //     float: Math.PI,
-  //     string: "Hello, world!",
-  //     longString: "Hello, world!\n".repeat(100),
-  //     binary: Uint8Array.from([0xf1, 0xf2, 0xf3]),
-  //     array: [1000, 2000, 3000],
-  //     map: { foo: 1, bar: 2, baz: 3 },
-  //     timestampExt: new Date(),
-  //     map0: {},
-  //     array0: [],
-  //     str0: "",
-  //     bin0: Uint8Array.from([]),
-  //   };
+  it("decodes mixed object byte-by-byte", async () => {
+    const object = {
+      nil: null,
+      true: true,
+      false: false,
+      int: -42,
+      uint64: Number.MAX_SAFE_INTEGER,
+      int64: Number.MIN_SAFE_INTEGER,
+      float: Math.PI,
+      string: "Hello, world!",
+      longString: "Hello, world!\n".repeat(100),
+      binary: Uint8Array.from([0xf1, 0xf2, 0xf3]),
+      array: [1000, 2000, 3000],
+      map: { foo: 1, bar: 2, baz: 3 },
+      timestampExt: new Date(),
+      map0: {},
+      array0: [],
+      str0: "",
+      bin0: Uint8Array.from([]),
+    };
 
-  //   const asyncBuffers = async function*() {
-  //     for (const byte of encode(object)) {
-  //       yield [byte];
-  //     }
-  //   };
-  //   assert.deepStrictEqual(await decodeAsync(asyncBuffers()), object);
-  // });
+    const asyncBuffers = async function*() {
+      for (const byte of encode(object)) {
+        yield [byte];
+      }
+    };
+    assert.deepStrictEqual(await decodeAsync(asyncBuffers()), object);
+  });
 });
