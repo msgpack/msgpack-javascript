@@ -36,21 +36,29 @@ export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): Uint8Array
       return rv;
     }
   } else {
-    // timestamp 96 = { nsec32 (signed), sec64 (signed) }
+    // timestamp 96 = { nsec32 (unsigned), sec64 (signed) }
     const rv = new Uint8Array(12);
     const view = new DataView(rv.buffer);
-    view.setInt32(0, nsec);
+    view.setUint32(0, nsec);
     encodeInt64(sec, view, 4);
     return rv;
   }
 }
 
+export function encodeDateToTimeSpec(date: Date): TimeSpec {
+  const time = date.getTime();
+  const sec = time < 0 ? Math.ceil(time / 1000) : Math.floor(time / 1000);
+  const nsec = (time - sec * 1000) * 1e6;
+  return {
+    sec: sec + Math.floor(nsec / 1e9),
+    nsec: nsec - Math.floor(nsec / 1e9) * 1e9,
+  };
+}
+
 export const encodeTimestampExtension: ExtensionEncoderType = (object: unknown) => {
   if (isDate(object)) {
-    const time = object.getTime();
-    const sec = time < 0 ? Math.ceil(time / 1000) : Math.floor(time / 1000);
-    const nsec = (time - sec * 1000) * 1e6;
-    return encodeTimestampFromTimeSpec({ sec, nsec });
+    const timeSpec = encodeDateToTimeSpec(object);
+    return encodeTimestampFromTimeSpec(timeSpec);
   } else {
     return null;
   }
@@ -77,10 +85,10 @@ export const decodeTimestampExtension: ExtensionDecoderType = (data: Uint8Array)
       return new Date(sec * 1000 + nsec / 1e6);
     }
     case 12: {
-      // timestamp 96 = { nsec32 (signed), sec64 (signed) }
+      // timestamp 96 = { nsec32 (unsigned), sec64 (signed) }
       const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
-      const nsec = view.getInt32(0);
+      const nsec = view.getUint32(0);
       const sec = decodeInt64(data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]);
 
       return new Date(sec * 1000 + nsec / 1e6);
