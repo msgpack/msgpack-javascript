@@ -1,0 +1,83 @@
+import assert from "assert";
+import { encode, decodeAsync } from "../src";
+
+describe("decodeAsync", () => {
+  it("decodes [fixarray, nil]", async () => {
+    const asyncBuffers = async function*() {
+      yield [0x91]; // fixarray size=1
+      yield [0xc0]; // nil
+    };
+
+    const object = await decodeAsync(asyncBuffers());
+    assert.deepStrictEqual(object, [null]);
+  });
+
+  it("decodes fixmap {'foo': 'bar'}", async () => {
+    const asyncBuffers = async function*() {
+      yield [0x81]; // fixmap size=1
+      yield encode("foo");
+      yield encode("bar");
+    };
+
+    const object = await decodeAsync(asyncBuffers());
+    assert.deepStrictEqual(object, { "foo": "bar" });
+  });
+
+  it("decodes multi-byte integer byte-by-byte", async () => {
+    const asyncBuffers = async function*() {
+      yield [0xcd]; // uint 16
+      yield [0x12];
+      yield [0x34];
+    };
+    const object = await decodeAsync(asyncBuffers());
+    assert.deepStrictEqual(object, 0x1234);
+  });
+
+  it("decodes string byte-by-byte", async () => {
+    const asyncBuffers = async function*() {
+      yield [0xa3]; // fixstr 3
+      yield [0x66]; // "f"
+      yield [0x6f]; // "o"
+      yield [0x6f]; // "o"
+    };
+    const object = await decodeAsync(asyncBuffers());
+    assert.deepStrictEqual(object, "foo");
+  });
+
+  it("decodes string byte-by-byte", async () => {
+    const asyncBuffers = async function*() {
+      yield [0xc4]; // bin 8
+      yield [0x03]; // size 3
+      yield [0x66]; // "f"
+      yield [0x6f]; // "o"
+      yield [0x6f]; // "o"
+    };
+    const object = await decodeAsync(asyncBuffers());
+    assert.deepStrictEqual(object, Uint8Array.from([0x66, 0x6f, 0x6f]));
+  });
+
+  it("decodes mixed object byte-by-byte", async () => {
+    const object = {
+      nil: null,
+      true: true,
+      false: false,
+      int: -42,
+      uint64: Number.MAX_SAFE_INTEGER,
+      int64: Number.MIN_SAFE_INTEGER,
+      float: Math.PI,
+      string: "Hello, world!",
+      longString: "Hello, world!\n".repeat(100),
+      binary: Uint8Array.from([0xf1, 0xf2, 0xf3]),
+      array: [1000, 2000, 3000],
+      map: { foo: 1, bar: 2, baz: 3 },
+      timestampExt: new Date(),
+    };
+
+    const asyncBuffers = async function*() {
+      for (const byte of encode(object)) {
+        yield [byte];
+      }
+    };
+    assert.deepStrictEqual(await decodeAsync(asyncBuffers()), object);
+  });
+});

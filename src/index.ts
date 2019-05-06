@@ -1,5 +1,6 @@
 export { encode } from "./encode";
 export { decode } from "./decode";
+export { decodeAsync } from "./decodeAsync";
 
 // Utilitiies for extensions
 export {

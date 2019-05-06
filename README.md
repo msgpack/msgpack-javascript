@@ -15,7 +15,7 @@ import { deepStrictEqual } from "assert";
 import { encode, decode } from "@msgpack/msgpack";
 
 const object = {
-  nullOrUndefined: null,
+  nil: null,
   integer: 1,
   float: Math.PI,
   string: "Hello, world!",
