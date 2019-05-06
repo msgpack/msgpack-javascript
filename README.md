@@ -39,6 +39,20 @@ This library is publised as [@msgpack/msgpack](https://www.npmjs.com/package/@ms
 npm install @msgpack/msgpack
 ```
 
+## Encode and Decode
+
+### `encode(data: unknown, options?): Uint8Array`
+
+It encodes `data` and returns a byte array as `Uint8Array`.
+
+### `decode(buffer: ArrayLike<number> | Uint8Array, options?): unknown`
+
+It decodes `buffer` in a byte buffer and returns decoded data as `uknown`.
+
+### `decodeAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>, options?): Promise<unknown>`
+
+It decodes `stream` in an async iterable of byte arrays and returns decoded data as `uknown` wrapped in `Promise`. This function works asyncronously.
+
 ## Extension Types
 
 To handle [MessagePack Extension Types](https://github.com/msgpack/msgpack/blob/master/spec.md#extension-types), this library provides `ExtensionCodec` class.
