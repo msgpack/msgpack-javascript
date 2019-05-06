@@ -70,23 +70,21 @@ export class AsyncDecoder {
       }
     }
 
-    this.view = EMPTY_VIEW;
     const { headByte, pos, totalPos } = this;
     throw new Error(
       `Insufficient data in parcing ${prettyByte(headByte)} at ${totalPos} (${pos} in the current buffer)`,
     );
   }
 
-  readHeadByte() {
+  readHeadByte(): number {
     if (this.headByte === HEAD_BYTE_REQUIRED) {
-      const headByte = (this.headByte = this.readU8());
-      return headByte;
-    } else {
-      return this.headByte; // to resume consume()
+      this.headByte = this.readU8();
     }
+
+    return this.headByte;
   }
 
-  complete() {
+  complete(): void {
     this.headByte = HEAD_BYTE_REQUIRED;
   }
 
