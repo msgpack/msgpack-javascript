@@ -5,7 +5,7 @@ describe("README", () => {
   context("#synopsis", () => {
     it("runs", () => {
       const object = {
-        nullOrUndefined: null,
+        nil: null,
         integer: 1,
         float: Math.PI,
         string: "Hello, world!",

@@ -1,14 +1,16 @@
 import { ExtensionCodecType, ExtensionCodec } from "./ExtensionCodec";
 import { Decoder } from "./Decoder";
 
-export type DecodeOptions = Partial<
+type DecodeAsyncOptions = Partial<
   Readonly<{
     extensionCodec: ExtensionCodecType;
   }>
 >;
 
-export function decode(buffer: ReadonlyArray<number> | Uint8Array, options: DecodeOptions = {}): unknown {
+export async function decodeAsync(
+  buffers: AsyncIterable<Uint8Array | ArrayLike<number>>,
+  options: DecodeAsyncOptions = {},
+): Promise<unknown> {
   const decoder = new Decoder(options.extensionCodec || ExtensionCodec.defaultCodec);
-  decoder.setBuffer(buffer); // decodeSync() requires only one buffer
-  return decoder.decodeSync();
+  return await decoder.decodeAsync(buffers);
 }

@@ -22,11 +22,14 @@ export class Encoder {
       this.encodeBoolean(object);
     } else if (typeof object === "number") {
       this.encodeNumber(object);
+
+      // eslint-disable-next-line valid-typeof
     } else if (typeof object === "bigint") {
       this.encodeBigInt(object);
     } else if (typeof object === "string") {
       this.encodeString(object);
     } else if (typeof object === "object") {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.encodeObject(object!, depth);
     } else {
       throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);

@@ -15,7 +15,7 @@ import { deepStrictEqual } from "assert";
 import { encode, decode } from "@msgpack/msgpack";
 
 const object = {
-  nullOrUndefined: null,
+  nil: null,
   integer: 1,
   float: Math.PI,
   string: "Hello, world!",
@@ -38,6 +38,20 @@ This library is publised as [@msgpack/msgpack](https://www.npmjs.com/package/@ms
 ```shell
 npm install @msgpack/msgpack
 ```
+
+## Encode and Decode
+
+### `encode(data: unknown, options?): Uint8Array`
+
+It encodes `data` and returns a byte array as `Uint8Array`.
+
+### `decode(buffer: ArrayLike<number> | Uint8Array, options?): unknown`
+
+It decodes `buffer` in a byte buffer and returns decoded data as `uknown`.
+
+### `decodeAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>, options?): Promise<unknown>`
+
+It decodes `stream` in an async iterable of byte arrays and returns decoded data as `uknown` wrapped in `Promise`. This function works asyncronously.
 
 ## Extension Types
 
@@ -105,17 +119,17 @@ If you use this library in NodeJS, v10 or later is required.
 
 ## Benchmark
 
-Benchmark on NodeJS/v12.1.0 (macOS 10.14.4):
+Benchmark on NodeJS/v12.1.0
 
 operation                                                         |   op   |   ms  |  op/s
 ----------------------------------------------------------------- | ------: | ----: | ------:
-buf = Buffer.from(JSON.stringify(obj));                           |  496800 |  5000 |   99360
-buf = JSON.stringify(obj);                                        |  911800 |  5000 |  182360
-obj = JSON.parse(buf);                                            |  350600 |  5000 |   70120
-buf = require("msgpack-lite").encode(obj);                        |  350900 |  5000 |   70180
-obj = require("msgpack-lite").decode(buf);                        |  270800 |  5000 |   54160
-buf = require("@msgpack/msgpack").encode(obj);                    |  576700 |  5000 |  115340
-obj = require("@msgpack/msgpack").decode(buf);                    |  340800 |  5001 |   68146
+buf = Buffer.from(JSON.stringify(obj));                           |  493600 |  5000 |   98720
+buf = JSON.stringify(obj);                                        |  959600 |  5000 |  191920
+obj = JSON.parse(buf);                                            |  346100 |  5000 |   69220
+buf = require("msgpack-lite").encode(obj);                        |  358300 |  5000 |   71660
+obj = require("msgpack-lite").decode(buf);                        |  270400 |  5000 |   54080
+buf = require("@msgpack/msgpack").encode(obj);                    |  594300 |  5000 |  118860
+obj = require("@msgpack/msgpack").decode(buf);                    |  343100 |  5000 |   68620
 
 ## Distrubition
 
