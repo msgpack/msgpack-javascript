@@ -49,6 +49,8 @@ export function encodeDateToTimeSpec(date: Date): TimeSpec {
   const time = date.getTime();
   const sec = time < 0 ? Math.ceil(time / 1000) : Math.floor(time / 1000);
   const nsec = (time - sec * 1000) * 1e6;
+
+  // Normalizes nsec to ensure it is unsigned.
   return {
     sec: sec + Math.floor(nsec / 1e9),
     nsec: nsec - Math.floor(nsec / 1e9) * 1e9,
