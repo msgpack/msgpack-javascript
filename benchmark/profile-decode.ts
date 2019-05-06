@@ -1,4 +1,4 @@
-import { encode, decode, decodeAsync, ExtensionCodec } from "../src";
+import { encode, decode, decodeAsync } from "../src";
 
 const data = require("./benchmark-from-msgpack-lite-data.json");
 const encoded = encode(data);

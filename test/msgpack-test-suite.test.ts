@@ -12,6 +12,7 @@ import {
 
 const { encode, decode }: { encode: typeof _encode; decode: typeof _decode } = (() => {
   if (process.env.TEST_DIST) {
+    // eslint-disable-next-line no-console
     console.log("# TEST_DIST is set");
     return require("../dist.es5/msgpack.js");
   } else {

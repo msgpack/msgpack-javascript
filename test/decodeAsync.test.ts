@@ -2,7 +2,6 @@ import assert from "assert";
 import { encode, decodeAsync } from "../src";
 
 describe("decodeAsync", () => {
-
   function wrapWithNoisyBuffer(byte: number) {
     return Uint8Array.from([0x01, byte, 0x02]).subarray(1, 2);
   }
@@ -69,7 +68,6 @@ describe("decodeAsync", () => {
     const object = await decodeAsync(asyncBuffers());
     assert.deepStrictEqual(object, Uint8Array.from([0x66, 0x6f, 0x6f]));
   });
-
 
   it("decodes binary with noisy buffer", async () => {
     const asyncBuffers = async function*() {

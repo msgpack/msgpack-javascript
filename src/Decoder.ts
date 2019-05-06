@@ -56,7 +56,6 @@ export class Decoder {
         this.setBuffer(buffer);
       } else {
         // retried because data is insufficient
-        // TODO: reuse ArrayBuffer as much as possible
         const remainingData = new Uint8Array(
           this.view.buffer,
           this.view.byteOffset + this.pos,
@@ -362,10 +361,6 @@ export class Decoder {
 
   lookU32() {
     return this.view.getUint32(this.pos);
-  }
-
-  lookI8() {
-    return this.view.getInt8(this.pos);
   }
 
   readU8(): number {
