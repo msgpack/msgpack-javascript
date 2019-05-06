@@ -1,6 +1,7 @@
 import assert from "assert";
 import util from "util";
 import { encode, decode } from "../src";
+import { encodeDateToTimeSpec } from "../src/ExtensionCodec";
 
 const TIME = 1556636810389;
 
@@ -17,13 +18,21 @@ const SPECS = {
   REGRESSION_1: new Date(1556799054803),
 } as Record<string, Date>;
 
-describe("codec: timestamp 32/64/96", () => {
-  for (const name of Object.keys(SPECS)) {
-    const value = SPECS[name];
+describe("codec: timestamp", () => {
+  context("timestamp 32/64/96", () => {
+    for (const name of Object.keys(SPECS)) {
+      const value = SPECS[name];
 
-    it(`encodes and decodes ${name} (${value.toISOString()})`, () => {
-      const encoded = encode(value);
-      assert.deepStrictEqual(decode(encoded), value, `encoded: ${util.inspect(Buffer.from(encoded))}`);
+      it(`encodes and decodes ${name} (${value.toISOString()})`, () => {
+        const encoded = encode(value);
+        assert.deepStrictEqual(decode(encoded), value, `encoded: ${util.inspect(Buffer.from(encoded))}`);
+      });
+    }
+  });
+
+  context("encodeDateToTimeSpec", () => {
+    it("normalizes new Date(-1) to { sec: -1, nsec: 999000000 }", () => {
+      assert.deepStrictEqual(encodeDateToTimeSpec(new Date(-1)), { sec: -1, nsec: 999000000 });
     });
-  }
+  });
 });
