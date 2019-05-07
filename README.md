@@ -115,13 +115,14 @@ boolean (true, false)|bool format family|boolean (true, false)
 number (53-bit int)|int format family|number (53-bit int)
 number (64-bit float)|float format family|Number (64-bit float)
 string|str format family|string
-ArrayBufferView |bin format family|Uint8Array
+ArrayBufferView |bin format family|Uint8Array (*2)
 Array|array format family|Array
 object|map format family|object
-Date|timestamp ext format family|Date (*2)
+Date|timestamp ext format family|Date (*3)
 
-* *1 Both `null` and `undefined` are mapped to `nil` (`0xC1`) type and are decoded into `null`
-* MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overrided by defining `-1` for the extension codec.
+* *1 Both `null` and `undefined` are mapped to `nil` (`0xC1`) type, and are decoded into `null`
+* *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
+* *3 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overrided by defining `-1` for the extension codec.
 
 ## Prerequsites
 
