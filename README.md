@@ -104,6 +104,25 @@ const decoded = decode(encoded, { extensionCodec });
 
 Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
 
+### MessagePack Mapping Table
+
+The following table shows how JavaScript values are mapped to [MessagePack formats](https://github.com/msgpack/msgpack/blob/master/spec.md) and vice versa.
+
+Source Value|MessagePack Format|Value Decoded
+----|----|----
+null, undefined|nil format family|null (*1)
+boolean (true, false)|bool format family|boolean (true, false)
+number (53-bit int)|int format family|number (53-bit int)
+number (64-bit float)|float format family|Number (64-bit float)
+string|str format family|string
+ArrayBufferView |bin format family|Uint8Array
+Array|array format family|Array
+object|map format family|object
+Date|timestamp ext format family|Date (*2)
+
+* *1 Both `null` and `undefined` are mapped to `nil` (`0xC1`) type and are decoded into `null`
+* MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overrided by defining `-1` for the extension codec.
+
 ## Prerequsites
 
 ### ECMA-262
@@ -117,7 +136,7 @@ You can use polyfills for all of them with TypeScript downlevel compilation.
 
 ### NodeJS
 
-If you use this library in NodeJS, v10 or later is required, but NodeJS v12 is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
+If you use this library in NodeJS v10 or later is required, but NodeJS v12 is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
 
 ## Benchmark
 
