@@ -50,8 +50,8 @@ export class Decoder {
     return this.view.byteLength - this.pos >= size;
   }
 
-  async decodeAsync(buffers: AsyncIterable<ArrayLike<number> | Uint8Array>): Promise<unknown> {
-    for await (const buffer of buffers) {
+  async decodeAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>): Promise<unknown> {
+    for await (const buffer of stream) {
       if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
         this.setBuffer(buffer);
       } else {
