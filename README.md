@@ -111,8 +111,9 @@ Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128
 * ES5 language features
 * Typed Arrays (ES2015; [caniuse: typedarrays](https://caniuse.com/#feat=typedarrays))
 * String.prototype.padStart (ES2017; [caniuse: pad-start-end](https://caniuse.com/#feat=pad-start-end))
+* Async iterations / `for await of` syntax (ES2018)
 
-You can use polyfills for them.
+You can use polyfills for all of them with TypeScript downlevel compilation.
 
 ### NodeJS
 
