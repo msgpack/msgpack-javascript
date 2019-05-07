@@ -1,6 +1,6 @@
 # MessagePack for JavaScript [![npm version](https://badge.fury.io/js/%40msgpack%2Fmsgpack.svg)](https://badge.fury.io/js/%40msgpack%2Fmsgpack) [![Build Status](https://travis-ci.org/msgpack/msgpack-javascript.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-javascript)
 
-This is the pure-JavaScript implementation of *MessagePack*, an efficient binary serilization format:
+This is the pure-JavaScript implementation of **MessagePack**, an efficient binary serilization format:
 
 https://msgpack.org/
 
@@ -25,8 +25,7 @@ const object = {
   timestampExt: new Date(),
 };
 
-const encoded = encode(object);
-// encoded is an Uint8Array instance
+const encoded: Uint8Array = encode(object);
 
 deepStrictEqual(decode(encoded), object);
 ```
@@ -39,7 +38,7 @@ This library is publised as [@msgpack/msgpack](https://www.npmjs.com/package/@ms
 npm install @msgpack/msgpack
 ```
 
-## Encode and Decode
+## API
 
 ### `encode(data: unknown, options?): Uint8Array`
 
@@ -53,7 +52,7 @@ It decodes `buffer` in a byte buffer and returns decoded data as `uknown`.
 
 It decodes `stream` in an async iterable of byte arrays and returns decoded data as `uknown` wrapped in `Promise`. This function works asyncronously.
 
-## Extension Types
+### Extension Types
 
 To handle [MessagePack Extension Types](https://github.com/msgpack/msgpack/blob/master/spec.md#extension-types), this library provides `ExtensionCodec` class.
 
@@ -106,6 +105,8 @@ const decoded = decode(encoded, { extensionCodec });
 Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
 
 ## Prerequsites
+
+### ECMA-262
 
 * ES5 language features
 * Typed Arrays (ES2015; [caniuse: typedarrays](https://caniuse.com/#feat=typedarrays))
