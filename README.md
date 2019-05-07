@@ -103,7 +103,7 @@ const encoded = = encode([new Set<any>(), new Map<any, any>()], { extensionCodec
 const decoded = decode(encoded, { extensionCodec });
 ```
 
-Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved to MessagePack itself.
+Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
 
 ## Prerequsites
 
@@ -115,7 +115,7 @@ You can use polyfills for them.
 
 ### NodeJS
 
-If you use this library in NodeJS, v10 or later is required.
+If you use this library in NodeJS, v10 or later is required, but NodeJS v12 is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
 
 ## Benchmark
 
@@ -130,6 +130,8 @@ buf = require("msgpack-lite").encode(obj);                        |  358300 |  5
 obj = require("msgpack-lite").decode(buf);                        |  270400 |  5000 |   54080
 buf = require("@msgpack/msgpack").encode(obj);                    |  594300 |  5000 |  118860
 obj = require("@msgpack/msgpack").decode(buf);                    |  343100 |  5000 |   68620
+
+Note that `Buffer.from()` for `JSON.stringify()` is added to emulate I/O where a JavaScript string must be converted into a byte array encoded in UTF-8, whereas MessagePack's `encode()` returns a byte array.
 
 ## Distrubition
 
