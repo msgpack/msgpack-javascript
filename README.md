@@ -4,6 +4,8 @@ This is the pure-JavaScript implementation of **MessagePack**, an efficient bina
 
 https://msgpack.org/
 
+This library is compatible with the "August 2017" revision of MessagePack specification at the point where timestamp ext was added.
+
 ## Stability
 
 This is under development until v1.0.0. Any API will change without notice.
