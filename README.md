@@ -106,6 +106,37 @@ const decoded = decode(encoded, { extensionCodec });
 
 Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
 
+#### Handling BigInt with ExtensionCodec
+
+This library does not handle BigInt by default, but you can handle it with `ExtensionCodec` like this:
+
+```typescript
+import { deepStrictEqual } from "assert";
+import { encode, decode, ExtensionCodec } from "../src";
+
+const BIGINT_EXT_TYPE = 0; // Any in 0-127
+
+const extensionCodec = new ExtensionCodec();
+extensionCodec.register({
+  type: BIGINT_EXT_TYPE,
+  encode: (input: unknown) => {
+    // eslint-disable-next-line valid-typeof
+    if (typeof input === "bigint") {
+      return encode(input.toString());
+    } else {
+      return null;
+    }
+  },
+  decode: (data: Uint8Array) => {
+    return BigInt(decode(data));
+  },
+});
+
+const value = BigInt(Number.MAX_SAFE_INTEGER) + BigInt(1);
+const encoded: = encode(value, { extensionCodec });
+deepStrictEqual(decode(encoded, { extensionCodec }), value);
+```
+
 ### MessagePack Mapping Table
 
 The following table shows how JavaScript values are mapped to [MessagePack formats](https://github.com/msgpack/msgpack/blob/master/spec.md) and vice versa.
