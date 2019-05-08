@@ -20,6 +20,20 @@ describe("edge cases", () => {
     });
   });
 
+  context("try to decode a map with non-string keys (asynchronous)", () => {
+    it("throws errors", () => {
+      const createStream = async function*() {
+        yield [0x81]; // fixmap size=1
+        yield encode(null);
+        yield encode(null);
+      };
+
+      assert.rejects(async () => {
+        decodeAsync(createStream());
+      }, /The type of key must be string/i);
+    });
+  });
+
   context("try to decode invlid MessagePack binary", () => {
     it("throws errors", () => {
       const TYPE_NEVER_USED = 0xc1;
@@ -66,6 +80,16 @@ describe("edge cases", () => {
       const createStream = async function*() {
         yield [0x90]; // fixarray size=0
         yield encode(null);
+      };
+
+      assert.rejects(async () => {
+        await decodeAsync(createStream());
+      }, RangeError);
+    });
+
+    it("throws errors (asynchronous)", () => {
+      const createStream = async function*() {
+        yield [0x90, ...encode(null)]; // fixarray size=0 + nil
       };
 
       assert.rejects(async () => {
