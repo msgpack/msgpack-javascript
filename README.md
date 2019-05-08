@@ -137,7 +137,7 @@ const encoded: = encode(value, { extensionCodec });
 deepStrictEqual(decode(encoded, { extensionCodec }), value);
 ```
 
-### MessagePack Mapping Table
+## MessagePack Mapping Table
 
 The following table shows how JavaScript values are mapped to [MessagePack formats](https://github.com/msgpack/msgpack/blob/master/spec.md) and vice versa.
 
@@ -153,10 +153,10 @@ Array|array format family|Array
 Object|map format family|Object (*3)
 Date|timestamp ext format family|Date (*4)
 
-* *1 Both `null` and `undefined` are mapped to `nil` (`0xC1`) type, and are decoded into `null`
+* *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
 * *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
 * *3 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
-* *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overrided by defining `-1` for the extension codec.
+* *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overrided by registering `-1` for the extension codec.
 
 ## Prerequsites
 
