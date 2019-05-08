@@ -29,7 +29,7 @@ type StackState = StackArrayState | StackMapState;
 const HEAD_BYTE_REQUIRED = -1;
 
 const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
-const MORE_DATA = new RangeError("MORE_DATA");
+const MORE_DATA = new RangeError("Insufficient data");
 
 export class Decoder {
   totalPos = 0;
@@ -46,12 +46,35 @@ export class Decoder {
     this.pos = 0;
   }
 
-  hasRemaining(size = 0) {
+  hasRemaining(size = 1) {
     return this.view.byteLength - this.pos >= size;
   }
 
-  async decodeAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>): Promise<unknown> {
+  createNoExtraBytesError() {
+    const { view, pos, totalPos } = this;
+    return new RangeError(`Extra ${view.byteLength - pos} byte(s) found at ${totalPos} (${pos} in the current buffer)`);
+  }
+
+  assertNoExtraBytes() {
+    if (this.hasRemaining()) {
+      throw this.createNoExtraBytesError();
+    }
+  }
+
+  decodeOneSync() {
+    const object = this.decodeSync();
+    this.assertNoExtraBytes();
+    return object;
+  }
+
+  async decodeOneAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>): Promise<unknown> {
+    let decoded = false;
+    let object: unknown;
     for await (const buffer of stream) {
+      if (decoded) {
+        throw this.createNoExtraBytesError();
+      }
+
       if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
         this.setBuffer(buffer);
       } else {
@@ -70,7 +93,8 @@ export class Decoder {
       //console.log("view", this.view, this.headByte);
 
       try {
-        return Promise.resolve(this.decodeSync());
+        object = this.decodeSync();
+        decoded = true;
       } catch (e) {
         if (!(e instanceof RangeError)) {
           throw e; // rethrow
@@ -80,8 +104,13 @@ export class Decoder {
       this.totalPos += this.pos;
     }
 
+    if (decoded) {
+      this.assertNoExtraBytes();
+      return object;
+    }
+
     const { headByte, pos, totalPos } = this;
-    throw new Error(
+    throw new RangeError(
       `Insufficient data in parcing ${prettyByte(headByte)} at ${totalPos} (${pos} in the current buffer)`,
     );
   }
