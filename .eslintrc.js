@@ -7,7 +7,6 @@ module.exports = {
     // https://prettier.io/docs/en/eslint.html
     "plugin:prettier/recommended",
   ],
-  // https://reactjs.org/docs/hooks-rules.html
   plugins: [],
   parser: "@typescript-eslint/parser",
   parserOptions: {
