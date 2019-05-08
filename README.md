@@ -66,8 +66,9 @@ import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
 const extensionCodec = new ExtensionCodec();
 
 // Set<T>
+const SET_EXT_TYPE = 0 // Any in 0-127
 extensionCodec.register({
-  type: 0,
+  type: SET_EXT_TYPE,
   encode: (object: unknown): Uint8Array | null => {
     if (object instanceof Set) {
       return encode([...object]);
@@ -82,6 +83,7 @@ extensionCodec.register({
 });
 
 // Map<T>
+const MAP_EXT_TYPE = 1; // Any in 0-127
 extensionCodec.register({
   type: 1,
   encode: (object: unknown): Uint8Array => {
@@ -115,12 +117,10 @@ import { deepStrictEqual } from "assert";
 import { encode, decode, ExtensionCodec } from "../src";
 
 const BIGINT_EXT_TYPE = 0; // Any in 0-127
-
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
   type: BIGINT_EXT_TYPE,
   encode: (input: unknown) => {
-    // eslint-disable-next-line valid-typeof
     if (typeof input === "bigint") {
       return encode(input.toString());
     } else {
