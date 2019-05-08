@@ -53,7 +53,7 @@ describe("ExtensionCodec", () => {
         }
       },
       decode: (data: Uint8Array) => {
-        const array = decode(data) as Array<any>;
+        const array = decode(data) as Array<unknown>;
         return new Set(array);
       },
     });
