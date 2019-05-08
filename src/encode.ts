@@ -1,4 +1,4 @@
-import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
+import { ExtensionCodecType } from "./ExtensionCodec";
 import { Encoder } from "./Encoder";
 
 export type EncodeOptions = Partial<

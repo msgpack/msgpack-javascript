@@ -1,5 +1,5 @@
 import { prettyByte } from "./utils/prettyByte";
-import { ExtensionCodecType, ExtensionCodec } from "./ExtensionCodec";
+import { ExtensionCodec } from "./ExtensionCodec";
 import { decodeInt64 } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";

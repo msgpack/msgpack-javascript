@@ -1,4 +1,4 @@
-import { ExtensionCodecType, ExtensionCodec } from "./ExtensionCodec";
+import { ExtensionCodecType } from "./ExtensionCodec";
 import { Decoder } from "./Decoder";
 
 type DecodeAsyncOptions = Partial<
