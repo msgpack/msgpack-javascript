@@ -1,15 +1,15 @@
 {
   "name": "@msgpack/msgpack",
   "version": "0.15.0",
-  "description": "MessagePack implementation in JavaScript",
+  "description": "MessagePack for JavaScript",
   "main": "./dist/index.js",
   "browser": "./dist.es5/msgpack.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "rm -rf dist dist.* ; tsc -p tsconfig.production.es2019.json && webpack",
+    "prepare": "rm -rf dist dist.* ; tsc -p tsconfig.dist.json && webpack",
     "prepublishOnly": "TEST_DIST=true npm run test",
-    "clean": "rm -rf build dist dist.es5",
+    "clean": "rm -rf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
     "test:cover": "npx nyc mocha 'test/**/*.test.ts'",
     "lint": "eslint --ext .ts src test",

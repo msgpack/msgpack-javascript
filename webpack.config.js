@@ -20,7 +20,7 @@ module.exports = {
         test: /\.tsx?$/,
         loader: "ts-loader",
         options: {
-          configFile: "tsconfig.production.es5.json",
+          configFile: "tsconfig.dist.webpack.json",
         },
       },
     ],
@@ -29,7 +29,7 @@ module.exports = {
   // We use webpack just to reduce filesystem accesses
   optimization: {
     noEmitOnErrors: true,
-		minimize: false,
+    minimize: false,
   },
 
   // We don't need NodeJS stuff on browsers!

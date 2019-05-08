@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "outDir": "./build/es5",
+    "declaration": false,
+    "downlevelIteration": true,
+    "noEmitOnError": true,
+    "incremental": false,
+  },
+  "include": ["src/**/*.ts"]
+}
