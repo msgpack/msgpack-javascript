@@ -9,8 +9,8 @@ type DecodeAsyncOptions = Partial<
 
 export async function decodeAsync(
   stream: AsyncIterable<Uint8Array | ArrayLike<number>>,
-  options: DecodeAsyncOptions = {},
+  { extensionCodec }: DecodeAsyncOptions = {},
 ): Promise<unknown> {
-  const decoder = new Decoder(options.extensionCodec || ExtensionCodec.defaultCodec);
+  const decoder = new Decoder(extensionCodec);
   return await decoder.decodeOneAsync(stream);
 }

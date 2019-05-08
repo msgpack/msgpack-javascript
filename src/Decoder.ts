@@ -1,5 +1,5 @@
 import { prettyByte } from "./utils/prettyByte";
-import { ExtensionCodecType } from "./ExtensionCodec";
+import { ExtensionCodecType, ExtensionCodec } from "./ExtensionCodec";
 import { decodeInt64 } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
@@ -39,7 +39,7 @@ export class Decoder {
   headByte = HEAD_BYTE_REQUIRED;
   readonly stack: Array<StackState> = [];
 
-  constructor(readonly extensionCodec: ExtensionCodecType) {}
+  constructor(readonly extensionCodec = ExtensionCodec.defaultCodec) {}
 
   setBuffer(buffer: ArrayLike<number> | Uint8Array): void {
     this.view = createDataView(buffer);

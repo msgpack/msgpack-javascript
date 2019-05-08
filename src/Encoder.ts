@@ -1,15 +1,20 @@
 import { utf8Encode, utf8Count } from "./utils/utf8";
-import { ExtensionCodecType, ExtDataType } from "./ExtensionCodec";
+import { ExtensionCodec, ExtDataType } from "./ExtensionCodec";
 import { encodeInt64, encodeUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 
-const initialBufferSize = 1024;
+export const DEFAULT_MAX_DEPTH = 100;
+export const DEFAULT_INITIAL_BUFFER_SIZE = 1024;
 
 export class Encoder {
   private pos = 0;
-  private view = new DataView(new ArrayBuffer(initialBufferSize));
+  private view = new DataView(new ArrayBuffer(this.initialBufferSize));
 
-  constructor(readonly maxDepth: number, readonly extensionCodec: ExtensionCodecType) {}
+  constructor(
+    readonly extensionCodec = ExtensionCodec.defaultCodec,
+    readonly maxDepth = DEFAULT_MAX_DEPTH,
+    readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
+  ) {}
 
   encode(object: unknown, depth: number): void {
     if (depth > this.maxDepth) {
