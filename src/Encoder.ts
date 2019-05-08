@@ -22,17 +22,10 @@ export class Encoder {
       this.encodeBoolean(object);
     } else if (typeof object === "number") {
       this.encodeNumber(object);
-
-      // eslint-disable-next-line valid-typeof
-    } else if (typeof object === "bigint") {
-      this.encodeBigInt(object);
     } else if (typeof object === "string") {
       this.encodeString(object);
-    } else if (typeof object === "object") {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.encodeObject(object!, depth);
     } else {
-      throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
+      this.encodeObject(object, depth);
     }
   }
 
@@ -118,11 +111,6 @@ export class Encoder {
     }
   }
 
-  encodeBigInt(_object: bigint) {
-    // BigInt literals is not available here!
-    throw new Error("BigInt is not yet implemented!");
-  }
-
   encodeString(object: string) {
     const byteLength = utf8Count(object);
     if (byteLength < 32) {
@@ -149,7 +137,7 @@ export class Encoder {
     this.pos += byteLength;
   }
 
-  encodeObject(object: object, depth: number) {
+  encodeObject(object: unknown, depth: number) {
     // try to encode objects with custom codec first of non-primitives
     const ext = this.extensionCodec.tryToEncode(object);
     if (ext != null) {
@@ -158,8 +146,11 @@ export class Encoder {
       this.encodeBinary(object);
     } else if (Array.isArray(object)) {
       this.encodeArray(object, depth);
-    } else {
+    } else if (typeof object === "object") {
       this.encodeMap(object as Record<string, unknown>, depth);
+    } else {
+      // symbol, function and other special object come here unless extensionCodec handles them.
+      throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
     }
   }
 
