@@ -8,9 +8,10 @@ export {
   ExtensionCodecType,
   ExtensionDecoderType,
   ExtensionEncoderType,
-  ExtDataType,
   EXT_TIMESTAMP,
   encodeTimestampExtension,
   encodeTimestampFromTimeSpec,
   decodeTimestampExtension,
 } from "./ExtensionCodec";
+
+export { ExtData } from "./ExtData";

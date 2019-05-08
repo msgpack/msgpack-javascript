@@ -1,9 +1,10 @@
 import { decodeInt64, encodeInt64 } from "./utils/int";
+import { ExtData } from "./ExtData";
 
 export const EXT_TIMESTAMP = -1;
 
 function isDate(object: unknown): object is Date {
-  return Object.prototype.toString.call(object) === "[object Date]";
+  return object instanceof Date;
 }
 
 export type TimeSpec = {
@@ -49,11 +50,11 @@ export function encodeDateToTimeSpec(date: Date): TimeSpec {
   const time = date.getTime();
   const sec = time < 0 ? Math.ceil(time / 1000) : Math.floor(time / 1000);
   const nsec = (time - sec * 1000) * 1e6;
-
+  const nsecInSec = Math.floor(nsec / 1e9);
   // Normalizes nsec to ensure it is unsigned.
   return {
-    sec: sec + Math.floor(nsec / 1e9),
-    nsec: nsec - Math.floor(nsec / 1e9) * 1e9,
+    sec: sec + nsecInSec,
+    nsec: nsec - nsecInSec * 1e9,
   };
 }
 
@@ -107,34 +108,12 @@ export type ExtensionEncoderType = (input: unknown) => Uint8Array | null;
 
 // immutable interfce to ExtensionCodec
 export type ExtensionCodecType = {
-  tryToEncode(object: unknown): ExtDataType | null;
+  tryToEncode(object: unknown): ExtData | null;
   decode(data: Uint8Array, extType: number): unknown;
-};
-
-const $Extension = Symbol("MessagePack.extension");
-
-export type ExtDataType = {
-  [$Extension]: true;
-  type: number;
-  data: Uint8Array;
 };
 
 export class ExtensionCodec implements ExtensionCodecType {
   public static readonly defaultCodec: ExtensionCodecType = new ExtensionCodec();
-
-  public static readonly Extension = $Extension;
-
-  public static createExtData(type: number, data: Uint8Array): ExtDataType {
-    return {
-      [$Extension]: true,
-      type,
-      data,
-    };
-  }
-
-  public static isExtData(object: any): object is ExtDataType {
-    return object != null && !!object[ExtensionCodec.Extension];
-  }
 
   // built-in extensions
   private readonly builtInEncoders: Array<ExtensionEncoderType> = [];
@@ -173,7 +152,7 @@ export class ExtensionCodec implements ExtensionCodecType {
     }
   }
 
-  public tryToEncode(object: unknown): ExtDataType | null {
+  public tryToEncode(object: unknown): ExtData | null {
     // built-in extensions
     for (let i = 0; i < this.builtInEncoders.length; i++) {
       const encoder = this.builtInEncoders[i];
@@ -181,7 +160,7 @@ export class ExtensionCodec implements ExtensionCodecType {
         const data = encoder(object);
         if (data != null) {
           const type = -1 - i;
-          return ExtensionCodec.createExtData(type, data);
+          return new ExtData(type, data);
         }
       }
     }
@@ -193,12 +172,12 @@ export class ExtensionCodec implements ExtensionCodecType {
         const data = encoder(object);
         if (data != null) {
           const type = i;
-          return ExtensionCodec.createExtData(type, data);
+          return new ExtData(type, data);
         }
       }
     }
 
-    if (ExtensionCodec.isExtData(object)) {
+    if (object instanceof ExtData) {
       // to keep ExtData as is
       return object;
     }
@@ -211,7 +190,7 @@ export class ExtensionCodec implements ExtensionCodecType {
       return decoder(data, type);
     } else {
       // decode() does not fail, returns ExtData instead.
-      return ExtensionCodec.createExtData(type, data);
+      return new ExtData(type, data);
     }
   }
 }

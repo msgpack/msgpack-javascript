@@ -1,7 +1,8 @@
 import { utf8Encode, utf8Count } from "./utils/utf8";
-import { ExtensionCodec, ExtDataType } from "./ExtensionCodec";
+import { ExtensionCodec } from "./ExtensionCodec";
 import { encodeInt64, encodeUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
+import { ExtData } from "./ExtData";
 
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 1024;
@@ -223,7 +224,7 @@ export class Encoder {
     }
   }
 
-  encodeExtension(ext: ExtDataType) {
+  encodeExtension(ext: ExtData) {
     const size = ext.data.length;
     if (size === 1) {
       // fixext 1
