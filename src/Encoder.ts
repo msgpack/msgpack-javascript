@@ -148,10 +148,10 @@ export class Encoder {
     const ext = this.extensionCodec.tryToEncode(object);
     if (ext != null) {
       this.encodeExtension(ext);
-    } else if (ArrayBuffer.isView(object)) {
-      this.encodeBinary(object);
     } else if (Array.isArray(object)) {
       this.encodeArray(object, depth);
+    } else if (ArrayBuffer.isView(object)) {
+      this.encodeBinary(object);
     } else if (typeof object === "object") {
       this.encodeMap(object as Record<string, unknown>, depth);
     } else {
@@ -263,7 +263,8 @@ export class Encoder {
   writeU8(value: number) {
     this.ensureBufferSizeToWrite(1);
 
-    this.view.setUint8(this.pos++, value);
+    this.view.setUint8(this.pos, value);
+    this.pos++;
   }
 
   writeU8v(...values: ReadonlyArray<number>) {
@@ -280,62 +281,56 @@ export class Encoder {
   writeI8(value: number) {
     this.ensureBufferSizeToWrite(1);
 
-    this.view.setInt8(this.pos++, value);
+    this.view.setInt8(this.pos, value);
+    this.pos++;
   }
 
   writeU16(value: number) {
     this.ensureBufferSizeToWrite(2);
 
-    const pos = this.pos;
+    this.view.setUint16(this.pos, value);
     this.pos += 2;
-    this.view.setUint16(pos, value);
   }
 
   writeI16(value: number) {
     this.ensureBufferSizeToWrite(2);
 
-    const pos = this.pos;
+    this.view.setInt16(this.pos, value);
     this.pos += 2;
-    this.view.setInt16(pos, value);
   }
 
   writeU32(value: number) {
     this.ensureBufferSizeToWrite(4);
 
-    const pos = this.pos;
+    this.view.setUint32(this.pos, value);
     this.pos += 4;
-    this.view.setUint32(pos, value);
   }
 
   writeI32(value: number) {
     this.ensureBufferSizeToWrite(4);
 
-    const pos = this.pos;
+    this.view.setInt32(this.pos, value);
     this.pos += 4;
-    this.view.setInt32(pos, value);
   }
 
   writeF64(value: number) {
     this.ensureBufferSizeToWrite(8);
 
-    const pos = this.pos;
+    this.view.setFloat64(this.pos, value);
     this.pos += 8;
-    this.view.setFloat64(pos, value);
   }
 
   writeU64(value: number) {
     this.ensureBufferSizeToWrite(8);
 
-    const pos = this.pos;
+    encodeUint64(value, this.view, this.pos);
     this.pos += 8;
-    encodeUint64(value, this.view, pos);
   }
 
   writeI64(value: number) {
     this.ensureBufferSizeToWrite(8);
 
-    const pos = this.pos;
+    encodeInt64(value, this.view, this.pos);
     this.pos += 8;
-    encodeInt64(value, this.view, pos);
   }
 }
