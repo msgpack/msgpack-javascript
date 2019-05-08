@@ -50,20 +50,16 @@ export class Decoder {
     return this.view.byteLength - this.pos >= size;
   }
 
-  createNoExtraBytesError() {
-    const { view, pos, totalPos } = this;
-    return new RangeError(`Extra ${view.byteLength - pos} byte(s) found at ${totalPos} (${pos} in the current buffer)`);
-  }
-
-  assertNoExtraBytes() {
-    if (this.hasRemaining()) {
-      throw this.createNoExtraBytesError();
-    }
+  createNoExtraBytesError(posToShow: number) {
+    const { view, pos } = this;
+    return new RangeError(`Extra ${view.byteLength - pos} byte(s) found at buffer[${posToShow}]`);
   }
 
   decodeOneSync() {
     const object = this.decodeSync();
-    this.assertNoExtraBytes();
+    if (this.hasRemaining()) {
+      throw this.createNoExtraBytesError(this.pos);
+    }
     return object;
   }
 
@@ -72,7 +68,7 @@ export class Decoder {
     let object: unknown;
     for await (const buffer of stream) {
       if (decoded) {
-        throw this.createNoExtraBytesError();
+        throw this.createNoExtraBytesError(this.totalPos);
       }
 
       if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
@@ -105,7 +101,9 @@ export class Decoder {
     }
 
     if (decoded) {
-      this.assertNoExtraBytes();
+      if (this.hasRemaining()) {
+        throw this.createNoExtraBytesError(this.totalPos);
+      }
       return object;
     }
 
