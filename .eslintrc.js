@@ -19,8 +19,11 @@ module.exports = {
     "no-useless-escape": "warn",
     "no-console": "warn",
     "valid-typeof": "warn", // "bigint" is not yet supported
+    "no-return-await": "error",
+    "prefer-const": "error",
+    "guard-for-in": "error",
 
-    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_|^intl$" }],
+    "@typescript-eslint/no-unused-vars":"warn",
     "@typescript-eslint/array-type": ["error", "generic"],
     "@typescript-eslint/camelcase": "warn",
     "@typescript-eslint/class-name-casing": "warn", // to allow the initial underscore
@@ -29,6 +32,9 @@ module.exports = {
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
     "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/restrict-plus-operands": "error",
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-for-in-array": "error",
 
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/no-explicit-any": "off",

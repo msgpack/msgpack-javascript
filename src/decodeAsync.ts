@@ -12,5 +12,5 @@ export async function decodeAsync(
   { extensionCodec }: DecodeAsyncOptions = {},
 ): Promise<unknown> {
   const decoder = new Decoder(extensionCodec);
-  return await decoder.decodeOneAsync(stream);
+  return decoder.decodeOneAsync(stream);
 }

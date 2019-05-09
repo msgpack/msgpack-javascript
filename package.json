@@ -14,6 +14,7 @@
     "test:cover": "npx nyc mocha 'test/**/*.test.ts'",
     "lint": "eslint --ext .ts src test",
     "lint:fix": "eslint --fix --ext .ts src test && npm run format",
+    "lint:print-config": "eslint --print-config .eslintrc.js",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "profile:encode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-encode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
     "profile:decode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-decode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",

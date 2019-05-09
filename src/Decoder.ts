@@ -55,7 +55,7 @@ export class Decoder {
     return new RangeError(`Extra ${view.byteLength - pos} byte(s) found at buffer[${posToShow}]`);
   }
 
-  decodeOneSync() {
+  decodeOneSync(): unknown {
     const object = this.decodeSync();
     if (this.hasRemaining()) {
       throw this.createNoExtraBytesError(this.pos);
