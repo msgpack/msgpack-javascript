@@ -21,15 +21,15 @@ describe("edge cases", () => {
   });
 
   context("try to decode a map with non-string keys (asynchronous)", () => {
-    it("throws errors", () => {
+    it("throws errors", async () => {
       const createStream = async function*() {
         yield [0x81]; // fixmap size=1
         yield encode(null);
         yield encode(null);
       };
 
-      assert.rejects(async () => {
-        decodeAsync(createStream());
+      await assert.rejects(async () => {
+        await decodeAsync(createStream());
       }, /The type of key must be string/i);
     });
   });
@@ -54,13 +54,13 @@ describe("edge cases", () => {
       }, RangeError);
     });
 
-    it("throws errors (asynchronous)", () => {
+    it("throws errors (asynchronous)", async () => {
       const createStream = async function*() {
         yield [0x92]; // fixarray size=2
         yield encode(null);
       };
 
-      assert.rejects(async () => {
+      await assert.rejects(async () => {
         await decodeAsync(createStream());
       }, RangeError);
     });
@@ -76,23 +76,23 @@ describe("edge cases", () => {
       }, RangeError);
     });
 
-    it("throws errors (asynchronous)", () => {
+    it("throws errors (asynchronous)", async () => {
       const createStream = async function*() {
         yield [0x90]; // fixarray size=0
         yield encode(null);
       };
 
-      assert.rejects(async () => {
+      await assert.rejects(async () => {
         await decodeAsync(createStream());
       }, RangeError);
     });
 
-    it("throws errors (asynchronous)", () => {
+    it("throws errors (asynchronous)", async () => {
       const createStream = async function*() {
         yield [0x90, ...encode(null)]; // fixarray size=0 + nil
       };
 
-      assert.rejects(async () => {
+      await assert.rejects(async () => {
         await decodeAsync(createStream());
       }, RangeError);
     });
