@@ -1,4 +1,4 @@
-import { decodeInt64, encodeInt64 } from "./utils/int";
+import { getInt64, setInt64 } from "./utils/int";
 import { ExtData } from "./ExtData";
 
 export const EXT_TIMESTAMP = -1;
@@ -41,7 +41,7 @@ export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): Uint8Array
     const rv = new Uint8Array(12);
     const view = new DataView(rv.buffer);
     view.setUint32(0, nsec);
-    encodeInt64(sec, view, 4);
+    setInt64(view, 4, sec);
     return rv;
   }
 }
@@ -93,7 +93,7 @@ export const decodeTimestampExtension: ExtensionDecoderType = (data: Uint8Array)
       const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
       const nsec = view.getUint32(0);
-      const sec = decodeInt64(data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]);
+      const sec = getInt64(view, 4);
 
       return new Date(sec * 1000 + nsec / 1e6);
     }

@@ -1,6 +1,6 @@
 import { utf8Encode, utf8Count } from "./utils/utf8";
 import { ExtensionCodec } from "./ExtensionCodec";
-import { encodeInt64, encodeUint64 } from "./utils/int";
+import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 import { ExtData } from "./ExtData";
 
@@ -323,14 +323,14 @@ export class Encoder {
   writeU64(value: number) {
     this.ensureBufferSizeToWrite(8);
 
-    encodeUint64(value, this.view, this.pos);
+    setUint64(this.view, this.pos, value);
     this.pos += 8;
   }
 
   writeI64(value: number) {
     this.ensureBufferSizeToWrite(8);
 
-    encodeInt64(value, this.view, this.pos);
+    setInt64(this.view, this.pos, value);
     this.pos += 8;
   }
 }
