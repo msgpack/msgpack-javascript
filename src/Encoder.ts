@@ -217,6 +217,8 @@ export class Encoder {
       // map 32
       this.writeU8(0xdf);
       this.writeU32(size);
+    } else {
+      throw new Error(`Too large map object: ${size}`);
     }
     for (const key of keys) {
       this.encodeString(key);
