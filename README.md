@@ -1,6 +1,6 @@
 # MessagePack for JavaScript [![npm version](https://badge.fury.io/js/%40msgpack%2Fmsgpack.svg)](https://badge.fury.io/js/%40msgpack%2Fmsgpack) [![Build Status](https://travis-ci.org/msgpack/msgpack-javascript.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-javascript) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graph/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript)
 
-This is the pure-JavaScript implementation of **MessagePack**, an efficient binary serilization format:
+This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient binary serilization format:
 
 https://msgpack.org/
 
