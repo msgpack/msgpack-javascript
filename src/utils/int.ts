@@ -1,4 +1,5 @@
-// the actual range is 53-bits integer (a.k.a. safe integer)
+// DataView extension to handle int64 / uint64,
+// where the actual range is 53-bits integer (a.k.a. safe integer)
 
 export function setUint64(view: DataView, offset: number, value: number): void {
   const high = value / 0x1_0000_0000;
@@ -7,7 +8,6 @@ export function setUint64(view: DataView, offset: number, value: number): void {
   view.setUint32(offset + 4, low);
 }
 
-// the actual range is int53 (a.k.a. safe integer)
 export function setInt64(view: DataView, offset: number, value: number): void {
   const high = Math.floor(value / 0x1_0000_0000);
   const low = value; // high bits are truncated by DataView
