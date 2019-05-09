@@ -47,11 +47,12 @@ export function encodeTimestampFromTimeSpec({ sec, nsec }: TimeSpec): Uint8Array
 }
 
 export function encodeDateToTimeSpec(date: Date): TimeSpec {
-  const time = date.getTime();
-  const sec = time < 0 ? Math.ceil(time / 1000) : Math.floor(time / 1000);
-  const nsec = (time - sec * 1000) * 1e6;
+  const msec = date.getTime();
+  const sec = Math.floor(msec / 1000);
+  const nsec = (msec - sec * 1000) * 1e6;
+
+  // Normalizes { sec, nsec } to ensure nsec is unsigned.
   const nsecInSec = Math.floor(nsec / 1e9);
-  // Normalizes nsec to ensure it is unsigned.
   return {
     sec: sec + nsecInSec,
     nsec: nsec - nsecInSec * 1e9,
