@@ -1,6 +1,6 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec } from "./ExtensionCodec";
-import { decodeInt64 } from "./utils/int";
+import { getInt64, getUint64 } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 
@@ -427,23 +427,15 @@ export class Decoder {
   }
 
   readU64(): number {
-    const high = this.view.getUint32(this.pos);
-    const low = this.view.getUint32(this.pos + 4);
+    const value = getUint64(this.view, this.pos);
     this.pos += 8;
-    return high * 0x100000000 + low;
+    return value;
   }
 
   readI64(): number {
-    const b1 = this.view.getUint8(this.pos);
-    const b2 = this.view.getUint8(this.pos + 1);
-    const b3 = this.view.getUint8(this.pos + 2);
-    const b4 = this.view.getUint8(this.pos + 3);
-    const b5 = this.view.getUint8(this.pos + 4);
-    const b6 = this.view.getUint8(this.pos + 5);
-    const b7 = this.view.getUint8(this.pos + 6);
-    const b8 = this.view.getUint8(this.pos + 7);
+    const value = getInt64(this.view, this.pos);
     this.pos += 8;
-    return decodeInt64(b1, b2, b3, b4, b5, b6, b7, b8);
+    return value;
   }
 
   readF32() {

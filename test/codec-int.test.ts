@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encodeInt64, decodeInt64 } from "../src/utils/int";
+import { setInt64, getInt64 } from "../src/utils/int";
 
 const INT64SPECS = {
   ZERO: 0,
@@ -20,8 +20,9 @@ describe("codec: encode and decode int 32/64", () => {
 
       it(`${value} (${value < 0 ? "-" : ""}0x${Math.abs(value).toString(16)})`, () => {
         const b = new Uint8Array(8);
-        encodeInt64(value, new DataView(b.buffer), 0);
-        assert.deepStrictEqual(decodeInt64(b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]), value);
+        const view = new DataView(b.buffer);
+        setInt64(new DataView(b.buffer), 0, value);
+        assert.deepStrictEqual(getInt64(view, 0), value);
       });
     }
   });
