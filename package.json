@@ -1,6 +1,6 @@
 {
   "name": "@msgpack/msgpack",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "MessagePack for JavaScript",
   "main": "./dist/index.js",
   "browser": "./dist.es5/msgpack.js",
