@@ -198,6 +198,26 @@ The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
 
 If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
 
+## Maintenance
+
+## CI
+
+* See .travis.yml for details
+
+### Relase Engineering
+
+```console
+# edit the changelog
+code CHANGELOG.md
+
+# prepare release engineering
+npm version major|minor|patch
+git push origin master
+
+# run the publishing task
+make publish
+```
+
 ## License
 
 Copyright 2019 The MessagePack Community.
