@@ -28,7 +28,6 @@ export default function configure(config: any) {
       node: {
         assert: false,
         util: false,
-        buffer: false,
       },
       resolve: {
         ...webpackConfig.resolve,
