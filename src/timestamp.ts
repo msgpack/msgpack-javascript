@@ -1,3 +1,4 @@
+// https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type
 import { getInt64, setInt64 } from "./utils/int";
 
 export const EXT_TIMESTAMP = -1;
@@ -63,7 +64,6 @@ export function encodeTimestampExtension(object: unknown): Uint8Array | null {
   }
 }
 
-// https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type
 export function decodeTimestampExtension(data: Uint8Array): Date {
   // data may be 32, 64, or 96 bits
   switch (data.byteLength) {
