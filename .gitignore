@@ -2,7 +2,6 @@ node_modules/
 dist/
 dist.es5/
 build/
-package-lock.json
 .nyc_output/
 coverage/
 benchmark/sandbox.ts
