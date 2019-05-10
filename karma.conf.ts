@@ -2,25 +2,30 @@ const webpackConfig = require("./webpack.config.js");
 
 export default function configure(config: any) {
   config.set({
+    browsers: ["FirefoxHeadless", "ChromeHeadless"],
+
     basePath: "",
     frameworks: ["mocha"],
     files: ["./test/karma-run.ts"],
     exclude: [],
     preprocessors: {
-      "**/*.ts": ["webpack"],
+      "**/*.ts": ["webpack", "sourcemap"],
     },
     reporters: ["mocha"],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ["Firefox"],
     singleRun: false,
     concurrency: 2,
 
     webpack: {
       mode: "development",
-      node: false,
+      node: {
+        assert: false,
+        util: false,
+        buffer: false,
+      },
       resolve: {
         ...webpackConfig.resolve,
         alias: {
