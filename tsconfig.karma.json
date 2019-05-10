@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "outDir": "./build/karma",
+    "declaration": false,
+    "downlevelIteration": true
+  }
+}

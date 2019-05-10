@@ -1,10 +1,17 @@
+# https://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
+addons:
+  firefox: latest
 node_js:
-  - "10"
-  - "12"
+  - "lts/*"
+  - "node"
 cache: npm
-before_install: npm install -g nyc codecov
-script: npm run test:cover
+install:
+  - npm install -g nyc codecov
+  - npm ci
+script:
+  - npm run test:browser:firefox
+  - npm run test:cover
 after_success:
   - nyc report --reporter=json > coverage/coverage.json
   - codecov
