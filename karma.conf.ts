@@ -20,7 +20,7 @@ export default function configure(config: any) {
     concurrency: 2,
 
     webpack: {
-      mode: "development",
+      mode: "production",
 
       // Handles NodeJS polyfills
       // https://webpack.js.org/configuration/node
