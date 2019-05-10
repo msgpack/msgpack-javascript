@@ -1,7 +1,6 @@
 import assert from "assert";
 import util from "util";
-import { encode, decode } from "../src";
-import { encodeDateToTimeSpec } from "../src/ExtensionCodec";
+import { encode, decode, encodeDateToTimeSpec } from "../src";
 
 const TIME = 1556636810389;
 
