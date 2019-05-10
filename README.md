@@ -207,6 +207,9 @@ If you use NodeJS and/or webpack, their module resolvers use the suitable one au
 ### Relase Engineering
 
 ```console
+# run tests on NodeJS, Chrome, and Firefox
+make test
+
 # edit the changelog
 code CHANGELOG.md
 
@@ -220,9 +223,9 @@ make publish
 
 ## License
 
-Copyright 2019 The MessagePack Community.
+Copyright 2019 The MessagePack community.
 
-This software is licensed under the ISC license:
+This software uses the ISC license:
 
 https://opensource.org/licenses/ISC
 
