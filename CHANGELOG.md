@@ -1,3 +1,5 @@
 This is the revision history of @msgpack/msgpack
 
-TODO: changes should be logged after v1.0.0
+## v1.0.0 2019/05/11
+
+* Initial stable release
