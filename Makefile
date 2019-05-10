@@ -3,7 +3,7 @@ test:
 	npm run test:browser
 	npm run test:cover
 
-dist: validate-git-status test
+publish: validate-git-status test
 	npm publish
 	git push origin master
 	git push origin master --tags
