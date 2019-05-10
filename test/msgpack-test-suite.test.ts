@@ -2,13 +2,7 @@ import assert from "assert";
 import util from "util";
 import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
-import {
-  encode as _encode,
-  decode as _decode,
-  ExtensionCodec,
-  EXT_TIMESTAMP,
-  encodeTimestampFromTimeSpec,
-} from "../src";
+import { encode as _encode, decode as _decode, ExtensionCodec, EXT_TIMESTAMP, encodeTimeSpecToTimestamp } from "../src";
 
 const { encode, decode }: { encode: typeof _encode; decode: typeof _decode } = (() => {
   if (process.env.TEST_DIST) {
@@ -28,7 +22,7 @@ extensionCodec.register({
   type: EXT_TIMESTAMP,
   encode: (input) => {
     if (input instanceof MsgTimestamp) {
-      return encodeTimestampFromTimeSpec({
+      return encodeTimeSpecToTimestamp({
         sec: input.getTime(),
         nsec: input.getNano(),
       });
