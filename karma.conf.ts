@@ -21,6 +21,10 @@ export default function configure(config: any) {
 
     webpack: {
       mode: "development",
+
+      // Handles NodeJS polyfills
+      // https://webpack.js.org/configuration/node
+      // Note that the dependencies in https://github.com/webpack/node-libs-browser are sometimes too old.
       node: {
         assert: false,
         util: false,
@@ -39,6 +43,7 @@ export default function configure(config: any) {
             loader: "ts-loader",
             options: {
               configFile: "tsconfig.karma.json",
+              // FIXME: some types for dependencies cannot be resolved, so ignore type checking for now.
               transpileOnly: true,
             },
           },
