@@ -5,8 +5,8 @@ node_js:
 env:
   - BROWSER=slChrome
   - BROWSER=slFirefox
-  #- BROWSER=slSafari
-  - BROWSER=slIE
+  # - BROWSER=slSafari
+  # - BROWSER=slIE
   - BROWSER=
 matrix:
 allow_failures:
