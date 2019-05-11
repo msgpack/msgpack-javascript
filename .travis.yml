@@ -2,15 +2,22 @@
 language: node_js
 node_js:
   - "lts/*"
+addons:
+  firefox: latest
 env:
   - BROWSER=slChrome
   - BROWSER=slFirefox
-  # - BROWSER=slSafari
-  # - BROWSER=slIE
+  - BROWSER=slSafari
+  - BROWSER=slIE
+  - BROWSER=FirefoxHeadless
   - BROWSER=
 matrix:
 allow_failures:
-  - env: BROWSERS=slIE
+  - env:
+    - BROWSER=slChrome
+    - BROWSER=slFirefox
+    - BROWSER=slSafari
+    - BROWSER=slIE
 cache: npm
 install: |
   if [ "${BROWSER}" = "" ]
@@ -21,7 +28,7 @@ script: |
   if [ "${BROWSER}" = "" ]
     then npm run test:cover
   else
-    npm run test:browser:saucelabs -- --browsers "$BROWSER"
+    travis_wait 300 npm run test:browser -- --browsers "$BROWSER"
   fi
 after_success: |
   if [ "${BROWSER}" = "" ]
