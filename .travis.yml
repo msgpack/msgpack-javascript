@@ -1,7 +1,5 @@
 # https://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
-addons:
-  sauce_connect: true
 node_js:
   - "lts/*"
 env:
