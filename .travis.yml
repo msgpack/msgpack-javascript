@@ -24,6 +24,6 @@ script: |
     npm run test:browser:saucelabs -- --browsers "$BROWSER"
   fi
 after_success: |
-  if [ "${BROWSER}" = "" ] ; then
+  if [ "${BROWSER}" = "" ]
     then nyc report --reporter=json > coverage/coverage.json && codecov
   fi
