@@ -1,16 +1,15 @@
 # https://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
 addons:
-  firefox: latest
+  sauce_connect: true
 node_js:
   - "lts/*"
-  - "node"
 cache: npm
 install:
   - npm install -g nyc codecov
   - npm ci
 script:
-  - npm run test:browser:firefox
+  - npm run test:browser:saucelabs
   - npm run test:cover
 after_success:
   - nyc report --reporter=json > coverage/coverage.json
