@@ -12,12 +12,11 @@ env:
   - BROWSER=FirefoxHeadless
   - BROWSER=
 matrix:
-allow_failures:
-  - env:
-    - BROWSER=slChrome
-    - BROWSER=slFirefox
-    - BROWSER=slSafari
-    - BROWSER=slIE
+  allow_failures:
+    - env: BROWSER=slChrome
+    - env: BROWSER=slFirefox
+    - env: BROWSER=slSafari
+    - env: BROWSER=slIE
 cache: npm
 install: |
   if [ "${BROWSER}" = "" ]
