@@ -24,26 +24,21 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     version: "latest",
     platform: "Windows 10",
   },
-  // slFirefox66: {
-  //   base: "SauceLabs",
-  //   browserName: "firefox",
-  //   version: "latest",
-  //   platform: "Windows 10",
-  // },
-
-  // TODO: Something's wrong?
-  // slSafari12: {
-  //   base: "SauceLabs",
-  //   browserName: "safari",
-  //   version: "12.0",
-  // },
-
-  // TODO: Requires commonjs-assert 2.0 with downlevel compilation
-  // https://github.com/browserify/commonjs-assert/pull/44/files#r283082666
-  // slIE11: {
-  //   base: "SauceLabs",
-  //   browserName: "internet explorer",
-  //   platform: "Windows 10",
-  //   version: "11.285",
-  // },
+  slFirefox: {
+    base: "SauceLabs",
+    browserName: "firefox",
+    version: "latest",
+    platform: "Windows 10",
+  },
+  slSafari: {
+    base: "SauceLabs",
+    browserName: "safari",
+    version: "latest",
+  },
+  slIE: {
+    base: "SauceLabs",
+    browserName: "internet explorer",
+    platform: "Windows 10",
+    version: "latest",
+  },
 };

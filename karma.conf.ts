@@ -3,28 +3,10 @@ import { sauceLabs, sauceLaunchers, SauceLauncher } from "./sauceLabs";
 const webpackConfig = require("./webpack.config.js");
 
 export default function configure(config: any) {
-  const SAUCE_USERNAME = process.env.SAUCE_USERNAME;
-  const SAUCE_ACCESS_KEY = process.env.SAUCE_ACCESS_KEY;
-
-  const browsers = config.browsers;
-  const customLaunchers: Record<string, SauceLauncher> = {};
-  if (process.env.SAUCELABS === "true") {
-    if (!(SAUCE_USERNAME && SAUCE_ACCESS_KEY)) {
-      throw new Error("Missing SAUCE_USER or SAUCE_ACCESS_KEY");
-    } else {
-      Object.assign(customLaunchers, sauceLaunchers);
-
-      browsers.length = 0;
-      browsers.push(...Object.keys(customLaunchers));
-
-      // eslint-disable-next-line no-console
-      console.log("Setup launchers for SauceLabs", customLaunchers);
-    }
-  }
-
   config.set({
-    browsers,
-    customLaunchers,
+    customLaunchers: {
+      ...sauceLaunchers,
+    },
     sauceLabs,
 
     basePath: "",
