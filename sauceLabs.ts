@@ -2,13 +2,6 @@
 
 const IS_LOCAL = !!process.env.TRAVIS_BUILD_NUMBER;
 
-for (const key of Object.keys(process.env)) {
-  if (key.startsWith("TRAVIS_")) {
-    // eslint-disable-next-line no-console
-    console.log(`${key}=${process.env[key]}`);
-  }
-}
-
 export type SauceLauncher = {
   base: "SauceLabs";
   browserName: string;
@@ -25,7 +18,10 @@ export const sauceLabs = {
   browserDisconnectTolerance: 5,
 
   // Only master branch are logged to the SauceLabs builds, which updates the browser-matrix badge.
-  build: process.env.TRAVIS_BRANCH === "master" ? process.env.TRAVIS_BUILD_NUMBER : undefined,
+  build:
+    process.env.TRAVIS_BRANCH === "master" && process.env.TRAVIS_EVENT_TYPE !== "pull_request"
+      ? process.env.TRAVIS_BUILD_NUMBER
+      : undefined,
 };
 
 export const sauceLaunchers: Record<string, SauceLauncher> = {
