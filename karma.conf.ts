@@ -13,6 +13,8 @@ export default function configure(config: any) {
       throw new Error("Missing SAUCE_USER or SAUCE_ACCESS_KEY");
     } else {
       Object.assign(customLaunchers, sauceLaunchers);
+
+      browsers.length = 0;
       browsers.push(...Object.keys(customLaunchers));
 
       // eslint-disable-next-line no-console
@@ -72,6 +74,10 @@ export default function configure(config: any) {
       },
       optimization: {
         minimize: false,
+      },
+      performance: {
+        maxEntrypointSize: 50 * 1024 ** 2,
+        maxAssetSize: 50 * 1024 ** 2,
       },
       devtool: "inline-source-map",
     },
