@@ -1,4 +1,4 @@
-import { sauceLabs, sauceLaunchers, SauceLauncher } from "./sauceLabs";
+import { sauceLabs, sauceLaunchers } from "./sauceLabs";
 
 const webpackConfig = require("./webpack.config.js");
 
@@ -8,6 +8,7 @@ export default function configure(config: any) {
       ...sauceLaunchers,
     },
     sauceLabs,
+    browsers: ["ChromeHeadless", "FirefoxHeadless"],
 
     basePath: "",
     frameworks: ["mocha"],
