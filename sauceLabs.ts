@@ -15,6 +15,7 @@ export const sauceLabs = {
   recordVideo: true,
   recordScreenshots: true,
   maxDuration: 120,
+  build: process.env.TRAVIS_BUILD_NUMBER,
 };
 
 export const sauceLaunchers: Record<string, SauceLauncher> = {
