@@ -2,6 +2,13 @@
 
 const IS_LOCAL = !!process.env.TRAVIS_BUILD_NUMBER;
 
+for (const key of Object.keys(process.env)) {
+  if (key.startsWith("TRAVIS_")) {
+    // eslint-disable-next-line no-console
+    console.log(`${key}=${process.env[key]}`);
+  }
+}
+
 export type SauceLauncher = {
   base: "SauceLabs";
   browserName: string;
