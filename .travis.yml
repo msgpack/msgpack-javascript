@@ -12,6 +12,7 @@ env:
   - BROWSER=FirefoxHeadless
   - BROWSER=
 matrix:
+  fast_finish: true
   allow_failures:
     - env: BROWSER=slChrome
     - env: BROWSER=slFirefox
