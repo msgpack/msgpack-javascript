@@ -1,5 +1,7 @@
 // https://saucelabs.com/platforms
 
+const IS_LOCAL = !!process.env.TRAVIS_BUILD_NUMBER;
+
 export type SauceLauncher = {
   base: "SauceLabs";
   browserName: string;
@@ -11,13 +13,12 @@ export type SauceLauncher = {
 export const sauceLabs = {
   testName: "@msgpack/msgpack unit tests",
   tags: ["msgpack-javascript"],
-  recordVideo: true,
-  recordScreenshots: true,
+  recordVideo: IS_LOCAL,
+  recordScreenshots: IS_LOCAL,
   maxDuration: 120,
 
   // Only master branch are logged to the SauceLabs builds, which updates the browser-matrix badge.
-  // build: process.env.TRAVIS_BRANCH === "master" ? process.env.TRAVIS_BUILD_NUMBER : undefined,
-  build: process.env.TRAVIS_BUILD_NUMBER,
+  build: process.env.TRAVIS_BRANCH === "master" ? process.env.TRAVIS_BUILD_NUMBER : undefined,
 };
 
 export const sauceLaunchers: Record<string, SauceLauncher> = {
