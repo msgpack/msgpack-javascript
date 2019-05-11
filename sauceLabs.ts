@@ -6,7 +6,6 @@ export type SauceLauncher = {
 
   platform?: string;
   version?: string;
-  deviceName?: string;
 };
 
 export const sauceLabs = {
@@ -30,19 +29,27 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
   },
   slFirefox: {
     base: "SauceLabs",
-    browserName: "firefox",
+    browserName: "Firefox",
     version: "latest",
     platform: "Windows 10",
   },
   slSafari: {
     base: "SauceLabs",
-    browserName: "safari",
+    browserName: "Safari",
     version: "latest",
+    // "macOS 10.14" is unstable for now
+    platform: "macOS 10.13",
+  },
+  slEdge: {
+    base: "SauceLabs",
+    browserName: "MicrosoftEdge",
+    version: "latest",
+    platform: "Windows 10",
   },
   slIE: {
     base: "SauceLabs",
-    browserName: "internet explorer",
-    platform: "Windows 10",
+    browserName: "Internet Explorer",
     version: "latest",
+    platform: "Windows 10",
   },
 };

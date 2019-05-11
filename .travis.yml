@@ -9,6 +9,7 @@ env:
   - BROWSER=slFirefox
   - BROWSER=slSafari
   - BROWSER=slIE
+  - BROWSER=slEdge
   - BROWSER=FirefoxHeadless
   - BROWSER=
 matrix:
@@ -18,6 +19,7 @@ matrix:
     - env: BROWSER=slFirefox
     - env: BROWSER=slSafari
     - env: BROWSER=slIE
+    - env: BROWSER=slEdge
 cache: npm
 install: |
   if [ "${BROWSER}" = "" ]
