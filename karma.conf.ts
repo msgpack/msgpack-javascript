@@ -37,9 +37,6 @@ export default function configure(config: any) {
       },
       resolve: {
         ...webpackConfig.resolve,
-        alias: {
-          assert$: "assert/assert.js",
-        },
       },
       module: {
         rules: [
