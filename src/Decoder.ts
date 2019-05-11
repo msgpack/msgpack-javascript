@@ -29,7 +29,20 @@ type StackState = StackArrayState | StackMapState;
 const HEAD_BYTE_REQUIRED = -1;
 
 const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
-const MORE_DATA = new RangeError("Insufficient data");
+
+// IE11: Just use RangeError when IE11 is obsolete.
+export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
+  try {
+    // IE11: The spec says it should throw RangeError,
+    // IE11: but in IE11 it throws TypeError.
+    EMPTY_VIEW.getInt8(0);
+  } catch (e) {
+    return e.constructor;
+  }
+  throw new Error("never reached");
+})();
+
+const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 
 export class Decoder {
   totalPos = 0;
@@ -92,7 +105,7 @@ export class Decoder {
         object = this.decodeSync();
         decoded = true;
       } catch (e) {
-        if (!(e instanceof RangeError)) {
+        if (!(e instanceof DataViewIndexOutOfBoundsError)) {
           throw e; // rethrow
         }
         // fallthrough
