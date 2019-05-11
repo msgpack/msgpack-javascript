@@ -1,8 +1,13 @@
+import { sauceLabs, sauceLaunchers, SauceLauncher } from "./sauceLabs";
+
 const webpackConfig = require("./webpack.config.js");
 
 export default function configure(config: any) {
   config.set({
-    browsers: ["FirefoxHeadless", "ChromeHeadless"],
+    customLaunchers: {
+      ...sauceLaunchers,
+    },
+    sauceLabs,
 
     basePath: "",
     frameworks: ["mocha"],
@@ -11,13 +16,14 @@ export default function configure(config: any) {
     preprocessors: {
       "**/*.ts": ["webpack", "sourcemap"],
     },
-    reporters: ["mocha"],
+    reporters: ["mocha", "saucelabs"],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
     singleRun: false,
-    concurrency: 2,
+    concurrency: 1,
+    browserNoActivityTimeout: 60_000,
 
     webpack: {
       mode: "production",
@@ -31,9 +37,6 @@ export default function configure(config: any) {
       },
       resolve: {
         ...webpackConfig.resolve,
-        alias: {
-          assert$: "assert/assert.js",
-        },
       },
       module: {
         rules: [
@@ -50,6 +53,10 @@ export default function configure(config: any) {
       },
       optimization: {
         minimize: false,
+      },
+      performance: {
+        maxEntrypointSize: 50 * 1024 ** 2,
+        maxAssetSize: 50 * 1024 ** 2,
       },
       devtool: "inline-source-map",
     },

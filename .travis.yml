@@ -1,17 +1,29 @@
 # https://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
-addons:
-  firefox: latest
 node_js:
   - "lts/*"
-  - "node"
+env:
+  - BROWSER=slChrome
+  - BROWSER=slFirefox
+  # - BROWSER=slSafari
+  # - BROWSER=slIE
+  - BROWSER=
+matrix:
+allow_failures:
+  - env: BROWSERS=slIE
 cache: npm
-install:
-  - npm install -g nyc codecov
-  - npm ci
-script:
-  - npm run test:browser:firefox
-  - npm run test:cover
-after_success:
-  - nyc report --reporter=json > coverage/coverage.json
-  - codecov
+install: |
+  if [ "${BROWSER}" = "" ]
+    then npm install -g nyc codecov
+  fi
+  npm ci
+script: |
+  if [ "${BROWSER}" = "" ]
+    then npm run test:cover
+  else
+    npm run test:browser:saucelabs -- --browsers "$BROWSER"
+  fi
+after_success: |
+  if [ "${BROWSER}" = "" ] ; then
+    then nyc report --reporter=json > coverage/coverage.json && codecov
+  fi
