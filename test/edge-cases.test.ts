@@ -1,5 +1,6 @@
 import assert from "assert";
 import { encode, decode, decodeAsync } from "../src";
+import { DataViewIndexOutOfBoundsError } from "../src/Decoder";
 
 describe("edge cases", () => {
   context("try to encode trycyclic refs", () => {
@@ -15,7 +16,7 @@ describe("edge cases", () => {
   context("try to encode non-encodable objects", () => {
     it("throws errors", () => {
       assert.throws(() => {
-        encode(Symbol("this is a symbol!"));
+        encode(() => {});
       }, /unrecognized object/i);
     });
   });
@@ -51,7 +52,8 @@ describe("edge cases", () => {
           0x92, // fixarray size=2
           0xc0, // nil
         ]);
-      }, RangeError);
+        // [IE11] A raw error thrown by DataView
+      }, DataViewIndexOutOfBoundsError);
     });
 
     it("throws errors (asynchronous)", async () => {

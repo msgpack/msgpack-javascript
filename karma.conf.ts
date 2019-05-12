@@ -6,6 +6,15 @@ export default function configure(config: any) {
   config.set({
     customLaunchers: {
       ...sauceLaunchers,
+
+      // To debug it wih IE11,
+      // Install `karma-virtualbox-ie11-launcher`,
+      // and configure custom launchers like this:
+      // IE11: {
+      //   base: "VirtualBoxIE11",
+      //   keepAlive: true,
+      //   vmName: "IE11 - Win10",
+      // },
     },
     sauceLabs,
     browsers: ["ChromeHeadless", "FirefoxHeadless"],
