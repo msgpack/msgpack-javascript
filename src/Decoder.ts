@@ -30,7 +30,8 @@ const HEAD_BYTE_REQUIRED = -1;
 
 const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
 
-// IE11: Just use RangeError when IE11 is obsolete.
+// IE11: Hack to support IE11.
+// IE11: Drop this hack and just use RangeError when IE11 is obsolete.
 export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
   try {
     // IE11: The spec says it should throw RangeError,
