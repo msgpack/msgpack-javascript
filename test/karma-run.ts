@@ -1,5 +1,5 @@
 // import "util" first,
-// because core-js breaks the util polyfll (https://github.com/browserify/node-util).
+// because core-js breaks the util polyfll (https://github.com/browserify/node-util) on IE11.
 import "util";
 
 import "core-js";
