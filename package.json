@@ -23,7 +23,10 @@
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "profile:encode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-encode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
     "profile:decode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-decode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
-    "benchmark": "ts-node benchmark/benchmark-from-msgpack-lite.ts"
+    "benchmark": "ts-node benchmark/benchmark-from-msgpack-lite.ts",
+    "asbuild:untouched": "asc assembly/index.ts -b build/as/untouched.wasm -t build/as/untouched.wat --sourceMap --validate --debug",
+    "asbuild:optimized": "asc assembly/index.ts -b build/as/optimized.wasm -t build/as/optimized.wat --sourceMap --validate --optimize",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
   "repository": {
     "type": "git",
@@ -46,6 +49,7 @@
     "@types/node": "^11.13.10",
     "@typescript-eslint/eslint-plugin": "^1.9.0",
     "@typescript-eslint/parser": "^1.9.0",
+    "assemblyscript": "github:AssemblyScript/assemblyscript",
     "assert": "^2.0.0",
     "core-js": "^3.0.1",
     "eslint": "^5.16.0",
