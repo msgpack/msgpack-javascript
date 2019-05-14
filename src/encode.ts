@@ -9,11 +9,12 @@ export type EncodeOptions = Partial<
   }>
 >;
 
-export function encode(
-  value: unknown,
-  { extensionCodec, maxDepth, initialBufferSize }: EncodeOptions = {},
-): Uint8Array {
-  const encoder = new Encoder(extensionCodec, maxDepth, initialBufferSize);
+export function encode(value: unknown, options?: EncodeOptions): Uint8Array {
+  const encoder = new Encoder(
+    options && options.extensionCodec,
+    options && options.maxDepth,
+    options && options.initialBufferSize,
+  );
   encoder.encode(value, 1);
   return encoder.getUint8Array();
 }
