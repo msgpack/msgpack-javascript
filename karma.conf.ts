@@ -73,5 +73,10 @@ export default function configure(config: any) {
     mime: {
       "text/x-typescript": ["ts", "tsx"],
     },
+    client: {
+      mocha: {
+        timeout: 5000,
+      },
+    },
   });
 }

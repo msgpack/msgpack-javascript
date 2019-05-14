@@ -1,2 +1,1 @@
 --require ts-node/register
---timeout 10000
