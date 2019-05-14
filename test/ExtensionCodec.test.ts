@@ -1,6 +1,6 @@
 import assert from "assert";
 import util from "util";
-import { encode, decode, ExtensionCodec, EXT_TIMESTAMP } from "../src";
+import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, decodeAsync } from "../src";
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
@@ -74,11 +74,21 @@ describe("ExtensionCodec", () => {
       },
     });
 
-    it("encodes and decodes custom data types", () => {
+    it("encodes and decodes custom data types (synchronously)", () => {
       const set = new Set([1, 2, 3]);
       const map = new Map([["foo", "bar"], ["bar", "baz"]]);
       const encoded = encode([set, map], { extensionCodec });
       assert.deepStrictEqual(decode(encoded, { extensionCodec }), [set, map]);
+    });
+
+    it("encodes and decodes custom data types (asynchronously)", async () => {
+      const set = new Set([1, 2, 3]);
+      const map = new Map([["foo", "bar"], ["bar", "baz"]]);
+      const encoded = encode([set, map], { extensionCodec });
+      const createStream = async function*() {
+        yield encoded;
+      };
+      assert.deepStrictEqual(await decodeAsync(createStream(), { extensionCodec }), [set, map]);
     });
   });
 });
