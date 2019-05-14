@@ -1,7 +1,7 @@
 {
   "name": "@msgpack/msgpack",
   "version": "1.0.1",
-  "description": "MessagePack for JavaScript",
+  "description": "MessagePack for JavaScript/ECMA-262",
   "main": "./dist/index.js",
   "browser": "./dist.es5/msgpack.js",
   "types": "./dist/index.d.ts",
