@@ -18,10 +18,12 @@ module.exports = {
     "no-constant-condition": ["warn", { checkLoops: false }],
     "no-useless-escape": "warn",
     "no-console": "warn",
+    "no-var": "warn",
     "valid-typeof": "warn", // "bigint" is not yet supported
-    "no-return-await": "error",
-    "prefer-const": "error",
-    "guard-for-in": "error",
+    "no-return-await": "warn",
+    "prefer-const": "warn",
+    "guard-for-in": "warn",
+    "curly": "warn",
 
     "@typescript-eslint/no-unused-vars":"warn",
     "@typescript-eslint/array-type": ["error", "generic"],
