@@ -21,7 +21,7 @@ module.exports = {
     "no-var": "warn",
     "valid-typeof": "warn", // "bigint" is not yet supported
     "no-return-await": "warn",
-    "prefer-const": "warn",
+    // "prefer-const": "warn", // TODO: AssemblyScript has different semantics.
     "guard-for-in": "warn",
     "curly": "warn",
 
@@ -34,7 +34,6 @@ module.exports = {
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
     "@typescript-eslint/no-use-before-define": "warn",
-    "@typescript-eslint/restrict-plus-operands": "error",
     "@typescript-eslint/await-thenable": "error",
     "@typescript-eslint/no-for-in-array": "error",
 

@@ -2,6 +2,7 @@ import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec } from "./ExtensionCodec";
 import { getInt64, getUint64 } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
+import { utf8Decode2 } from "../wasmModule";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 
 enum State {
@@ -29,6 +30,7 @@ type StackState = StackArrayState | StackMapState;
 const HEAD_BYTE_REQUIRED = -1;
 
 const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
+const EMPTY_BYTES = new Uint8Array(EMPTY_VIEW.buffer);
 
 // IE11: Hack to support IE11.
 // IE11: Drop this hack and just use RangeError when IE11 is obsolete.
@@ -49,14 +51,16 @@ export class Decoder {
   totalPos = 0;
   pos = 0;
 
-  view: DataView = EMPTY_VIEW;
+  view = EMPTY_VIEW;
+  bytes = EMPTY_BYTES;
   headByte = HEAD_BYTE_REQUIRED;
   readonly stack: Array<StackState> = [];
 
   constructor(readonly extensionCodec = ExtensionCodec.defaultCodec) {}
 
   setBuffer(buffer: ArrayLike<number> | Uint8Array): void {
-    this.view = createDataView(buffer);
+    this.bytes = ensureUint8Array(buffer);
+    this.view = createDataView(this.bytes);
     this.pos = 0;
   }
 
@@ -371,7 +375,10 @@ export class Decoder {
   }
 
   decodeUtf8String(byteLength: number, headOffset: number): string {
-    const object = utf8Decode(this.view, this.pos + headOffset, byteLength);
+    if (this.bytes.byteLength < this.pos + headOffset + byteLength) {
+      throw MORE_DATA;
+    }
+    const object = utf8Decode2(this.bytes, this.pos + headOffset, byteLength);
     this.pos += headOffset + byteLength;
     return object;
   }

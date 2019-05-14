@@ -85,28 +85,28 @@ export function utf8Encode(str: string, view: DataView, offset: number): void {
   }
 }
 
-export function utf8Decode(view: DataView, offset: number, byteLength: number): string {
+export function utf8Decode(bytes: Uint8Array, offset: number, byteLength: number): string {
   const out: Array<number> = [];
   const end = offset + byteLength;
   while (offset < end) {
-    const byte1 = view.getUint8(offset++);
+    const byte1 = bytes[offset++];
     if ((byte1 & 0x80) === 0) {
       // 1 byte
       out.push(byte1);
     } else if ((byte1 & 0xe0) === 0xc0) {
       // 2 bytes
-      const byte2 = view.getUint8(offset++) & 0x3f;
+      const byte2 = bytes[offset++] & 0x3f;
       out.push(((byte1 & 0x1f) << 6) | byte2);
     } else if ((byte1 & 0xf0) === 0xe0) {
       // 3 bytes
-      const byte2 = view.getUint8(offset++) & 0x3f;
-      const byte3 = view.getUint8(offset++) & 0x3f;
+      const byte2 = bytes[offset++] & 0x3f;
+      const byte3 = bytes[offset++] & 0x3f;
       out.push(((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
     } else if ((byte1 & 0xf8) === 0xf0) {
       // 4 bytes
-      const byte2 = view.getUint8(offset++) & 0x3f;
-      const byte3 = view.getUint8(offset++) & 0x3f;
-      const byte4 = view.getUint8(offset++) & 0x3f;
+      const byte2 = bytes[offset++] & 0x3f;
+      const byte3 = bytes[offset++] & 0x3f;
+      const byte4 = bytes[offset++] & 0x3f;
       let codepoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
       if (codepoint > 0xffff) {
         codepoint -= 0x10000;
@@ -115,7 +115,7 @@ export function utf8Decode(view: DataView, offset: number, byteLength: number): 
       }
       out.push(codepoint);
     } else {
-      throw new Error(`Invalid UTF-8 byte ${prettyByte(byte1)} at ${offset}`);
+      out.push(byte1);
     }
   }
   return String.fromCharCode(...out);
