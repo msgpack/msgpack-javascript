@@ -1,6 +1,6 @@
 // https://saucelabs.com/platforms
 
-const IS_LOCAL = !!process.env.TRAVIS_BUILD_NUMBER;
+const IS_LOCAL = !process.env.TRAVIS_BUILD_NUMBER;
 
 export type SauceLauncher = {
   base: "SauceLabs";
