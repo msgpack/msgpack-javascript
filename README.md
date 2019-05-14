@@ -112,7 +112,7 @@ This library does not handle BigInt by default, but you can handle it with `Exte
 
 ```typescript
 import { deepStrictEqual } from "assert";
-import { encode, decode, ExtensionCodec } from "../src";
+import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
 
 const BIGINT_EXT_TYPE = 0; // Any in 0-127
 const extensionCodec = new ExtensionCodec();
