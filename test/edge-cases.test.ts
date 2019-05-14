@@ -3,10 +3,18 @@ import { encode, decode, decodeAsync } from "../src";
 import { DataViewIndexOutOfBoundsError } from "../src/Decoder";
 
 describe("edge cases", () => {
-  context("try to encode trycyclic refs", () => {
-    it("throws errors", () => {
+  context("try to encode cyclic refs", () => {
+    it("throws errors on arrays", () => {
       const cyclicRefs: Array<any> = [];
       cyclicRefs.push(cyclicRefs);
+      assert.throws(() => {
+        encode(cyclicRefs);
+      }, /too deep/i);
+    });
+
+    it("throws errors on objects", () => {
+      const cyclicRefs: Record<string, any> = {};
+      cyclicRefs["foo"] = cyclicRefs;
       assert.throws(() => {
         encode(cyclicRefs);
       }, /too deep/i);
