@@ -47,6 +47,8 @@ export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
 
 const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 
+const USE_WASM = process.env.USE_WASM === "true";
+
 export class Decoder {
   totalPos = 0;
   pos = 0;
@@ -378,7 +380,13 @@ export class Decoder {
     if (this.bytes.byteLength < this.pos + headOffset + byteLength) {
       throw MORE_DATA;
     }
-    const object = utf8Decode2(this.bytes, this.pos + headOffset, byteLength);
+
+    let object: string;
+    if (USE_WASM) {
+      object = utf8Decode2(this.bytes, this.pos + headOffset, byteLength);
+    } else {
+      object = utf8Decode(this.bytes, this.pos + headOffset, byteLength);
+    }
     this.pos += headOffset + byteLength;
     return object;
   }

@@ -25,7 +25,7 @@
     "profile:decode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-decode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
     "benchmark": "ts-node benchmark/benchmark-from-msgpack-lite.ts",
     "asbuild:untouched": "asc assembly/index.ts -b build/wasm/untouched.wasm -t build/wasm/untouched.wat --sourceMap --validate --debug",
-    "asbuild:optimized": "asc assembly/index.ts -b build/wasm/optimized.wasm -t build/wasm/optimized.wat --sourceMap --validate --optimize",
+    "asbuild:optimized": "asc assembly/index.ts -b build/wasm/optimized.wasm -t build/wasm/optimized.wat --sourceMap --validate -O3",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
   "repository": {
