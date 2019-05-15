@@ -19,8 +19,8 @@ export function utf8ToUtf16(byteLength: i32, outputOffset: i32): i32 {
       outputOffset += 2;
     } else if ((byte1 & 0xf0) === 0xe0) {
       // 3 bytes
-      let byte2: u16 = load<u16>(inputOffset++) & 0x3f;
-      let byte3: u16 = load<u16>(inputOffset++) & 0x3f;
+      let byte2: u16 = load<u8>(inputOffset++) & 0x3f;
+      let byte3: u16 = load<u8>(inputOffset++) & 0x3f;
       store<u16>(outputOffset, ((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
       outputOffset += 2;
     } else if ((byte1 & 0xf8) === 0xf0) {
