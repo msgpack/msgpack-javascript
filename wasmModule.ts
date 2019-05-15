@@ -23,5 +23,5 @@ export function utf8Decode2(bytes: Uint8Array, offset: number, byteLength: numbe
   // console.log([byteLength, outputStart, outputEnd]);
   // console.log(instanceMemory.subarray(0, 10));
   // console.log(utf16array);
-  return String.fromCharCode(...utf16array);
+  return String.fromCharCode.apply(String, utf16array as any);
 }
