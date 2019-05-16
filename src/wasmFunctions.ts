@@ -3,7 +3,7 @@
 // TODO: Use TypeScript built-in type
 declare const WebAssembly: any;
 
-export const WASM_DEBUG = typeof process !== "undefined" && process.env.WASM_DEBUG === "true";
+export const WASM_DEBUG = process.env.WASM_DEBUG === "true";
 
 let { wasmModule } = (() => {
   try {
