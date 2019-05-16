@@ -2,7 +2,7 @@ import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec } from "./ExtensionCodec";
 import { getInt64, getUint64 } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
-import { utf8Decode2 } from "../wasmModule";
+import { utf8DecodeWasm, WASM_AVAILABLE } from "./wasmFunctions";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 
 enum State {
@@ -46,8 +46,6 @@ export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
 })();
 
 const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
-
-const USE_WASM = process.env.USE_WASM === "true";
 
 export class Decoder {
   totalPos = 0;
@@ -382,8 +380,8 @@ export class Decoder {
     }
 
     let object: string;
-    if (USE_WASM) {
-      object = utf8Decode2(this.bytes, this.pos + headOffset, byteLength);
+    if (WASM_AVAILABLE) {
+      object = utf8DecodeWasm(this.bytes, this.pos + headOffset, byteLength);
     } else {
       object = utf8Decode(this.bytes, this.pos + headOffset, byteLength);
     }
