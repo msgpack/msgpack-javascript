@@ -163,12 +163,12 @@ Date|timestamp ext format family|Date (*4)
 ### ECMA-262
 
 * ES5 language features
-* ES2015 standard library, including:
+* ES2018 standard library, including:
   * Typed arrays (ES2015)
   * Async iterations (ES2018)
   * Features added in ES2015-ES2018
 
-We use [core-js](https://github.com/zloirock/core-js) as polyfills to run tests on IE11, which has ES5 language features.
+ES2018 standard library used in this library can be polyfilled. For example, [core-js](https://github.com/zloirock/core-js) is used as polyfills to run tests on IE11, which has only ES5 language features.
 
 ### NodeJS
 
@@ -203,7 +203,7 @@ If you use NodeJS and/or webpack, their module resolvers use the suitable one au
 
 ## CI
 
-* See .travis.yml for details
+See [.travis.yml](./travis.yml) for details.
 
 ### Relase Engineering
 
