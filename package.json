@@ -7,9 +7,9 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "rm -rf dist dist.* ; tsc -p tsconfig.dist.json && webpack && npm run asbuild",
+    "prepare": "npm run clean && npm run asbuild && tsc -p tsconfig.dist.json && webpack",
     "prepublishOnly": "TEST_DIST=true npm run test",
-    "clean": "rm -rf build dist dist.*",
+    "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
     "test:cover": "npx nyc mocha 'test/**/*.test.ts'",
     "test:browser": "karma start --single-run",
@@ -21,12 +21,12 @@
     "lint:fix": "eslint --fix --ext .ts src test && npm run format",
     "lint:print-config": "eslint --print-config .eslintrc.js",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
-    "profile:encode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-encode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
-    "profile:decode": "rm -f isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-decode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
+    "profile:encode": "rimraf isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-encode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
+    "profile:decode": "rimraf isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-decode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
     "benchmark": "ts-node benchmark/benchmark-from-msgpack-lite.ts",
-    "asbuild:untouched": "asc assembly/index.ts -b build/wasm/untouched.wasm -t build/wasm/untouched.wat --sourceMap --validate --debug",
-    "asbuild:optimized": "asc assembly/index.ts -b build/wasm/optimized.wasm -t build/wasm/optimized.wat --sourceMap --validate -O3",
-    "asbuild": "rm -rf build/wasm && npm run asbuild:untouched && npm run asbuild:optimized && ts-node tools/pack-wasm.ts"
+    "asbuild:untouched": "asc assembly/index.ts -b dist/wasm/untouched.wasm -t dist/wasm/untouched.wat --sourceMap --validate --debug",
+    "asbuild:optimized": "asc assembly/index.ts -b dist/wasm/optimized.wasm -t dist/wasm/optimized.wat --sourceMap --validate -O3",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized && ts-node tools/pack-wasm.ts"
   },
   "repository": {
     "type": "git",
@@ -70,6 +70,7 @@
     "msgpack-lite": "^0.1.26",
     "msgpack-test-js": "^1.0.0",
     "prettier": "^1.17.1",
+    "rimraf": "^2.6.3",
     "ts-loader": "^5.4.5",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5",

@@ -4,7 +4,7 @@ import fs from "fs";
 import { resolve } from "path";
 import base64 from "base64-js";
 
-const artifactDir = resolve(__dirname, "../build/wasm");
+const artifactDir = resolve(__dirname, "../dist/wasm");
 for (const basename of fs.readdirSync(artifactDir)) {
   const file = resolve(artifactDir, basename);
   if (!file.endsWith(".wasm")) {

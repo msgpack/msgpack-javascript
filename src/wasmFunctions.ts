@@ -3,21 +3,22 @@
 // TODO: Use TypeScript built-in type
 declare const WebAssembly: any;
 
-export const WASM_DEBUG = !!(process && process.env.WASM_DEBUG === "true");
+export const WASM_DEBUG = typeof process !== "undefined" && process.env.WASM_DEBUG === "true";
 
-let wasmModule: any;
-try {
-  if (WASM_DEBUG) {
-    wasmModule = require("../build/wasm/untouched.wasm.js").wasmModule;
-  } else {
-    wasmModule = require("../build/wasm/optimized.wasm.js").wasmModule;
+let { wasmModule } = (() => {
+  try {
+    if (WASM_DEBUG) {
+      return require("../dist/wasm/untouched.wasm.js");
+    } else {
+      return require("../dist/wasm/optimized.wasm.js");
+    }
+  } catch (e) {
+    if (WASM_DEBUG) {
+      console.error("WebAssembly is not supported", e);
+    }
+    return {};
   }
-} catch (e) {
-  if (WASM_DEBUG) {
-    console.error(e);
-  }
-  // WebAssembly is not supported.
-}
+})();
 
 function abort(filename: number, line: number, column: number): void {
   throw new Error(`abort called at ${filename}:${line}:${column}`);
