@@ -163,11 +163,12 @@ Date|timestamp ext format family|Date (*4)
 ### ECMA-262
 
 * ES5 language features
-* Typed Arrays (ES2015; [caniuse: typedarrays](https://caniuse.com/#feat=typedarrays))
-* String.prototype.padStart (ES2017; [caniuse: pad-start-end](https://caniuse.com/#feat=pad-start-end))
-* Async iterations / `for await of` syntax (ES2018)
+* ES2015 standard library, including:
+  * Typed arrays (ES2015)
+  * Async iterations (ES2018)
+  * Features added in ES2015-ES2018
 
-You can use polyfills for all of them with TypeScript downlevel compilation.
+We use [core-js](https://github.com/zloirock/core-js) as polyfills to run tests on IE11, which has ES5 language features.
 
 ### NodeJS
 
