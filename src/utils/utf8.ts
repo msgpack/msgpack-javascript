@@ -1,4 +1,7 @@
 import { prettyByte } from "./prettyByte";
+import { WASM_AVAILABLE, utf8DecodeWasm } from "../wasmFunctions";
+
+const WASM_THRESHOLD = 0x100;
 
 export function utf8Count(str: string): number {
   const strLength = str.length;
@@ -86,6 +89,10 @@ export function utf8Encode(str: string, view: DataView, offset: number): void {
 }
 
 export function utf8Decode(bytes: Uint8Array, offset: number, byteLength: number): string {
+  if (WASM_AVAILABLE && byteLength > WASM_THRESHOLD) {
+    return utf8DecodeWasm(bytes, offset, byteLength);
+  }
+
   const out: Array<number> = [];
   const end = offset + byteLength;
   while (offset < end) {
