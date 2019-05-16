@@ -118,7 +118,11 @@ export class Encoder {
   }
 
   encodeString(object: string) {
-    const byteLength = utf8Count(object);
+    const units = new Uint16Array(object.length);
+    for (let i = 0; i < object.length; i++) {
+      units[i] = object.charCodeAt(i);
+    }
+    const byteLength = utf8Count(units);
     if (byteLength < 32) {
       // fixstr
       this.writeU8(0xa0 + byteLength);
@@ -139,7 +143,7 @@ export class Encoder {
     }
 
     this.ensureBufferSizeToWrite(byteLength);
-    utf8Encode(object, this.view, this.pos);
+    utf8Encode(units, this.view, this.pos);
     this.pos += byteLength;
   }
 

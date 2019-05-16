@@ -1,19 +1,22 @@
 import { prettyByte } from "./prettyByte";
-import { WASM_AVAILABLE, WASM_DEBUG, utf8DecodeWasm } from "../wasmFunctions";
+import { WASM_AVAILABLE, WASM_DEBUG, utf8DecodeWasm, utf8CountWasm } from "../wasmFunctions";
 
 const WASM_THRESHOLD = WASM_DEBUG ? 0 : 0x100;
 
-export function utf8Count(str: string): number {
+export function utf8Count(str: Uint16Array): number {
   const strLength = str.length;
+  if (WASM_AVAILABLE && strLength > WASM_THRESHOLD) {
+    return utf8CountWasm(str);
+  }
 
   let byteLength = 0;
   let pos = 0;
   while (pos < strLength) {
-    let value = str.charCodeAt(pos++);
+    let value = str[pos++];
     if (value >= 0xd800 && value <= 0xdbff) {
       // high surrogate
       if (pos < strLength) {
-        const extra = str.charCodeAt(pos);
+        const extra = str[pos];
         if ((extra & 0xfc00) === 0xdc00) {
           ++pos;
           value = ((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000;
@@ -44,16 +47,16 @@ export function utf8Count(str: string): number {
   return byteLength;
 }
 
-export function utf8Encode(str: string, view: DataView, offset: number): void {
+export function utf8Encode(str: Uint16Array, view: DataView, offset: number): void {
   const strLength = str.length;
 
   let pos = 0;
   while (pos < strLength) {
-    let value = str.charCodeAt(pos++);
+    let value = str[pos++];
     if (value >= 0xd800 && value <= 0xdbff) {
       // high surrogate
       if (pos < strLength) {
-        const extra = str.charCodeAt(pos);
+        const extra = str[pos];
         if ((extra & 0xfc00) === 0xdc00) {
           ++pos;
           value = ((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000;
