@@ -203,7 +203,7 @@ If you use NodeJS and/or webpack, their module resolvers use the suitable one au
 
 ## CI
 
-See [.travis.yml](./travis.yml) for details.
+See [.travis.yml](./.travis.yml) for details.
 
 ### Relase Engineering
 
