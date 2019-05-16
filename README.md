@@ -223,7 +223,7 @@ make publish
 
 Cross-browser Testing Platform and Open Source <3 Provided by Sauce Labs.
 
-[![Sauce Labs](./assets/SauceLabs.svg)](https://saucelabs.com)
+<a href="https://saucelabs.com"><img src="./assets/SauceLabs.svg" alt="Sauce Labs"/ width="280"></a>
 
 ## License
 
