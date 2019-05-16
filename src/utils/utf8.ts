@@ -1,7 +1,7 @@
 import { prettyByte } from "./prettyByte";
-import { WASM_AVAILABLE, utf8DecodeWasm } from "../wasmFunctions";
+import { WASM_AVAILABLE, WASM_DEBUG, utf8DecodeWasm } from "../wasmFunctions";
 
-const WASM_THRESHOLD = 0x100;
+const WASM_THRESHOLD = WASM_DEBUG ? 0 : 0x100;
 
 export function utf8Count(str: string): number {
   const strLength = str.length;

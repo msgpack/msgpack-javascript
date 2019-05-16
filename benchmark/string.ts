@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { encode, decode } from "../src";
 
 const data = "Hello, 🌏\n".repeat(10000);

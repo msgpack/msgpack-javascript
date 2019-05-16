@@ -1,19 +1,42 @@
+/* eslint-disable no-console */
+
+// TODO: Use TypeScript built-in type
+declare const WebAssembly: any;
+
+export const WASM_DEBUG = !!(process && process.env.WASM_DEBUG === "true");
+
 let wasmModule: any;
 try {
-  wasmModule = require("../build/wasm/optimized.wasm.js").wasmModule;
-} catch {
+  if (WASM_DEBUG) {
+    wasmModule = require("../build/wasm/untouched.wasm.js").wasmModule;
+  } else {
+    wasmModule = require("../build/wasm/optimized.wasm.js").wasmModule;
+  }
+} catch (e) {
+  if (WASM_DEBUG) {
+    console.error(e);
+  }
   // WebAssembly is not supported.
 }
 
-declare var WebAssembly: any;
-const WASM_MEMORY_PAGE_SIZE = 0x10000; // 64KiB
+function abort(filename: number, line: number, column: number): void {
+  throw new Error(`abort called at ${filename}:${line}:${column}`);
+}
 
-const defaultWasmInstance = wasmModule && new WebAssembly.Instance(wasmModule);
+const defaultWasmInstance =
+  wasmModule &&
+  new WebAssembly.Instance(wasmModule, {
+    env: {
+      abort,
+    },
+  });
 
 export const WASM_AVAILABLE = !!wasmModule && process.env.NO_WASM !== "true";
 
-function copyArrayBuffer(dest: ArrayBuffer, src: Uint8Array) {
-  const destView = new Uint8Array(dest);
+type pointer = number;
+
+function setMemory(wasm: any, destPtr: pointer, src: Uint8Array, size: number) {
+  const destView = new Uint8Array(wasm.exports.memory.buffer, destPtr, size);
   destView.set(src);
 }
 
@@ -21,31 +44,21 @@ export function utf8DecodeWasm(
   bytes: Uint8Array,
   offset: number,
   byteLength: number,
-  wasmInstance = defaultWasmInstance,
+  wasm = defaultWasmInstance,
 ): string {
-  if (!wasmInstance) {
-    throw new Error("No WebAssembly available");
+  const inputPtr: pointer = wasm.exports.malloc(byteLength);
+  // in worst case, the UTF-16 array uses the same as byteLength * 2
+  const outputPtr: pointer = wasm.exports.malloc(byteLength * 2);
+  try {
+    setMemory(wasm, inputPtr, bytes.subarray(offset, offset + byteLength), byteLength);
+
+    const outputArraySize = wasm.exports.utf8DecodeToUint16Array(outputPtr, inputPtr, byteLength);
+    const codepoints = new Uint16Array(wasm.exports.memory.buffer, outputPtr, outputArraySize);
+
+    // FIXME: split codepoints if it is too long (the maximum size depends on the JS engine, though).
+    return String.fromCharCode.apply(String, codepoints as any);
+  } finally {
+    wasm.exports.free(inputPtr);
+    wasm.exports.free(outputPtr);
   }
-
-  const currentMemorySize: number = wasmInstance.exports.memory.buffer.byteLength;
-  const requiredMemorySize = bytes.length * 3; // input(utf8) + output(utf16)
-  if (currentMemorySize < requiredMemorySize) {
-    const page = Math.ceil((requiredMemorySize - currentMemorySize) / WASM_MEMORY_PAGE_SIZE);
-    wasmInstance.exports.memory.grow(page);
-  }
-
-  copyArrayBuffer(wasmInstance.exports.memory.buffer, bytes.subarray(offset, offset + byteLength));
-  // console.log(instanceMemory.subarray(0, 10));
-
-  const outputStart = Math.ceil(byteLength / Uint16Array.BYTES_PER_ELEMENT) * Uint16Array.BYTES_PER_ELEMENT;
-  const outputEnd = wasmInstance.exports.utf8ToUtf16(byteLength, outputStart);
-  const codepoints = new Uint16Array(
-    wasmInstance.exports.memory.buffer,
-    outputStart,
-    (outputEnd - outputStart) / Uint16Array.BYTES_PER_ELEMENT,
-  );
-  // console.log([byteLength, outputStart, outputEnd]);
-  // console.log(instanceMemory.subarray(0, 10));
-  // console.log(utf16array);
-  return String.fromCharCode.apply(String, codepoints as any);
 }
