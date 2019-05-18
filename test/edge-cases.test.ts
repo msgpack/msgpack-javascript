@@ -107,4 +107,22 @@ describe("edge cases", () => {
       }, RangeError);
     });
   });
+
+  context("try to decode object with __proto__", () => {
+    it("does not decode __proto__ by default", () => {
+      // decode { __proto__: { "foo": "bar" } }
+      const object: any = decode([
+        // fixmap 1
+        0x81,
+        // str: "__proto__",
+        ...encode("__proto__"),
+        // fixmap 1
+        0x81,
+        // { "foo": "bar "}
+        ...encode("foo"),
+        ...encode("bar"),
+      ]);
+      assert.deepStrictEqual(object.foo, undefined);
+    });
+  });
 });
