@@ -67,18 +67,7 @@ You can use `max${Type}Length` to limit the length of each type decoded.
 
 It decodes `stream` in an async iterable of byte arrays and returns decoded data as `uknown` wrapped in `Promise`. This function works asyncronously.
 
-#### DecodeAsyncOptions
-
-Name|Type|Default
-----|----|----
-extensionCodec | ExtensionCodec | `ExtensinCodec.defaultCodec`
-maxStrLength | number | `4_294_967_295` (UINT32_MAX)
-maxBinLength | number | `4_294_967_295` (UINT32_MAX)
-maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
-maxMapLength | number | `4_294_967_295` (UINT32_MAX)
-maxExtLength | number | `4_294_967_295` (UINT32_MAX)
-
-You can use `max${Type}Length` to limit the length of each type decoded.
+Note that `decodeAsync()` acceps the same options as `decode()`.
 
 ### Extension Types
 
