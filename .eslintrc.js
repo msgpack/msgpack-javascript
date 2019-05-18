@@ -24,6 +24,7 @@ module.exports = {
     // "prefer-const": "warn", // TODO: AssemblyScript has different semantics.
     "guard-for-in": "warn",
     "curly": "warn",
+    "no-param-reassign": "warn",
 
     "@typescript-eslint/no-unused-vars":"warn",
     "@typescript-eslint/array-type": ["error", "generic"],

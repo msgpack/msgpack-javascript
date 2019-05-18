@@ -3,6 +3,7 @@ import { ExtensionCodec } from "./ExtensionCodec";
 import { getInt64, getUint64 } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
+import { WASM_AVAILABLE, WASM_STR_THRESHOLD, utf8DecodeWasm } from "./wasmFunctions";
 
 enum State {
   ARRAY,
@@ -373,13 +374,17 @@ export class Decoder {
     });
   }
 
-  decodeUtf8String(byteLength: number, headOffset: number): string {
-    if (this.bytes.byteLength < this.pos + headOffset + byteLength) {
+  decodeUtf8String(byteLength: number, headerOffset: number): string {
+    if (this.bytes.byteLength < this.pos + headerOffset + byteLength) {
       throw MORE_DATA;
     }
 
-    const object = utf8Decode(this.bytes, this.pos + headOffset, byteLength);
-    this.pos += headOffset + byteLength;
+    const offset = this.pos + headerOffset;
+    const object =
+      WASM_AVAILABLE && byteLength > WASM_STR_THRESHOLD
+        ? utf8DecodeWasm(this.bytes, offset, byteLength)
+        : utf8Decode(this.bytes, offset, byteLength);
+    this.pos += headerOffset + byteLength;
     return object;
   }
 

@@ -7,10 +7,11 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "npm run clean && npm run asbuild && tsc -p tsconfig.dist.json && webpack",
+    "prepare": "npm run clean && npm run asbuild:production && tsc -p tsconfig.dist.json && webpack",
     "prepublishOnly": "TEST_DIST=true npm run test",
     "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
+    "test:wasm": "MSGPACK_WASM=force mocha 'test/**/*.test.ts'",
     "test:cover": "npx nyc mocha 'test/**/*.test.ts'",
     "test:browser": "karma start --single-run",
     "test:browser:firefox": "karma start --single-run --browsers FirefoxHeadless",
@@ -24,9 +25,8 @@
     "profile:encode": "rimraf isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-encode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
     "profile:decode": "rimraf isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-decode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
     "benchmark": "ts-node benchmark/benchmark-from-msgpack-lite.ts",
-    "asbuild:untouched": "asc assembly/index.ts -b dist/wasm/untouched.wasm -t dist/wasm/untouched.wat --sourceMap --validate --debug",
-    "asbuild:optimized": "asc assembly/index.ts -b dist/wasm/optimized.wasm -t dist/wasm/optimized.wat --sourceMap --validate -O3",
-    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized && ts-node tools/pack-wasm.ts"
+    "asbuild:development": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate --debug && ts-node tools/pack-wasm.ts",
+    "asbuild:production": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate -O3 && ts-node tools/pack-wasm.ts"
   },
   "repository": {
     "type": "git",
