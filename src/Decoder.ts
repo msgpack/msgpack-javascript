@@ -363,9 +363,7 @@ export class Decoder {
 
   pushMapState(size: number) {
     if (size > this.maxMapLength) {
-      throw new Error(
-        `Max length exceeded: map length (${size}) > maxMapLengthLength (${this.maxMapLength})`,
-      );
+      throw new Error(`Max length exceeded: map length (${size}) > maxMapLengthLength (${this.maxMapLength})`);
     }
 
     this.stack.push({
@@ -379,9 +377,7 @@ export class Decoder {
 
   pushArrayState(size: number) {
     if (size > this.maxArrayLength) {
-      throw new Error(
-        `Max length exceeded: array length (${size}) > maxArrayLength (${this.maxArrayLength})`,
-      );
+      throw new Error(`Max length exceeded: array length (${size}) > maxArrayLength (${this.maxArrayLength})`);
     }
 
     this.stack.push({
@@ -393,9 +389,7 @@ export class Decoder {
 
   decodeUtf8String(byteLength: number, headOffset: number): string {
     if (byteLength > this.maxStrLength) {
-      throw new Error(
-        `Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`,
-      );
+      throw new Error(`Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`);
     }
 
     const object = utf8Decode(this.view, this.pos + headOffset, byteLength);
