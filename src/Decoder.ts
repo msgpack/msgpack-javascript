@@ -329,11 +329,8 @@ export class Decoder {
           state.type = State.MAP_VALUE;
           continue DECODE;
         } else if (state.type === State.MAP_VALUE) {
-          // Ignore __proto__ to avoid prototpe pollution
-          if (state.key !== "__proto__") {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            state.map[state.key!] = object;
-          }
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          state.map[state.key!] = object;
           state.readCount++;
 
           if (state.readCount === state.size) {
