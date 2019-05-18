@@ -74,4 +74,22 @@ describe("decode with max${Type}Length specified", () => {
       }, /max length exceeded/i);
     });
   });
+
+  context("maxExtType", () => {
+    const input = encode(new Date());
+    // timextamp ext requires at least 4 bytes.
+    const options: DecodeOptions = { maxExtLength: 1 };
+
+    it("throws errors (synchronous)", () => {
+      assert.throws(() => {
+        decode(input, options);
+      }, /max length exceeded/i);
+    });
+
+    it("throws errors (asynchronous)", async () => {
+      await assert.rejects(async () => {
+        await decodeAsync(createStream(input), options);
+      }, /max length exceeded/i);
+    });
+  });
 });
