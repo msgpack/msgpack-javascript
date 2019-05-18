@@ -42,17 +42,32 @@ npm install @msgpack/msgpack
 
 ## API
 
-### `encode(data: unknown, options?): Uint8Array`
+### `encode(data: unknown, options?: EncodeOptions): Uint8Array`
 
 It encodes `data` and returns a byte array as `Uint8Array`.
 
-### `decode(buffer: ArrayLike<number> | Uint8Array, options?): unknown`
+### `decode(buffer: ArrayLike<number> | Uint8Array, options?: DecodeOptions): unknown`
 
 It decodes `buffer` in a byte buffer and returns decoded data as `uknown`.
 
-### `decodeAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>, options?): Promise<unknown>`
+#### DecodeOptions
+
+Name|Type|Default
+----|----|----
+extensionCodec | ExtensionCodec | `ExtensinCodec.defaultCodec`
+maxStrLength | number | `4_294_967_295` (UINT32_MAX)
+maxBinLength | number | `4_294_967_295` (UINT32_MAX)
+maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
+maxMapLength | number | `4_294_967_295` (UINT32_MAX)
+maxExtLength | number | `4_294_967_295` (UINT32_MAX)
+
+You can use `max${Type}Length` to limit the length of each type decoded.
+
+### `decodeAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>, options?: DecodeAsyncOptions): Promise<unknown>`
 
 It decodes `stream` in an async iterable of byte arrays and returns decoded data as `uknown` wrapped in `Promise`. This function works asyncronously.
+
+Note that `decodeAsync()` acceps the same options as `decode()`.
 
 ### Extension Types
 

@@ -45,6 +45,8 @@ export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
 
 const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 
+const DEFAULT_MAX_LENGTH = 0xffff_ffff; // uint32_max
+
 export class Decoder {
   totalPos = 0;
   pos = 0;
@@ -53,7 +55,14 @@ export class Decoder {
   headByte = HEAD_BYTE_REQUIRED;
   readonly stack: Array<StackState> = [];
 
-  constructor(readonly extensionCodec = ExtensionCodec.defaultCodec) {}
+  constructor(
+    readonly extensionCodec = ExtensionCodec.defaultCodec,
+    readonly maxStrLength = DEFAULT_MAX_LENGTH,
+    readonly maxBinLength = DEFAULT_MAX_LENGTH,
+    readonly maxArrayLength = DEFAULT_MAX_LENGTH,
+    readonly maxMapLength = DEFAULT_MAX_LENGTH,
+    readonly maxExtLength = DEFAULT_MAX_LENGTH,
+  ) {}
 
   setBuffer(buffer: ArrayLike<number> | Uint8Array): void {
     this.view = createDataView(buffer);
@@ -356,6 +365,12 @@ export class Decoder {
   }
 
   pushMapState(size: number) {
+    if (size > this.maxMapLength) {
+      throw new Error(
+        `Max length exceeded: map length (${size}) > maxMapLengthLength (${this.maxMapLength})`,
+      );
+    }
+
     this.stack.push({
       type: State.MAP_KEY,
       size,
@@ -366,6 +381,12 @@ export class Decoder {
   }
 
   pushArrayState(size: number) {
+    if (size > this.maxArrayLength) {
+      throw new Error(
+        `Max length exceeded: array length (${size}) > maxArrayLength (${this.maxArrayLength})`,
+      );
+    }
+
     this.stack.push({
       type: State.ARRAY,
       size,
@@ -374,12 +395,22 @@ export class Decoder {
   }
 
   decodeUtf8String(byteLength: number, headOffset: number): string {
+    if (byteLength > this.maxStrLength) {
+      throw new Error(
+        `Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`,
+      );
+    }
+
     const object = utf8Decode(this.view, this.pos + headOffset, byteLength);
     this.pos += headOffset + byteLength;
     return object;
   }
 
   decodeBinary(byteLength: number, headOffset: number): Uint8Array {
+    if (byteLength > this.maxBinLength) {
+      throw new Error(`Max length exceeded: bin length (${byteLength}) > maxBinLength (${this.maxBinLength})`);
+    }
+
     if (!this.hasRemaining(byteLength + headOffset)) {
       throw MORE_DATA;
     }
@@ -390,6 +421,10 @@ export class Decoder {
   }
 
   decodeExtension(size: number, headOffset: number): unknown {
+    if (size > this.maxExtLength) {
+      throw new Error(`Max length exceeded: ext length (${size}) > maxExtLength (${this.maxExtLength})`);
+    }
+
     const extType = this.view.getInt8(this.pos + headOffset);
     const data = this.decodeBinary(size, headOffset + 1 /* extType */);
     return this.extensionCodec.decode(data, extType);
