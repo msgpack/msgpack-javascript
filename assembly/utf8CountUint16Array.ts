@@ -1,4 +1,4 @@
-import { loadUint16BE } from "./memoryBE";
+import { loadUint16BE } from "./be";
 
 // inputPtr: u16*
 export function utf8CountUint16Array(inputPtr: usize, inputLength: usize): usize {

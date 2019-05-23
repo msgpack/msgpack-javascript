@@ -1,5 +1,5 @@
 import { utf8CountUint16Array } from "./utf8CountUint16Array";
-import { storeUint8BE, storeUint16BE, storeUint32BE, loadUint16BE } from "./memoryBE";
+import { storeUint8BE, storeUint16BE, storeUint32BE, loadUint16BE } from "./be";
 
 function storeStringHeader(outputPtr: usize, utf8ByteLength: usize): usize {
   let ptr = outputPtr;
