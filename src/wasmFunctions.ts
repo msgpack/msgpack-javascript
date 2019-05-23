@@ -1,7 +1,4 @@
-// TODO: Use TypeScript built-in type
-declare const WebAssembly: any;
-
-// WASM=no - disable WASM functions
+// WASM=never - disable WASM functions
 // WASM=force - force to use WASM functions
 const WASM: string = process.env.MSGPACK_WASM || process.env.WASM || "";
 export const NO_WASM = WASM === "never";
