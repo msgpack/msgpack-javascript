@@ -59,9 +59,6 @@ export function utf8EncodeUint16Array(outputPtr: usize, inputPtr: usize, inputLe
             value = ((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000;
           }
         }
-        if (value >= 0xd800 && value <= 0xdbff) {
-          continue; // drop lone surrogate
-        }
       }
 
       if ((value & 0xffff0000) === 0) {
