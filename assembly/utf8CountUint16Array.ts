@@ -11,20 +11,6 @@ export function utf8CountUint16Array(inputPtr: usize, inputLength: usize): usize
     let value: u32 = loadUint16BE(pos);
     pos += u16s;
 
-    if (value >= 0xd800 && value <= 0xdbff) {
-      // high surrogate
-      if (pos < end) {
-        let extra: u32 = loadUint16BE(pos);
-        if ((extra & 0xfc00) === 0xdc00) {
-          pos += u16s;
-          value = ((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000;
-        }
-      }
-      if (value >= 0xd800 && value <= 0xdbff) {
-        continue; // drop lone surrogate
-      }
-    }
-
     if ((value & 0xffffff80) === 0) {
       // 1-byte
       byteLength++;
