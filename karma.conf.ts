@@ -1,6 +1,5 @@
 import { sauceLabs, sauceLaunchers } from "./sauceLabs";
 
-const webpackConfig = require("./webpack.config.js");
 const webpack = require("webpack");
 
 export default function configure(config: any) {
@@ -47,7 +46,7 @@ export default function configure(config: any) {
         util: false,
       },
       resolve: {
-        ...webpackConfig.resolve,
+        extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".wasm"],
       },
       module: {
         rules: [
