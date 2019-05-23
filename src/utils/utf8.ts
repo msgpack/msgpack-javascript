@@ -1,5 +1,3 @@
-import { prettyByte } from "./prettyByte";
-
 export function utf8Count(str: string): number {
   const strLength = str.length;
 
@@ -89,6 +87,23 @@ export function utf8Encode(str: string, output: DataView, outputOffset: number):
   }
 }
 
+const CHUNK_SIZE = 0x10_000;
+
+export function safeStringFromCharCode(units: Array<number> | Uint16Array) {
+  if (units.length <= CHUNK_SIZE) {
+    // `String.fromCharCode.apply()` is faster than `String.fromCharCode(...units)`
+    // in case `units` is a typed array
+    return String.fromCharCode.apply(String, units as any);
+  }
+
+  let result = "";
+  for (let i = 0; i < units.length; i++) {
+    const chunk = units.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+    result += String.fromCharCode.apply(String, chunk as any);
+  }
+  return result;
+}
+
 export function utf8Decode(bytes: Uint8Array, outputOffset: number, byteLength: number): string {
   let offset = outputOffset;
   const out: Array<number> = [];
@@ -123,5 +138,6 @@ export function utf8Decode(bytes: Uint8Array, outputOffset: number, byteLength: 
       out.push(byte1);
     }
   }
-  return String.fromCharCode(...out);
+
+  return safeStringFromCharCode(out);
 }

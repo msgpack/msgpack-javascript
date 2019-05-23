@@ -1,3 +1,5 @@
+import { safeStringFromCharCode } from "./utils/utf8";
+
 // WASM=never - disable WASM functions
 // WASM=force - force to use WASM functions
 const WASM: string = process.env.MSGPACK_WASM || process.env.WASM || "";
@@ -70,10 +72,8 @@ export function utf8DecodeWasm(bytes: Uint8Array, offset: number, byteLength: nu
     setMemoryU8(inputPtr, bytes.subarray(offset, offset + byteLength), byteLength);
 
     const outputArraySize = wm.utf8DecodeToUint16Array(outputPtr, inputPtr, byteLength);
-    const codepoints = new Uint16Array(wm.memory.buffer, outputPtr, outputArraySize);
-
-    // FIXME: split codepoints if it is too long (the maximum size depends on the JS engine, though).
-    return String.fromCharCode.apply(String, codepoints as any);
+    const units = new Uint16Array(wm.memory.buffer, outputPtr, outputArraySize);
+    return safeStringFromCharCode(units);
   } finally {
     wm.free(inputPtr);
     wm.free(outputPtr);

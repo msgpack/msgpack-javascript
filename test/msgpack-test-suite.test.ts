@@ -91,8 +91,9 @@ describe("msgpack-test-suite", () => {
       FLOAT64_POSITIVE_INF: Number.POSITIVE_INFINITY,
       FLOAT64_NEGATIVE_INF: Number.NEGATIVE_INFINITY,
       FLOAT64_NAN: Number.NaN,
-      STR16: "x".repeat(0x100),
-      STR32: "x".repeat(0x10000),
+      STR16: "a".repeat(0x100),
+      STR32: "b".repeat(0x10_000),
+      STR32LARGE: "c".repeat(0x100_000), // may cause "RangeError: Maximum call stack size exceeded" in simple implelementions
       BIN16: new Uint8Array(0x100).fill(0xff),
       BIN32: new Uint8Array(0x10000).fill(0xff),
       ARRAY16: new Array<boolean>(0x100).fill(true),
