@@ -1,4 +1,6 @@
-# MessagePack for JavaScript [![npm version](https://badge.fury.io/js/%40msgpack%2Fmsgpack.svg)](https://badge.fury.io/js/%40msgpack%2Fmsgpack) [![Build Status](https://travis-ci.org/msgpack/msgpack-javascript.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-javascript) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graph/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript)
+# MessagePack for JavaScript
+
+[![npm version](https://badge.fury.io/js/%40msgpack%2Fmsgpack.svg)](https://badge.fury.io/js/%40msgpack%2Fmsgpack) [![Build Status](https://travis-ci.org/msgpack/msgpack-javascript.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-javascript) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graph/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript) [![bundlephobia](https://badgen.net/bundlephobia/minzip/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack)
 
 [![Browser Matrix powered by Sauce Labs](https://saucelabs.com/browser-matrix/gfx2019.svg)](https://saucelabs.com)
 
@@ -40,17 +42,32 @@ npm install @msgpack/msgpack
 
 ## API
 
-### `encode(data: unknown, options?): Uint8Array`
+### `encode(data: unknown, options?: EncodeOptions): Uint8Array`
 
 It encodes `data` and returns a byte array as `Uint8Array`.
 
-### `decode(buffer: ArrayLike<number> | Uint8Array, options?): unknown`
+### `decode(buffer: ArrayLike<number> | Uint8Array, options?: DecodeOptions): unknown`
 
 It decodes `buffer` in a byte buffer and returns decoded data as `uknown`.
 
-### `decodeAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>, options?): Promise<unknown>`
+#### DecodeOptions
+
+Name|Type|Default
+----|----|----
+extensionCodec | ExtensionCodec | `ExtensinCodec.defaultCodec`
+maxStrLength | number | `4_294_967_295` (UINT32_MAX)
+maxBinLength | number | `4_294_967_295` (UINT32_MAX)
+maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
+maxMapLength | number | `4_294_967_295` (UINT32_MAX)
+maxExtLength | number | `4_294_967_295` (UINT32_MAX)
+
+You can use `max${Type}Length` to limit the length of each type decoded.
+
+### `decodeAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>, options?: DecodeAsyncOptions): Promise<unknown>`
 
 It decodes `stream` in an async iterable of byte arrays and returns decoded data as `uknown` wrapped in `Promise`. This function works asyncronously.
+
+Note that `decodeAsync()` acceps the same options as `decode()`.
 
 ### Extension Types
 
@@ -161,11 +178,12 @@ Date|timestamp ext format family|Date (*4)
 ### ECMA-262
 
 * ES5 language features
-* Typed Arrays (ES2015; [caniuse: typedarrays](https://caniuse.com/#feat=typedarrays))
-* String.prototype.padStart (ES2017; [caniuse: pad-start-end](https://caniuse.com/#feat=pad-start-end))
-* Async iterations / `for await of` syntax (ES2018)
+* ES2018 standard library, including:
+  * Typed arrays (ES2015)
+  * Async iterations (ES2018)
+  * Features added in ES2015-ES2018
 
-You can use polyfills for all of them with TypeScript downlevel compilation.
+ES2018 standard library used in this library can be polyfilled. For example, [core-js](https://github.com/zloirock/core-js) is used as polyfills to run tests on IE11, which has only ES5 language features.
 
 ### NodeJS
 
@@ -200,7 +218,7 @@ If you use NodeJS and/or webpack, their module resolvers use the suitable one au
 
 ## CI
 
-* See .travis.yml for details
+See [.travis.yml](./.travis.yml) for details.
 
 ### Relase Engineering
 
