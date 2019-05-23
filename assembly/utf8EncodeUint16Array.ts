@@ -40,19 +40,6 @@ export function utf8EncodeUint16Array(outputPtr: usize, inputPtr: usize, inputLe
   while (inputOffset < inputEnd) {
     let value: u32 = loadUint16BE(inputOffset);
     inputOffset += u16s;
-    if (value >= 0xd800 && value <= 0xdbff) {
-      // high surrogate
-      if (inputOffset < inputEnd) {
-        let extra: u32 = loadUint16BE(inputOffset);
-        if ((extra & 0xfc00) === 0xdc00) {
-          inputOffset += u16s;
-          value = ((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000;
-        }
-      }
-      if (value >= 0xd800 && value <= 0xdbff) {
-        continue; // drop lone surrogate
-      }
-    }
 
     if ((value & 0xffffff80) === 0) {
       // 1-byte
@@ -61,17 +48,32 @@ export function utf8EncodeUint16Array(outputPtr: usize, inputPtr: usize, inputLe
     } else if ((value & 0xfffff800) === 0) {
       // 2-bytes
       store<u8>(outputOffset++, ((value >> 6) & 0x1f) | 0xc0);
-    } else if ((value & 0xffff0000) === 0) {
-      // 3-byte
-      store<u8>(outputOffset++, ((value >> 12) & 0x0f) | 0xe0);
-      store<u8>(outputOffset++, ((value >> 6) & 0x3f) | 0x80);
-    } else if ((value & 0xffe00000) === 0) {
-      // 4-byte
-      store<u8>(outputOffset++, ((value >> 18) & 0x07) | 0xf0);
-      store<u8>(outputOffset++, ((value >> 12) & 0x3f) | 0x80);
-      store<u8>(outputOffset++, ((value >> 6) & 0x3f) | 0x80);
     } else {
-      unreachable();
+      // handle surrogate pair
+      if (value >= 0xd800 && value <= 0xdbff) {
+        // high surrogate
+        if (inputOffset < inputEnd) {
+          let extra: u32 = loadUint16BE(inputOffset);
+          if ((extra & 0xfc00) === 0xdc00) {
+            inputOffset += u16s;
+            value = ((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000;
+          }
+        }
+        if (value >= 0xd800 && value <= 0xdbff) {
+          continue; // drop lone surrogate
+        }
+      }
+
+      if ((value & 0xffff0000) === 0) {
+        // 3-byte
+        store<u8>(outputOffset++, ((value >> 12) & 0x0f) | 0xe0);
+        store<u8>(outputOffset++, ((value >> 6) & 0x3f) | 0x80);
+      } else {
+        // 4-byte
+        store<u8>(outputOffset++, ((value >> 18) & 0x07) | 0xf0);
+        store<u8>(outputOffset++, ((value >> 12) & 0x3f) | 0x80);
+        store<u8>(outputOffset++, ((value >> 6) & 0x3f) | 0x80);
+      }
     }
 
     store<u8>(outputOffset++, (value & 0x3f) | 0x80);

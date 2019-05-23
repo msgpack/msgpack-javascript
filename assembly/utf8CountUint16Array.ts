@@ -32,14 +32,29 @@ export function utf8CountUint16Array(inputPtr: usize, inputLength: usize): usize
     } else if ((value & 0xfffff800) === 0) {
       // 2-bytes
       byteLength += 2;
-    } else if ((value & 0xffff0000) === 0) {
-      // 3-byte
-      byteLength += 3;
-    } else if ((value & 0xffe00000) === 0) {
-      // 4-byte
-      byteLength += 4;
     } else {
-      unreachable();
+      // handle surrogate pair
+      if (value >= 0xd800 && value <= 0xdbff) {
+        // high surrogate
+        if (pos < end) {
+          let extra: u32 = loadUint16BE(pos);
+          if ((extra & 0xfc00) === 0xdc00) {
+            pos += u16s;
+            value = ((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000;
+          }
+        }
+        if (value >= 0xd800 && value <= 0xdbff) {
+          continue; // drop lone surrogate
+        }
+      }
+
+      if ((value & 0xffff0000) === 0) {
+        // 3-byte
+        byteLength += 3;
+      } else {
+        // 4-byte
+        byteLength += 4;
+      }
     }
   }
   return byteLength;
