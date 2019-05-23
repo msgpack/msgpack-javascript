@@ -27,7 +27,7 @@ var wasmInstance = new WebAssembly.Instance(wasmModule, {
   env: {
     abort: function (filename, line, column) {
       // FIXME: filename is just a number (pointer?)
-      throw new Error(\`abort called at \${filename}:\${line}:\${column}\`);
+      throw new Error("abort called at " + filename + ":" + line + ":" + column);
     },
   },
 });

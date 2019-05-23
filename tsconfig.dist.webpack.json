@@ -6,8 +6,7 @@
     "outDir": "./build/es5",
     "declaration": false,
     "downlevelIteration": true,
-    "noEmitOnError": true,
-    "incremental": false,
+    "noEmitOnError": true
   },
   "include": ["src/**/*.ts"]
 }
