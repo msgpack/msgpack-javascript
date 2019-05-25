@@ -220,14 +220,18 @@ export class Encoder {
     }
   }
 
-  encodeMap(object: Record<string, unknown>, depth: number) {
-    let size = 0;
+  countObjectKeys(object: Record<string, unknown>): number {
+    let count = 0;
     for (const key in object) {
       if (Object.prototype.hasOwnProperty.call(object, key)) {
-        size++;
+        count++;
       }
     }
-    // map
+    return count;
+  }
+
+  encodeMap(object: Record<string, unknown>, depth: number) {
+    const size = this.countObjectKeys(object);
     if (size < 16) {
       // fixmap
       this.writeU8(0x80 + size);
