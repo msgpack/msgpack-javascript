@@ -5,6 +5,7 @@
   "main": "./dist/index.js",
   "browser": "./dist.es5/msgpack.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "scripts": {
     "build": "npm publish --dry-run",
     "prepare": "npm run clean && npm run asbuild:production && tsc -p tsconfig.dist.json && webpack",
