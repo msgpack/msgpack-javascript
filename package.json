@@ -28,9 +28,6 @@
     "lint:fix": "eslint --fix --ext .ts src test && npm run format",
     "lint:print-config": "eslint --print-config .eslintrc.js",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
-    "profile:encode": "rimraf isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-encode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
-    "profile:decode": "rimraf isolate-*.log ; node --prof --require ts-node/register  -e 'require(\"./benchmark/profile-decode\")' && node --prof-process --preprocess -j isolate-*.log | npx flamebearer",
-    "benchmark": "ts-node benchmark/benchmark-from-msgpack-lite.ts",
     "asbuild:development": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate --debug && ts-node tools/pack-wasm.ts",
     "asbuild:production": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate -O3 && ts-node tools/pack-wasm.ts"
   },

@@ -17,5 +17,17 @@ validate-git-status:
 	fi
 	git pull
 
+profile-encode:
+		npx rimraf isolate-*.log
+		node --prof --require ts-node/register -e 'require("./benchmark/profile-encode")'
+		node --prof-process --preprocess -j isolate-*.log | npx flamebearer
 
-.PHONY: test dist validate-branch
+profile-decode:
+		npx rimraf isolate-*.log
+		node --prof --require ts-node/register  -e 'require("./benchmark/profile-decode")'
+		node --prof-process --preprocess -j isolate-*.log | npx flamebearer
+
+benchmark:
+	npx ts-node benchmark/benchmark-from-msgpack-lite.ts
+
+.PHONY: test dist validate-branch benchmark
