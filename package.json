@@ -40,7 +40,8 @@
   "keywords": [
     "msgpack",
     "MessagePack",
-    "serialization"
+    "serialization",
+    "universal"
   ],
   "author": "The MessagePack community",
   "license": "ISC",
