@@ -221,8 +221,12 @@ export class Encoder {
   }
 
   encodeMap(object: Record<string, unknown>, depth: number) {
-    const keys = Object.keys(object);
-    const size = keys.length;
+    let size = 0;
+    for (const key in object) {
+      if (Object.prototype.hasOwnProperty.call(object, key)) {
+        size++;
+      }
+    }
     // map
     if (size < 16) {
       // fixmap
@@ -238,9 +242,11 @@ export class Encoder {
     } else {
       throw new Error(`Too large map object: ${size}`);
     }
-    for (const key of keys) {
-      this.encodeString(key);
-      this.encode(object[key], depth + 1);
+    for (const key in object) {
+      if (Object.prototype.hasOwnProperty.call(object, key)) {
+        this.encodeString(key);
+        this.encode(object[key], depth + 1);
+      }
     }
   }
 
