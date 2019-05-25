@@ -26,7 +26,7 @@ export default function configure(config: any) {
     preprocessors: {
       "**/*.ts": ["webpack", "sourcemap"],
     },
-    reporters: ["mocha", "saucelabs"],
+    reporters: ["dots", "saucelabs"],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
