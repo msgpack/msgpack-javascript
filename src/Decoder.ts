@@ -3,6 +3,7 @@ import { ExtensionCodec } from "./ExtensionCodec";
 import { getInt64, getUint64 } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
+import { WASM_AVAILABLE, WASM_STR_THRESHOLD, utf8DecodeWasm } from "./wasmFunctions";
 
 enum State {
   ARRAY,
@@ -29,6 +30,7 @@ type StackState = StackArrayState | StackMapState;
 const HEAD_BYTE_REQUIRED = -1;
 
 const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
+const EMPTY_BYTES = new Uint8Array(EMPTY_VIEW.buffer);
 
 // IE11: Hack to support IE11.
 // IE11: Drop this hack and just use RangeError when IE11 is obsolete.
@@ -51,7 +53,8 @@ export class Decoder {
   totalPos = 0;
   pos = 0;
 
-  view: DataView = EMPTY_VIEW;
+  view = EMPTY_VIEW;
+  bytes = EMPTY_BYTES;
   headByte = HEAD_BYTE_REQUIRED;
   readonly stack: Array<StackState> = [];
 
@@ -65,7 +68,8 @@ export class Decoder {
   ) {}
 
   setBuffer(buffer: ArrayLike<number> | Uint8Array): void {
-    this.view = createDataView(buffer);
+    this.bytes = ensureUint8Array(buffer);
+    this.view = createDataView(this.bytes);
     this.pos = 0;
   }
 
@@ -387,13 +391,21 @@ export class Decoder {
     });
   }
 
-  decodeUtf8String(byteLength: number, headOffset: number): string {
+  decodeUtf8String(byteLength: number, headerOffset: number): string {
     if (byteLength > this.maxStrLength) {
       throw new Error(`Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`);
     }
 
-    const object = utf8Decode(this.view, this.pos + headOffset, byteLength);
-    this.pos += headOffset + byteLength;
+    if (this.bytes.byteLength < this.pos + headerOffset + byteLength) {
+      throw MORE_DATA;
+    }
+
+    const offset = this.pos + headerOffset;
+    const object =
+      WASM_AVAILABLE && byteLength > WASM_STR_THRESHOLD
+        ? utf8DecodeWasm(this.bytes, offset, byteLength)
+        : utf8Decode(this.bytes, offset, byteLength);
+    this.pos += headerOffset + byteLength;
     return object;
   }
 

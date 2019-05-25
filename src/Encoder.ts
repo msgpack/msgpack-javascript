@@ -3,6 +3,7 @@ import { ExtensionCodec } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 import { ExtData } from "./ExtData";
+import { WASM_AVAILABLE, utf8EncodeWasm, WASM_STR_THRESHOLD } from "./wasmFunctions";
 
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 1024;
@@ -117,8 +118,7 @@ export class Encoder {
     }
   }
 
-  encodeString(object: string) {
-    const byteLength = utf8Count(object);
+  writeStringHeader(byteLength: number) {
     if (byteLength < 32) {
       // fixstr
       this.writeU8(0xa0 + byteLength);
@@ -137,10 +137,28 @@ export class Encoder {
     } else {
       throw new Error(`Too long string: ${byteLength} bytes in UTF-8`);
     }
+  }
 
-    this.ensureBufferSizeToWrite(byteLength);
-    utf8Encode(object, this.view, this.pos);
-    this.pos += byteLength;
+  encodeString(object: string) {
+    const maxHeaderSize = 1 + 4;
+    const strLength = object.length;
+
+    if (WASM_AVAILABLE && strLength > WASM_STR_THRESHOLD) {
+      // ensure max possible size
+      const maxSize = maxHeaderSize + strLength * 4;
+      this.ensureBufferSizeToWrite(maxSize);
+
+      const output = new Uint8Array(this.view.buffer, this.view.byteOffset + this.pos);
+      const consumedLength = utf8EncodeWasm(object, output);
+      this.pos += consumedLength;
+      return;
+    } else {
+      const byteLength = utf8Count(object);
+      this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
+      this.writeStringHeader(byteLength);
+      utf8Encode(object, this.view, this.pos);
+      this.pos += byteLength;
+    }
   }
 
   encodeObject(object: unknown, depth: number) {

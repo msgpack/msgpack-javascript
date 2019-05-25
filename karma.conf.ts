@@ -1,6 +1,6 @@
 import { sauceLabs, sauceLaunchers } from "./sauceLabs";
 
-const webpackConfig = require("./webpack.config.js");
+const webpack = require("webpack");
 
 export default function configure(config: any) {
   config.set({
@@ -46,7 +46,7 @@ export default function configure(config: any) {
         util: false,
       },
       resolve: {
-        ...webpackConfig.resolve,
+        extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".wasm"],
       },
       module: {
         rules: [
@@ -61,12 +61,16 @@ export default function configure(config: any) {
           },
         ],
       },
+      plugins: [
+        new webpack.DefinePlugin({
+          "process.env.MSGPACK_WASM": JSON.stringify(process.env.MSGPACK_WASM),
+        }),
+      ],
       optimization: {
         minimize: false,
       },
       performance: {
-        maxEntrypointSize: 50 * 1024 ** 2,
-        maxAssetSize: 50 * 1024 ** 2,
+        hints: false,
       },
       devtool: "inline-source-map",
     },
@@ -75,7 +79,7 @@ export default function configure(config: any) {
     },
     client: {
       mocha: {
-        timeout: 5000,
+        timeout: 10000,
       },
     },
   });
