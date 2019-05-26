@@ -4,10 +4,9 @@ test:
 
 test-all:
 	npm ci
-	npm run test:browser
-	npm run test:cover
+	npm publish --dry-run
 
-publish: validate-git-status test-all
+publish: validate-git-status
 	npm publish
 	git push origin master
 	git push origin master --tags

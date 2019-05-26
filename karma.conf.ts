@@ -1,5 +1,5 @@
 import { sauceLabs, sauceLaunchers } from "./sauceLabs";
-
+const path = require("path");
 const webpack = require("webpack");
 
 export default function configure(config: any) {
@@ -47,6 +47,9 @@ export default function configure(config: any) {
       },
       resolve: {
         extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".wasm"],
+        alias: {
+          "@msgpack/msgpack": path.resolve(__dirname, "src"),
+        },
       },
       module: {
         rules: [
@@ -54,7 +57,7 @@ export default function configure(config: any) {
             test: /\.tsx?$/,
             loader: "ts-loader",
             options: {
-              configFile: "tsconfig.karma.json",
+              configFile: "tsconfig.test-karma.json",
               // FIXME: some types for dependencies cannot be resolved, so ignore type checking for now.
               transpileOnly: true,
             },

@@ -2,20 +2,17 @@ import assert from "assert";
 import util from "util";
 import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
-import { encode as _encode, decode as _decode, ExtensionCodec, EXT_TIMESTAMP, encodeTimeSpecToTimestamp } from "../src";
+import {
+  encode,
+  decode,
+  ExtensionCodec,
+  EXT_TIMESTAMP,
+  encodeTimeSpecToTimestamp,
+  __WASM_AVAILABLE,
+} from "@msgpack/msgpack";
 
-const { encode, decode }: { encode: typeof _encode; decode: typeof _decode } = (() => {
-  if (process.env.TEST_DIST) {
-    // eslint-disable-next-line no-console
-    console.log("# TEST_DIST is set");
-    return require("../dist.es5/msgpack.js");
-  } else {
-    return {
-      encode: _encode,
-      decode: _decode,
-    };
-  }
-})();
+// eslint-disable-next-line no-console
+console.log("# configuration", { __WASM_AVAILABLE });
 
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
