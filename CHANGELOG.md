@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.2.1 2019/05/26
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.2.0...v1.2.1
+
+* Reduced object allocations in `encode()`
+
 ## v1.2.0 2019/05/25
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.1.0...v1.2.0
