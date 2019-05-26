@@ -216,22 +216,27 @@ If you use NodeJS and/or webpack, their module resolvers use the suitable one au
 
 ## Maintenance
 
-## CI
+## Testing
 
-See [.travis.yml](./.travis.yml) for details.
+test matrix:
+
+* WebAssembly availability
+  * `WASM=force` / `WASM=never`
+* TypeScript targets
+  * `target=es2019` / `target=es5`
+* JavaScript engines
+  * NodeJS, borwsers (Chrome, Firefox, Safari, IE11)
+
+See [test:* in package.json](./package.json) and [.travis.yml](./.travis.yml) for details.
 
 ### Relase Engineering
 
 ```console
 # run tests on NodeJS, Chrome, and Firefox
-make test
+make test-all
 
 # edit the changelog
 code CHANGELOG.md
-
-# prepare release engineering
-npm version major|minor|patch
-git push origin master
 
 # run the publishing task
 make publish

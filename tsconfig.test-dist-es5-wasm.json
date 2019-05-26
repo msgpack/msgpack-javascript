@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./build/test-dist-es5-wasm",
+    "noImplicitAny": false,
+    "paths": {
+      "@msgpack/msgpack": ["./dist.es5/msgpack+wasm"]
+    }
+  }
+}
