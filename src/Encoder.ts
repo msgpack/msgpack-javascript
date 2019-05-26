@@ -11,6 +11,7 @@ export const DEFAULT_INITIAL_BUFFER_SIZE = 1024;
 export class Encoder {
   private pos = 0;
   private view = new DataView(new ArrayBuffer(this.initialBufferSize));
+  private bytes = new Uint8Array(this.view.buffer);
 
   constructor(
     readonly extensionCodec = ExtensionCodec.defaultCodec,
@@ -37,7 +38,7 @@ export class Encoder {
   }
 
   getUint8Array(): Uint8Array {
-    return new Uint8Array(this.view.buffer, this.view.byteOffset, this.pos);
+    return this.bytes.subarray(0, this.pos);
   }
 
   ensureBufferSizeToWrite(sizeToWrite: number) {
@@ -50,11 +51,13 @@ export class Encoder {
 
   resizeBuffer(newSize: number) {
     const newBuffer = new ArrayBuffer(newSize);
-
-    new Uint8Array(newBuffer).set(new Uint8Array(this.view.buffer));
-
+    const newBytes = new Uint8Array(newBuffer);
     const newView = new DataView(newBuffer);
+
+    newBytes.set(this.bytes);
+
     this.view = newView;
+    this.bytes = newBytes;
   }
 
   encodeNil() {
@@ -148,8 +151,7 @@ export class Encoder {
       const maxSize = maxHeaderSize + strLength * 4;
       this.ensureBufferSizeToWrite(maxSize);
 
-      const output = new Uint8Array(this.view.buffer, this.view.byteOffset + this.pos);
-      const consumedLength = utf8EncodeWasm(object, output);
+      const consumedLength = utf8EncodeWasm(object, this.bytes, this.pos);
       this.pos += consumedLength;
       return;
     } else {

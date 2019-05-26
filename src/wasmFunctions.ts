@@ -45,7 +45,7 @@ function setMemoryStr(destPtr: pointer, destByteLength: number, str: string, str
  * It encodes string to MessagePack str family (headByte/size + utf8 bytes).
  * @returns The whole byte length including headByte/size.
  */
-export function utf8EncodeWasm(str: string, output: Uint8Array): number {
+export function utf8EncodeWasm(str: string, output: Uint8Array, outputOffset: number): number {
   const strLength = str.length;
   const inputByteLength = strLength * 2;
   const inputU16BePtr: pointer = wm.malloc(inputByteLength);
@@ -55,7 +55,7 @@ export function utf8EncodeWasm(str: string, output: Uint8Array): number {
   const outputPtr: pointer = wm.malloc(maxOutputHeaderSize + strLength * 4);
   try {
     const outputLength = wm.utf8EncodeUint16Array(outputPtr, inputU16BePtr, strLength);
-    output.set(new Uint8Array(wm.memory.buffer, outputPtr, outputLength));
+    output.set(new Uint8Array(wm.memory.buffer, outputPtr, outputLength), outputOffset);
     return outputLength;
   } finally {
     wm.free(inputU16BePtr);

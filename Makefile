@@ -1,9 +1,13 @@
+
 test:
+	npm run test
+
+test-all:
 	npm ci
 	npm run test:browser
 	npm run test:cover
 
-publish: validate-git-status test
+publish: validate-git-status test-all
 	npm publish
 	git push origin master
 	git push origin master --tags
