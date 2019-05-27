@@ -6,8 +6,15 @@ export type SauceLauncher = {
   base: "SauceLabs";
   browserName: string;
 
-  platform?: string;
+  // for PC
   version?: string;
+  platform?: string;
+
+  // for mobile
+  deviceName?: string;
+  appiumVersion?: string;
+  platformName?: string;
+  platformVersion?: string;
 };
 
 export const sauceLabs = {
@@ -55,5 +62,21 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     browserName: "Internet Explorer",
     version: "latest",
     platform: "Windows 10",
+  },
+
+  slIos: {
+    base: "SauceLabs",
+    browserName: "Safari",
+    platformName: "iOS",
+    platformVersion: "latest",
+    deviceName: "iPhone X Simulator",
+  },
+
+  slAndroid: {
+    base: "SauceLabs",
+    browserName: "Chrome",
+    platformName: "Android",
+    platformVersion: "latest",
+    deviceName: "Android GoogleAPI Emulator",
   },
 };
