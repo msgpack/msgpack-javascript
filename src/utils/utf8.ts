@@ -121,13 +121,13 @@ export function utf8Decode(bytes: Uint8Array, inputOffset: number, byteLength: n
       const byte2 = bytes[offset++] & 0x3f;
       const byte3 = bytes[offset++] & 0x3f;
       const byte4 = bytes[offset++] & 0x3f;
-      let codepoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
-      if (codepoint > 0xffff) {
-        codepoint -= 0x10000;
-        out.push(((codepoint >>> 10) & 0x3ff) | 0xd800);
-        codepoint = 0xdc00 | (codepoint & 0x3ff);
+      let unit = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
+      if (unit > 0xffff) {
+        unit -= 0x10000;
+        out.push(((unit >>> 10) & 0x3ff) | 0xd800);
+        unit = 0xdc00 | (unit & 0x3ff);
       }
-      out.push(codepoint);
+      out.push(unit);
     } else {
       out.push(byte1);
     }
