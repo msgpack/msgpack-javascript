@@ -102,11 +102,7 @@ export class Decoder {
         this.setBuffer(buffer);
       } else {
         // retried because data is insufficient
-        const remainingData = new Uint8Array(
-          this.view.buffer,
-          this.view.byteOffset + this.pos,
-          this.view.byteLength - this.pos,
-        );
+        const remainingData = this.bytes.subarray(this.pos);
         const newData = ensureUint8Array(buffer);
         const concated = new Uint8Array(remainingData.length + newData.length);
         concated.set(remainingData);
