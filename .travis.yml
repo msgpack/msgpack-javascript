@@ -10,16 +10,9 @@ env:
   - BROWSER=slSafari
   - BROWSER=slIE
   - BROWSER=slEdge
-  - BROWSER=FirefoxHeadless
+  - BROWSER=slIos
+  - BROWSER=slAndroid
   - BROWSER=
-matrix:
-  fast_finish: true
-  allow_failures:
-    - env: BROWSER=slChrome
-    - env: BROWSER=slFirefox
-    - env: BROWSER=slSafari
-    - env: BROWSER=slIE
-    - env: BROWSER=slEdge
 cache: npm
 install: |
   if [ "${BROWSER}" = "" ]
