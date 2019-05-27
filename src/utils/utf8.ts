@@ -38,7 +38,7 @@ export function utf8Count(str: string): number {
   return byteLength;
 }
 
-export function utf8Encode(str: string, output: DataView, outputOffset: number): void {
+export function utf8Encode(str: string, output: Uint8Array, outputOffset: number): void {
   const strLength = str.length;
   let offset = outputOffset;
   let pos = 0;
@@ -47,11 +47,11 @@ export function utf8Encode(str: string, output: DataView, outputOffset: number):
 
     if ((value & 0xffffff80) === 0) {
       // 1-byte
-      output.setUint8(offset++, value);
+      output[offset++] = value;
       continue;
     } else if ((value & 0xfffff800) === 0) {
       // 2-bytes
-      output.setUint8(offset++, ((value >> 6) & 0x1f) | 0xc0);
+      output[offset++] = ((value >> 6) & 0x1f) | 0xc0;
     } else {
       // handle surrogate pair
       if (value >= 0xd800 && value <= 0xdbff) {
@@ -67,17 +67,17 @@ export function utf8Encode(str: string, output: DataView, outputOffset: number):
 
       if ((value & 0xffff0000) === 0) {
         // 3-byte
-        output.setUint8(offset++, ((value >> 12) & 0x0f) | 0xe0);
-        output.setUint8(offset++, ((value >> 6) & 0x3f) | 0x80);
+        output[offset++] = ((value >> 12) & 0x0f) | 0xe0;
+        output[offset++] = ((value >> 6) & 0x3f) | 0x80;
       } else {
         // 4-byte
-        output.setUint8(offset++, ((value >> 18) & 0x07) | 0xf0);
-        output.setUint8(offset++, ((value >> 12) & 0x3f) | 0x80);
-        output.setUint8(offset++, ((value >> 6) & 0x3f) | 0x80);
+        output[offset++] = ((value >> 18) & 0x07) | 0xf0;
+        output[offset++] = ((value >> 12) & 0x3f) | 0x80;
+        output[offset++] = ((value >> 6) & 0x3f) | 0x80;
       }
     }
 
-    output.setUint8(offset++, (value & 0x3f) | 0x80);
+    output[offset++] = (value & 0x3f) | 0x80;
   }
 }
 

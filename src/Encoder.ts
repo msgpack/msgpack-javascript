@@ -151,14 +151,15 @@ export class Encoder {
       const maxSize = maxHeaderSize + strLength * 4;
       this.ensureBufferSizeToWrite(maxSize);
 
-      const consumedLength = utf8EncodeWasm(object, this.bytes, this.pos);
-      this.pos += consumedLength;
+      // utf8EncodeWasm() handles headByte+size as well as string itself
+      const ouputLength = utf8EncodeWasm(object, this.bytes, this.pos);
+      this.pos += ouputLength;
       return;
     } else {
       const byteLength = utf8Count(object);
       this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
       this.writeStringHeader(byteLength);
-      utf8Encode(object, this.view, this.pos);
+      utf8Encode(object, this.bytes, this.pos);
       this.pos += byteLength;
     }
   }
