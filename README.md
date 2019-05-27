@@ -175,6 +175,8 @@ Date|timestamp ext format family|Date (*4)
 
 ## Prerequsites
 
+This is a universal JavaScript library that supports major browsers and NodeJS.
+
 ### ECMA-262
 
 * ES5 language features
@@ -187,7 +189,7 @@ ES2018 standard library used in this library can be polyfilled. For example, [co
 
 ### NodeJS
 
-If you use this library in NodeJS v10 or later is required, but NodeJS v12 is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
+NodeJS v10 is required, but NodeJS v12 or later is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
 
 ## Benchmark
 
