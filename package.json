@@ -73,7 +73,6 @@
     "karma-webpack": "^3.0.5",
     "lodash": "^4.17.11",
     "mocha": "^6.1.4",
-    "msgpack-lite": "^0.1.26",
     "msgpack-test-js": "^1.0.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.17.1",
