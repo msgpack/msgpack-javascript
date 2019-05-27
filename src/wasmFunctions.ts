@@ -64,12 +64,12 @@ export function utf8EncodeWasm(str: string, output: Uint8Array, outputOffset: nu
 }
 
 // A wrapper function for utf8DecodeToUint16Array()
-export function utf8DecodeWasm(bytes: Uint8Array, offset: number, byteLength: number): string {
+export function utf8DecodeWasm(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   const inputPtr: pointer = wm.malloc(byteLength);
   // in worst case, the UTF-16 array uses the same as byteLength * 2
   const outputPtr: pointer = wm.malloc(byteLength * 2);
   try {
-    setMemoryU8(inputPtr, bytes.subarray(offset, offset + byteLength), byteLength);
+    setMemoryU8(inputPtr, bytes.subarray(inputOffset, inputOffset + byteLength), byteLength);
 
     const outputArraySize = wm.utf8DecodeToUint16Array(outputPtr, inputPtr, byteLength);
     const units = new Uint16Array(wm.memory.buffer, outputPtr, outputArraySize);

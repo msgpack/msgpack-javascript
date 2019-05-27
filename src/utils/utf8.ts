@@ -98,8 +98,8 @@ export function safeStringFromCharCode(units: Array<number> | Uint16Array) {
   return result;
 }
 
-export function utf8Decode(bytes: Uint8Array, outputOffset: number, byteLength: number): string {
-  let offset = outputOffset;
+export function utf8Decode(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
+  let offset = inputOffset;
   const out: Array<number> = [];
   const end = offset + byteLength;
   while (offset < end) {
