@@ -6,7 +6,7 @@ import { ExtData } from "./ExtData";
 import { WASM_AVAILABLE, utf8EncodeWasm, WASM_STR_THRESHOLD } from "./wasmFunctions";
 
 export const DEFAULT_MAX_DEPTH = 100;
-export const DEFAULT_INITIAL_BUFFER_SIZE = 1024;
+export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
 
 export class Encoder {
   private pos = 0;
