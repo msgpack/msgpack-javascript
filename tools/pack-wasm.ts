@@ -30,7 +30,7 @@ var wasmInstance = new WebAssembly.Instance(wasmModule, {
 
 // from getStringImpl() in AssemblyScript/lib/loader/index.js
 function getString(ptr) {
-  const buffer = wasmInstance.exports.memory.buffer;
+  var buffer = wasmInstance.exports.memory.buffer;
   var u32 = new Uint32Array(buffer);
   var u16 = new Uint16Array(buffer);
   var offset = (ptr + 4) >>> 1;
