@@ -23,6 +23,7 @@ type StackArrayState = {
   type: State.ARRAY;
   size: number;
   array: Array<unknown>;
+  position: number;
 };
 
 type StackState = StackArrayState | StackMapState;
@@ -314,8 +315,9 @@ export class Decoder {
         // arrays and maps
         const state = stack[stack.length - 1];
         if (state.type === State.ARRAY) {
-          state.array.push(object);
-          if (state.array.length === state.size) {
+          state.array[state.position] = object;
+          state.position++;
+          if (state.position === state.size) {
             stack.pop();
             object = state.array;
           } else {
@@ -383,7 +385,8 @@ export class Decoder {
     this.stack.push({
       type: State.ARRAY,
       size,
-      array: [],
+      array: new Array<unknown>(size),
+      position: 0,
     });
   }
 
