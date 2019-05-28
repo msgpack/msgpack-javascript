@@ -16,8 +16,8 @@ const implementations = {
     decode: require("msgpack-lite").decode,
   },
   "notepack.io": {
-    encode: require("notepack.io").encode,
-    decode: require("notepack.io").decode,
+    encode: require("notepack.io/browser/encode"),
+    decode: require("notepack.io/browser/decode"),
   },
 };
 
