@@ -98,7 +98,7 @@ export function safeStringFromCharCode(units: Array<number> | Uint16Array) {
   return result;
 }
 
-const MIN_TEXT_DECODER_STRING_LENGTH = 32;
+const MIN_TEXT_DECODER_STRING_LENGTH = 200;
 const defaultEncoding = "utf-8";
 const sharedTextDecoder = typeof TextDecoder !== "undefined" ? new TextDecoder(defaultEncoding) : null;
 
