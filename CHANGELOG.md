@@ -1,5 +1,12 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.2.2 2019/05/29
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.2.1...v1.2.2
+
+* Improved array decoding performance ([#32](https://github.com/msgpack/msgpack-javascript/pull/32) by @sergeyzenchenko)
+* Improved string decoding performance with TextDecoder ([#34](https://github.com/msgpack/msgpack-javascript/pull/34) by @sergeyzenchenko)
+
 ## v1.2.1 2019/05/26
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.2.0...v1.2.1
