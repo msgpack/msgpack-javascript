@@ -98,10 +98,20 @@ export function safeStringFromCharCode(units: Array<number> | Uint16Array) {
   return result;
 }
 
+const MIN_TEXT_DECODER_STRING_LENGTH = 32;
+const defaultEncoding = "utf-8";
+const sharedTextDecoder = typeof TextDecoder !== "undefined" ? new TextDecoder(defaultEncoding) : null;
+
 export function utf8Decode(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   let offset = inputOffset;
-  const out: Array<number> = [];
   const end = offset + byteLength;
+
+  if (sharedTextDecoder !== null && byteLength > MIN_TEXT_DECODER_STRING_LENGTH) {
+    const stringBytes = bytes.subarray(offset, end);
+    return sharedTextDecoder.decode(stringBytes);
+  }
+
+  const out: Array<number> = [];
   while (offset < end) {
     const byte1 = bytes[offset++];
     if ((byte1 & 0x80) === 0) {
