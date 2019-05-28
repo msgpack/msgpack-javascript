@@ -35,7 +35,7 @@ function getString(ptr) {
   var u16 = new Uint16Array(buffer);
   var offset = (ptr + 4) >>> 1;
   var length = u32[ptr >>> 2];
-  return String.fromCharCode(...u16.subarray(offset, offset + length))
+  return String.fromCharCode.apply(String, u16.subarray(offset, offset + length))
 }
 
 function abort(message, filename, line, column) {
