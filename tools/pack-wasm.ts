@@ -12,9 +12,8 @@ for (const basename of fs.readdirSync(artifactDir)) {
   }
 
   const blob = fs.readFileSync(file);
-  fs.writeFileSync(
-    `${file}.js`,
-    `// generated from ${basename}
+
+  const source = `// generated from ${basename}
 "use strict";
 
 var base64 = require("base64-js");
@@ -25,14 +24,26 @@ var wasmModule = new WebAssembly.Module(
 );
 var wasmInstance = new WebAssembly.Instance(wasmModule, {
   env: {
-    abort: function (filename, line, column) {
-      // FIXME: filename is just a number (pointer?)
-      throw new Error("abort called at " + filename + ":" + line + ":" + column);
-    },
+    abort: abort,
   },
 });
 
+// from getStringImpl() in AssemblyScript/lib/loader/index.js
+function getString(ptr) {
+  const buffer = wasmInstance.exports.memory.buffer;
+  var u32 = new Uint32Array(buffer);
+  var u16 = new Uint16Array(buffer);
+  var offset = (ptr + 4) >>> 1;
+  var length = u32[ptr >>> 2];
+  return String.fromCharCode(...u16.subarray(offset, offset + length))
+}
+
+function abort(message, filename, line, column) {
+  throw new Error("abort: " + getString(message) + " at " + getString(filename) + ":" + line + ":" + column);
+}
+
 module.exports = wasmInstance.exports;
-`,
-  );
+`;
+
+  fs.writeFileSync(`${file}.js`, source);
 }
