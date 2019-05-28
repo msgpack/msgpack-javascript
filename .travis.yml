@@ -1,18 +1,21 @@
-# https://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
 node_js:
-  - "lts/*"
-addons:
-  firefox: latest
+  - lts/*
 env:
-  - BROWSER=slChrome
-  - BROWSER=slFirefox
-  - BROWSER=slSafari
-  - BROWSER=slIE
-  - BROWSER=slEdge
-  - BROWSER=slIos
-  - BROWSER=slAndroid
-  - BROWSER=
+  matrix:
+    - BROWSER=slChrome
+    - BROWSER=slFirefox
+    - BROWSER=slSafari
+    - BROWSER=slIE
+    - BROWSER=slEdge
+    - BROWSER=slIos
+    - BROWSER=slAndroid
+    - BROWSER=
+  global:
+    # SAUCE_USERNAME
+    - secure: J+FOPE/vVK6yzVXHVE7xibFV/hV+Ehc78MBADLlE10YIY7Ag6JkVeomgqRFB9I8zFzj5DALkpzOLGx4iIrFs6iYiNnEcl39fkm8myHl8xIuW+KHt5QOsCtM5qmvfSEZhJV+La0lSzFicjY9VX90VLZvJOHIbiCvIFRoxnwYVw6o=
+    # SAUCE_ACCESS_KEY
+    - secure: ay3CSAjya+UQDi0RulLIl6q25oobwLsjLbdkeASgjBq0qN5dXgFgEpBjecBxFqPGrwzzCj9K9fR81NWV80EjLkGdcfN0oGx0wvsOo2C2ulWGHc1dRgKUnMKAA2TL3br14KMfmGn6fmr+fA7Vq+qWajQpExlG0Kuw68C9iNuKIQw=
 cache: npm
 install: |
   if [ "${BROWSER}" = "" ]
