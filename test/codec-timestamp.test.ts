@@ -1,6 +1,13 @@
 import assert from "assert";
 import util from "util";
-import { encode, decode, encodeDateToTimeSpec, decodeTimestampExtension } from "../src";
+import {
+  encode,
+  decode,
+  encodeDateToTimeSpec,
+  decodeTimestampExtension,
+  decodeTimestampToTimeSpec,
+  encodeTimestampExtension,
+} from "../src";
 
 const TIME = 1556636810389;
 
@@ -32,6 +39,14 @@ describe("codec: timestamp 32/64/96", () => {
   context("encodeDateToTimeSpec", () => {
     it("normalizes new Date(-1) to { sec: -1, nsec: 999000000 }", () => {
       assert.deepStrictEqual(encodeDateToTimeSpec(new Date(-1)), { sec: -1, nsec: 999000000 });
+    });
+  });
+
+  context("encodeDateToTimeSpec", () => {
+    it("decodes timestamp-ext binary to TimeSpec", () => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const encoded = encodeTimestampExtension(new Date(42000))!;
+      assert.deepStrictEqual(decodeTimestampToTimeSpec(encoded), { sec: 42, nsec: 0 });
     });
   });
 

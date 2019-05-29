@@ -1,12 +1,5 @@
 import { deepStrictEqual } from "assert";
-import {
-  encode,
-  decode,
-  ExtensionCodec,
-  EXT_TIMESTAMP,
-  encodeTimeSpecToTimestamp,
-  decodeTimestampToTimeSpec,
-} from "../src";
+import { encode, decode } from "../src";
 
 describe("README", () => {
   context("#synopsis", () => {
