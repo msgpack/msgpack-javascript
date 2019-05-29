@@ -74,6 +74,20 @@ export class Decoder {
     this.pos = 0;
   }
 
+  appendBuffer(buffer: Uint8Array | ArrayLike<number>) {
+    if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
+      this.setBuffer(buffer);
+    } else {
+      // retried because data is insufficient
+      const remainingData = this.bytes.subarray(this.pos);
+      const newData = ensureUint8Array(buffer);
+      const concated = new Uint8Array(remainingData.length + newData.length);
+      concated.set(remainingData);
+      concated.set(newData, remainingData.length);
+      this.setBuffer(concated);
+    }
+  }
+
   hasRemaining(size = 1) {
     return this.view.byteLength - this.pos >= size;
   }
@@ -99,18 +113,7 @@ export class Decoder {
         throw this.createNoExtraBytesError(this.totalPos);
       }
 
-      if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
-        this.setBuffer(buffer);
-      } else {
-        // retried because data is insufficient
-        const remainingData = this.bytes.subarray(this.pos);
-        const newData = ensureUint8Array(buffer);
-        const concated = new Uint8Array(remainingData.length + newData.length);
-        concated.set(remainingData);
-        concated.set(newData, remainingData.length);
-        this.setBuffer(concated);
-      }
-      //console.log("view", this.view, this.headByte);
+      this.appendBuffer(buffer);
 
       try {
         object = this.decodeSync();
@@ -135,6 +138,47 @@ export class Decoder {
     throw new RangeError(
       `Insufficient data in parcing ${prettyByte(headByte)} at ${totalPos} (${pos} in the current buffer)`,
     );
+  }
+
+  async *decodeArrayStream(stream: AsyncIterable<ArrayLike<number> | Uint8Array>) {
+    let headerParsed = false;
+    let decoded = false;
+    let itemsLeft = 0;
+
+    for await (const buffer of stream) {
+      if (decoded) {
+        throw this.createNoExtraBytesError(this.totalPos);
+      }
+
+      this.appendBuffer(buffer);
+
+      if (!headerParsed) {
+        itemsLeft = this.readArraySize();
+        headerParsed = true;
+        this.complete();
+      }
+
+      try {
+        while (true) {
+          let result = this.decodeSync();
+
+          yield result;
+
+          itemsLeft--;
+
+          if (itemsLeft === 0) {
+            decoded = true;
+            break;
+          }
+        }
+      } catch (e) {
+        if (!(e instanceof DataViewIndexOutOfBoundsError)) {
+          throw e; // rethrow
+        }
+        // fallthrough
+      }
+      this.totalPos += this.pos;
+    }
   }
 
   decodeSync(): unknown {
@@ -361,6 +405,24 @@ export class Decoder {
 
   complete(): void {
     this.headByte = HEAD_BYTE_REQUIRED;
+  }
+
+  readArraySize(): number {
+    const headByte = this.readHeadByte();
+
+    switch (headByte) {
+      case 0xdc:
+        return this.readU16();
+      case 0xdd:
+        return this.readU32();
+      default: {
+        if (headByte < 0xa0) {
+          return headByte - 0x90;
+        } else {
+          throw new Error(`Unrecognized array type byte: ${prettyByte(headByte)}`);
+        }
+      }
+    }
   }
 
   pushMapState(size: number) {

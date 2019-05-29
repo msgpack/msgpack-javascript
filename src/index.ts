@@ -2,7 +2,7 @@
 
 export { encode } from "./encode";
 export { decode } from "./decode";
-export { decodeAsync } from "./decodeAsync";
+export { decodeAsync, decodeArrayStream } from "./decodeAsync";
 
 // Utilitiies for Extension Types:
 

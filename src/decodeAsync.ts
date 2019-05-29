@@ -1,4 +1,3 @@
-import { ExtensionCodecType } from "./ExtensionCodec";
 import { Decoder } from "./Decoder";
 import { defaultDecodeOptions, DecodeOptions } from "./decode";
 
@@ -18,4 +17,22 @@ export async function decodeAsync(
     options.maxExtLength,
   );
   return decoder.decodeOneAsync(stream);
+}
+
+export async function* decodeArrayStream(
+  stream: AsyncIterable<Uint8Array | ArrayLike<number>>,
+  options: DecodeAsyncOptions = defaultDecodeOptions,
+) {
+  const decoder = new Decoder(
+    options.extensionCodec,
+    options.maxStrLength,
+    options.maxBinLength,
+    options.maxArrayLength,
+    options.maxMapLength,
+    options.maxExtLength,
+  );
+
+  for await (let item of decoder.decodeArrayStream(stream)) {
+    yield item;
+  }
 }

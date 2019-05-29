@@ -1,7 +1,7 @@
 #!ts-node
 /* eslint-disable no-console */
 
-import { encode, decode, decodeAsync } from "../src";
+import { encode, decode, decodeAsync, decodeArrayStream } from "../src";
 import { writeFileSync, unlinkSync, readFileSync, createReadStream } from "fs";
 import { deepStrictEqual } from "assert";
 
@@ -39,4 +39,14 @@ import { deepStrictEqual } from "assert";
     await decodeAsync(createReadStream(file));
   }
   console.timeEnd("creteReadStream |> decodeAsync");
+
+  // asyncArrayStream
+
+  console.time("creteReadStream |> decodeArrayStream");
+  for (let i = 0; i < 100; i++) {
+    for await (let result of decodeArrayStream(createReadStream(file))) {
+      // console.log(result);
+    }
+  }
+  console.timeEnd("creteReadStream |> decodeArrayStream");
 })();
