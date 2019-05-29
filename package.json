@@ -1,6 +1,6 @@
 {
   "name": "@msgpack/msgpack",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "MessagePack for JavaScript/ECMA-262",
   "main": "./dist/index.js",
   "browser": "./dist.es5/msgpack.js",
