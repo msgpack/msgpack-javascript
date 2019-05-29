@@ -134,7 +134,7 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
 
 const sharedTextDecoder = typeof TextDecoder !== "undefined" ? new TextDecoder() : null;
 export const TEXT_DECODER_AVAILABLE = process.env.TEXT_DECODER !== "never" && !!sharedTextDecoder;
-export const TEXT_DECODER_THRESHOLD = 200;
+export const TEXT_DECODER_THRESHOLD = process.env.TEXT_DECODER !== "force" ? 200 : 0;
 
 export function utf8DecodeTD(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   const stringBytes = bytes.subarray(inputOffset, inputOffset + byteLength);

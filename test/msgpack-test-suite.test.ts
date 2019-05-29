@@ -89,7 +89,9 @@ describe("msgpack-test-suite", () => {
       FLOAT64_NEGATIVE_INF: Number.NEGATIVE_INFINITY,
       FLOAT64_NAN: Number.NaN,
       STR16: "a".repeat(0x100),
+      STR16_MBS: "🌏".repeat(0x100),
       STR32: "b".repeat(0x10_000),
+      STR32_MBS: "🍣".repeat(0x10_000),
       STR32LARGE: "c".repeat(0x100_000), // may cause "RangeError: Maximum call stack size exceeded" in simple implelementions
       STR_INCLUDING_NUL: "foo\0bar",
       STR_BROKEN_FF: "\xff",
