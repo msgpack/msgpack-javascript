@@ -152,6 +152,50 @@ const encoded: = encode(value, { extensionCodec });
 deepStrictEqual(decode(encoded, { extensionCodec }), value);
 ```
 
+#### The temporal module as timestamp extensions
+
+This library maps `Date` to the MessagePack timestamp extension, but you re-map the [temporal module](https://github.com/tc39/proposal-temporal) to the timestamp ext like this:
+
+```typescript
+import { Instant } from "@std-proposal/temporal";
+import { deepStrictEqual } from "assert";
+import {
+  encode,
+  decode,
+  ExtensionCodec,
+  EXT_TIMESTAMP,
+  encodeTimeSpecToTimestamp,
+  decodeTimestampToTimeSpec,
+} from "@msgpack/msgpack";
+
+const extensionCodec = new ExtensionCodec();
+extensionCodec.register({
+  type: EXT_TIMESTAMP, // override the default behavior!
+  encode: (input: any) => {
+    if (input instanceof Instant) {
+      const sec = input.seconds;
+      const nsec = Number(input.nanoseconds - BigInt(sec) * BigInt(1e9));
+      return encodeTimeSpecToTimestamp({ sec, nsec });
+    } else {
+      return null;
+    }
+  },
+  decode: (data: Uint8Array) => {
+    const timeSpec = decodeTimestampToTimeSpec(data);
+    const sec = BigInt(timeSpec.sec);
+    const nsec = BigInt(timeSpec.nsec);
+    return Instant.fromEpochNanoseconds(sec * BigInt(1e9) + nsec);
+  },
+});
+
+const instant = Instant.fromEpochMilliseconds(Date.now());
+const encoded = encode(instant, { extensionCodec });
+const decoded = decode(encoded, { extensionCodec });
+deepStrictEqual(decoded, instant);
+```
+
+This will be default after the temporal module is implemented in major browsers, which is not a near-future, though.
+
 ## MessagePack Mapping Table
 
 The following table shows how JavaScript values are mapped to [MessagePack formats](https://github.com/msgpack/msgpack/blob/master/spec.md) and vice versa.

@@ -53,6 +53,7 @@
   "homepage": "https://msgpack.org/",
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "^1.0.2",
+    "@std-proposal/temporal": "0.0.1",
     "@types/base64-js": "^1.2.5",
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.13.12",
