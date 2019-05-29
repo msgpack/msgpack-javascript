@@ -12,6 +12,7 @@ export {
   EXT_TIMESTAMP,
   encodeDateToTimeSpec,
   encodeTimeSpecToTimestamp,
+  decodeTimestampToTimeSpec,
   encodeTimestampExtension,
   decodeTimestampExtension,
 } from "./timestamp";

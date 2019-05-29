@@ -1,5 +1,3 @@
-import { safeStringFromCharCode } from "./utils/utf8";
-
 // WASM=never - disable WASM functions
 // WASM=force - force to use WASM functions
 const WASM: string = process.env.MSGPACK_WASM || process.env.WASM || "";
@@ -63,6 +61,23 @@ export function utf8EncodeWasm(str: string, output: Uint8Array, outputOffset: nu
   }
 }
 
+const CHUNK_SIZE = 0x10_000;
+
+function safeStringFromCharCodeU16(units: Uint16Array) {
+  if (units.length <= CHUNK_SIZE) {
+    // `String.fromCharCode.apply()` is faster than `String.fromCharCode(...units)`
+    // in case `units` is a typed array
+    return String.fromCharCode.apply(String, units as any);
+  }
+
+  let result = "";
+  for (let i = 0; i < units.length; i++) {
+    const chunk = units.subarray(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+    result += String.fromCharCode.apply(String, chunk as any);
+  }
+  return result;
+}
+
 // A wrapper function for utf8DecodeToUint16Array()
 export function utf8DecodeWasm(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   const inputPtr: pointer = wm.malloc(byteLength);
@@ -73,7 +88,7 @@ export function utf8DecodeWasm(bytes: Uint8Array, inputOffset: number, byteLengt
 
     const outputArraySize = wm.utf8DecodeToUint16Array(outputPtr, inputPtr, byteLength);
     const units = new Uint16Array(wm.memory.buffer, outputPtr, outputArraySize);
-    return safeStringFromCharCode(units);
+    return safeStringFromCharCodeU16(units);
   } finally {
     wm.free(inputPtr);
     wm.free(outputPtr);

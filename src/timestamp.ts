@@ -44,8 +44,8 @@ export function encodeTimeSpecToTimestamp({ sec, nsec }: TimeSpec): Uint8Array {
 
 export function encodeDateToTimeSpec(date: Date): TimeSpec {
   const msec = date.getTime();
-  const sec = Math.floor(msec / 1000);
-  const nsec = (msec - sec * 1000) * 1e6;
+  const sec = Math.floor(msec / 1e3);
+  const nsec = (msec - sec * 1e3) * 1e6;
 
   // Normalizes { sec, nsec } to ensure nsec is unsigned.
   const nsecInSec = Math.floor(nsec / 1e9);
@@ -64,14 +64,15 @@ export function encodeTimestampExtension(object: unknown): Uint8Array | null {
   }
 }
 
-export function decodeTimestampExtension(data: Uint8Array): Date {
+export function decodeTimestampToTimeSpec(data: Uint8Array): TimeSpec {
   // data may be 32, 64, or 96 bits
   switch (data.byteLength) {
     case 4: {
       // timestamp 32 = { sec32 }
       const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
       const sec = view.getUint32(0);
-      return new Date(sec * 1000);
+      const nsec = 0;
+      return { sec, nsec };
     }
     case 8: {
       // timestamp 64 = { nsec30, sec34 }
@@ -79,22 +80,26 @@ export function decodeTimestampExtension(data: Uint8Array): Date {
 
       const nsec30AndSecHigh2 = view.getUint32(0);
       const secLow32 = view.getUint32(4);
-      const nsec = nsec30AndSecHigh2 >>> 2;
       const sec = (nsec30AndSecHigh2 & 0x3) * 0x100000000 + secLow32;
-      return new Date(sec * 1000 + nsec / 1e6);
+      const nsec = nsec30AndSecHigh2 >>> 2;
+      return { sec, nsec };
     }
     case 12: {
       // timestamp 96 = { nsec32 (unsigned), sec64 (signed) }
       const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
-      const nsec = view.getUint32(0);
       const sec = getInt64(view, 4);
-
-      return new Date(sec * 1000 + nsec / 1e6);
+      const nsec = view.getUint32(0);
+      return { sec, nsec };
     }
     default:
       throw new Error(`Unrecognized data size for timestamp: ${data.length}`);
   }
+}
+
+export function decodeTimestampExtension(data: Uint8Array): Date {
+  const timeSpec = decodeTimestampToTimeSpec(data);
+  return new Date(timeSpec.sec * 1e3 + timeSpec.nsec / 1e6);
 }
 
 export const timestampExtension = {
