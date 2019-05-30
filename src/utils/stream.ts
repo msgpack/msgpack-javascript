@@ -1,7 +1,7 @@
 // utility for whatwg streams
 
 export function isReadableStream<T>(object: unknown): object is ReadableStream<T> {
-  return typeof ReadableStream !== "object" && object instanceof ReadableStream;
+  return typeof ReadableStream !== "undefined" && object instanceof ReadableStream;
 }
 
 export async function* asyncIterableFromStream<T>(stream: ReadableStream<T>): AsyncIterable<T> {
