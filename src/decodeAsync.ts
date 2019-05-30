@@ -19,7 +19,7 @@ export async function decodeAsync(
   return decoder.decodeOneAsync(stream);
 }
 
-export async function* decodeArrayStream(
+export function decodeArrayStream(
   stream: AsyncIterable<Uint8Array | ArrayLike<number>>,
   options: DecodeAsyncOptions = defaultDecodeOptions,
 ) {
@@ -32,7 +32,21 @@ export async function* decodeArrayStream(
     options.maxExtLength,
   );
 
-  for await (let item of decoder.decodeArrayStream(stream)) {
-    yield item;
-  }
+  return decoder.decodeArrayStream(stream);
+}
+
+export function decodeStream(
+  stream: AsyncIterable<Uint8Array | ArrayLike<number>>,
+  options: DecodeAsyncOptions = defaultDecodeOptions,
+) {
+  const decoder = new Decoder(
+    options.extensionCodec,
+    options.maxStrLength,
+    options.maxBinLength,
+    options.maxArrayLength,
+    options.maxMapLength,
+    options.maxExtLength,
+  );
+
+  return decoder.decodeStream(stream);
 }
