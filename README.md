@@ -71,15 +71,15 @@ Note that `decodeAsync()` acceps the same options as `decode()`.
 
 ### `decodeArrayStream(stream: AsyncIterable<Uint8Array | ArrayLike<number>> | ReadableStream<Uint8Array | ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
-It is alike to `decodeAsync()`, but only accepts an array of items as `stream`, and emits the decoded item one-by-one.
+It is alike to `decodeAsync()`, but only accepts an array of items as the input `stream`, and emits the decoded item one by one.
 
 It throws errors when the input is not an array.
 
 ### `decodeStream(stream: AsyncIterable<Uint8Array | ArrayLike<number>> | ReadableStream<Uint8Array | ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
-It is like to `decodeAsync()` and `decodeArrayStream()`, but the input consists of independent MessagePack items.
+It is like to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
 
-In other words, it decodes an unlimited stream and emits an item one-by-one.
+In other words, it decodes an unlimited stream and emits an item one by one.
 
 ### Extension Types
 
