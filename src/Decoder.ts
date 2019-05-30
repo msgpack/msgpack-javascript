@@ -140,6 +140,25 @@ export class Decoder {
     );
   }
 
+  async *decodeStream(stream: AsyncIterable<ArrayLike<number> | Uint8Array>) {
+    for await (const buffer of stream) {
+      this.appendBuffer(buffer);
+
+      try {
+        while (true) {
+          const result = this.decodeSync();
+
+          yield result;
+        }
+      } catch (e) {
+        if (!(e instanceof DataViewIndexOutOfBoundsError)) {
+          throw e; // rethrow
+        }
+        // fallthrough
+      }
+    }
+  }
+
   async *decodeArrayStream(stream: AsyncIterable<ArrayLike<number> | Uint8Array>) {
     let headerParsed = false;
     let decoded = false;
@@ -160,7 +179,7 @@ export class Decoder {
 
       try {
         while (true) {
-          let result = this.decodeSync();
+          const result = this.decodeSync();
 
           yield result;
 
