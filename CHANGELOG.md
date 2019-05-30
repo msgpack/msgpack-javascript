@@ -1,5 +1,13 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.3.0 2019/05/29
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.2.3...v1.3.0
+
+* Add `decodeArrayStream()` to decode an array and returns `AsyncIterable<unknown>` [#42](https://github.com/msgpack/msgpack-javascript/pull/42)
+* Add `decodeStream()` to decode an unlimited data stream [#46](https://github.com/msgpack/msgpack-javascript/pull/46)
+* Let `decodeAsync()` and `decodeArrayStream()` to take `ReadalbeStream<Uint8Array | ArrayLike<number>>` (whatwg-streams) [#43](https://github.com/msgpack/msgpack-javascript/pull/46)
+
 ## v1.2.3 2019/05/29
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.2.2...v1.2.3
