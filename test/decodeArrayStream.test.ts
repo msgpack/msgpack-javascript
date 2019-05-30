@@ -46,18 +46,12 @@ describe("decodeArrayStream", () => {
   it("fails for non array input", async () => {
     const object = "demo";
 
-    let error: Error | null = null;
-
-    try {
+    await assert.rejects(async () => {
       const result = [];
 
       for await (let item of decodeArrayStream(createStream(object))) {
         result.push(item);
       }
-    } catch (e) {
-      error = e;
-    }
-
-    assert.notStrictEqual(error, null);
+    }, /.*Unrecognized array type byte:.*/i);
   });
 });
