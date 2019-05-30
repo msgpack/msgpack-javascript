@@ -1,8 +1,9 @@
 import { deepStrictEqual } from "assert";
-import { encode, decode } from "../src";
+import { encode, decode, decodeAsync } from "@msgpack/msgpack";
+import { asyncIterableFromStream } from "../src/utils/stream";
 
 describe("README", () => {
-  context("#synopsis", () => {
+  context("## Synopsis", () => {
     it("runs", () => {
       const object = {
         nil: null,
@@ -19,6 +20,29 @@ describe("README", () => {
       // encoded is an Uint8Array instance
 
       deepStrictEqual(decode(encoded), object);
+    });
+  });
+
+  context("## ReadableStream", () => {
+    before(function() {
+      if (typeof ReadableStream === "undefined") {
+        this.skip();
+      }
+    });
+
+    it("reads from stream", async () => {
+      const data = [1, 2, 3];
+      const encoded = encode(data);
+      const stream = new ReadableStream({
+        start(controller) {
+          for (const byte of encoded) {
+            controller.enqueue([byte]);
+          }
+          controller.close();
+        },
+      });
+
+      deepStrictEqual(await decodeAsync(asyncIterableFromStream(stream)), data);
     });
   });
 });
