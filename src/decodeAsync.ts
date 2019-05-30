@@ -1,17 +1,15 @@
 import { Decoder } from "./Decoder";
 import { defaultDecodeOptions, DecodeOptions } from "./decode";
-import { isReadableStream, asyncIterableFromStream } from "./utils/stream";
+import { ensureAsyncIterabe, ReadableStreamLike } from "./utils/stream";
 
 export type DecodeAsyncOptions = DecodeOptions;
 export const defaultDecodeAsyncOptions = defaultDecodeOptions;
 
-type StreamLike<T> = AsyncIterable<T> | ReadableStream<T>;
-
 export async function decodeAsync(
-  streamLike: StreamLike<Uint8Array | ArrayLike<number>>,
+  streamLike: ReadableStreamLike<Uint8Array | ArrayLike<number>>,
   options: DecodeAsyncOptions = defaultDecodeOptions,
 ): Promise<unknown> {
-  const stream = isReadableStream(streamLike) ? asyncIterableFromStream(streamLike) : streamLike;
+  const stream = ensureAsyncIterabe(streamLike);
 
   const decoder = new Decoder(
     options.extensionCodec,
@@ -25,10 +23,10 @@ export async function decodeAsync(
 }
 
 export async function* decodeArrayStream(
-  streamLike: StreamLike<Uint8Array | ArrayLike<number>>,
+  streamLike: ReadableStreamLike<Uint8Array | ArrayLike<number>>,
   options: DecodeAsyncOptions = defaultDecodeOptions,
 ) {
-  const stream = isReadableStream(streamLike) ? asyncIterableFromStream(streamLike) : streamLike;
+  const stream = ensureAsyncIterabe(streamLike);
 
   const decoder = new Decoder(
     options.extensionCodec,

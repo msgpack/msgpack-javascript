@@ -1,5 +1,7 @@
 // utility for whatwg streams
 
+export type ReadableStreamLike<T> = AsyncIterable<T> | ReadableStream<T>;
+
 export function isReadableStream<T>(object: unknown): object is ReadableStream<T> {
   return typeof ReadableStream !== "undefined" && object instanceof ReadableStream;
 }
@@ -17,5 +19,13 @@ export async function* asyncIterableFromStream<T>(stream: ReadableStream<T>): As
     }
   } finally {
     reader.releaseLock();
+  }
+}
+
+export function ensureAsyncIterabe<T>(streamLike: ReadableStreamLike<T>): AsyncIterable<T> {
+  if (isReadableStream(streamLike)) {
+    return asyncIterableFromStream(streamLike);
+  } else {
+    return streamLike;
   }
 }
