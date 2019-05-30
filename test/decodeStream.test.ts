@@ -21,7 +21,7 @@ describe("decodeStream", () => {
 
     const result = [];
 
-    for await (let item of decodeStream(createStream())) {
+    for await (const item of decodeStream(createStream())) {
       result.push(item);
     }
 

@@ -146,7 +146,7 @@ export class Decoder {
 
       try {
         while (true) {
-          let result = this.decodeSync();
+          const result = this.decodeSync();
 
           yield result;
         }
@@ -179,7 +179,7 @@ export class Decoder {
 
       try {
         while (true) {
-          let result = this.decodeSync();
+          const result = this.decodeSync();
 
           yield result;
 
