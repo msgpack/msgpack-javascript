@@ -1,8 +1,8 @@
 import { deepStrictEqual } from "assert";
-import { encode, decode } from "../src";
+import { encode, decode } from "@msgpack/msgpack";
 
 describe("README", () => {
-  context("#synopsis", () => {
+  context("## Synopsis", () => {
     it("runs", () => {
       const object = {
         nil: null,
