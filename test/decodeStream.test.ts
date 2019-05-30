@@ -14,7 +14,7 @@ describe("decodeStream", () => {
     ];
 
     const createStream = async function*() {
-      for (let item of items) {
+      for (const item of items) {
         yield encode(item);
       }
     };
