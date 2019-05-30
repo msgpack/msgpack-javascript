@@ -1,6 +1,5 @@
 import { deepStrictEqual } from "assert";
 import { decodeAsync, encode, decodeArrayStream } from "@msgpack/msgpack";
-import { constants } from "http2";
 
 describe("whatwg streams", () => {
   before(function() {
