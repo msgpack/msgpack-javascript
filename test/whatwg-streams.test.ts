@@ -8,7 +8,7 @@ describe("whatwg streams", () => {
     }
   });
 
-  context("decodeAsync", async () => {
+  it("decodeAsync", async () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
     const stream = new ReadableStream({
@@ -20,7 +20,7 @@ describe("whatwg streams", () => {
       },
     });
 
-    const items = [];
+    const items: Array<unknown> = [];
     for await (const item of decodeArrayStream(stream)) {
       items.push(item);
     }

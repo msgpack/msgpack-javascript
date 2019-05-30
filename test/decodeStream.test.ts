@@ -19,7 +19,7 @@ describe("decodeStream", () => {
       }
     };
 
-    const result = [];
+    const result: Array<unknown> = [];
 
     for await (const item of decodeStream(createStream())) {
       result.push(item);

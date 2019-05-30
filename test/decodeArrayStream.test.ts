@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decodeAsync, decodeArrayStream } from "../src";
+import { encode, decodeArrayStream } from "../src";
 
 describe("decodeArrayStream", () => {
   const generateSampleObject = () => {
@@ -18,9 +18,9 @@ describe("decodeArrayStream", () => {
   it("decodes numbers array", async () => {
     const object = [1, 2, 3, 4, 5];
 
-    const result = [];
+    const result: Array<unknown> = [];
 
-    for await (let item of decodeArrayStream(createStream(object))) {
+    for await (const item of decodeArrayStream(createStream(object))) {
       result.push(item);
     }
 
@@ -34,7 +34,7 @@ describe("decodeArrayStream", () => {
       objectsArrays.push(generateSampleObject());
     }
 
-    const result = [];
+    const result: Array<unknown> = [];
 
     for await (let item of decodeArrayStream(createStream(objectsArrays))) {
       result.push(item);
@@ -47,7 +47,7 @@ describe("decodeArrayStream", () => {
     const object = "demo";
 
     await assert.rejects(async () => {
-      const result = [];
+      const result: Array<unknown> = [];
 
       for await (let item of decodeArrayStream(createStream(object))) {
         result.push(item);
