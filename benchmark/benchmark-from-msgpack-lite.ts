@@ -1,3 +1,4 @@
+/* eslint-disable */
 // original: https://raw.githubusercontent.com/kawanet/msgpack-lite/master/lib/benchmark.js
 
 var msgpack_msgpack = require("../src");
@@ -107,7 +108,7 @@ function bench(name: string, func: (...args: any[]) => any, src: any) {
   // warm up
   func(src);
 
-  var ret, duration: number;
+  var ret, duration = 0;
   var start = Date.now();
   var count = 0;
   while (1) {
