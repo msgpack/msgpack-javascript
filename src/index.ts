@@ -2,7 +2,7 @@
 
 export { encode } from "./encode";
 export { decode } from "./decode";
-export { decodeAsync, decodeArrayStream } from "./decodeAsync";
+export { decodeAsync, decodeArrayStream, decodeStream } from "./decodeAsync";
 
 export { Decoder } from "./Decoder";
 export { Encoder } from "./Encoder";
