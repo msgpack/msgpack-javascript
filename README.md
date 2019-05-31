@@ -166,7 +166,11 @@ deepStrictEqual(decode(encoded, { extensionCodec }), value);
 
 #### The temporal module as timestamp extensions
 
-This library maps `Date` to the MessagePack timestamp extension, but you re-map the [temporal module](https://github.com/tc39/proposal-temporal) to the timestamp ext like this:
+There is a proposal for a new date/time representations in JavaScript:
+
+* https://github.com/tc39/proposal-temporal
+
+This library maps `Date` to the MessagePack timestamp extension by default, but you can re-map the temporal module (or [@std-proposal/temporal ponyfill](https://github.com/tc39/proposal-temporal)) to the timestamp extension like this:
 
 ```typescript
 import { Instant } from "@std-proposal/temporal";
@@ -206,7 +210,7 @@ const decoded = decode(encoded, { extensionCodec });
 deepStrictEqual(decoded, instant);
 ```
 
-This will be default after the temporal module is implemented in major browsers, which is not a near-future, though.
+This will be default once the temporal module is standardizied, which is not a near-future, though.
 
 ## MessagePack Mapping Table
 
