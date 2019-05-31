@@ -46,5 +46,5 @@ script: |
   fi
 after_success: |
   if [ "${BROWSER}" = "" ]
-    then nyc report --reporter=json > coverage/coverage.json && codecov
+    then codecov -f coverage/*.json
   fi

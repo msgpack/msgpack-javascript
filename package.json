@@ -22,7 +22,7 @@
     "test:cover:wasm": "npx nyc --no-clean npm run test:wasm",
     "test:cover:td": "npx nyc --no-clean npm run test:td",
     "cover:clean": "rimraf .nyc_output coverage/",
-    "cover:report": "nyc report --reporter=lcov --reporter=text-summary --reporter=html",
+    "cover:report": "nyc report --reporter=text-summary --reporter=html --reporter=json",
     "test:browser": "karma start --single-run",
     "test:browser:firefox": "karma start --single-run --browsers FirefoxHeadless",
     "test:browser:chrome": "karma start --single-run --browsers ChromeHeadless",
