@@ -77,6 +77,6 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     browserName: "Chrome",
     platformName: "Android",
     platformVersion: "latest",
-    deviceName: "Android GoogleAPI Emulator",
+    deviceName: "Android Emulator",
   },
 };
