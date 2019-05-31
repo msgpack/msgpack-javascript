@@ -4,7 +4,7 @@ import { decodeAsync, encode, decodeArrayStream } from "@msgpack/msgpack";
 describe("whatwg streams", () => {
   before(function() {
     // Edge <= 18 has no ReadableStream constructor
-    if (typeof ReadableStream === "function") {
+    if (typeof ReadableStream !== "function") {
       this.skip();
     }
   });
