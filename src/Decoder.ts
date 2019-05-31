@@ -68,13 +68,13 @@ export class Decoder {
     readonly maxExtLength = DEFAULT_MAX_LENGTH,
   ) {}
 
-  setBuffer(buffer: ArrayLike<number> | Uint8Array): void {
+  setBuffer(buffer: ArrayLike<number>): void {
     this.bytes = ensureUint8Array(buffer);
     this.view = createDataView(this.bytes);
     this.pos = 0;
   }
 
-  appendBuffer(buffer: Uint8Array | ArrayLike<number>) {
+  appendBuffer(buffer: ArrayLike<number>) {
     if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
       this.setBuffer(buffer);
     } else {
@@ -105,7 +105,7 @@ export class Decoder {
     return object;
   }
 
-  async decodeOneAsync(stream: AsyncIterable<ArrayLike<number> | Uint8Array>): Promise<unknown> {
+  async decodeOneAsync(stream: AsyncIterable<ArrayLike<number>>): Promise<unknown> {
     let decoded = false;
     let object: unknown;
     for await (const buffer of stream) {
@@ -140,7 +140,7 @@ export class Decoder {
     );
   }
 
-  async *decodeStream(stream: AsyncIterable<ArrayLike<number> | Uint8Array>) {
+  async *decodeStream(stream: AsyncIterable<ArrayLike<number>>) {
     for await (const buffer of stream) {
       this.appendBuffer(buffer);
 
@@ -159,7 +159,7 @@ export class Decoder {
     }
   }
 
-  async *decodeArrayStream(stream: AsyncIterable<ArrayLike<number> | Uint8Array>) {
+  async *decodeArrayStream(stream: AsyncIterable<ArrayLike<number>>) {
     let headerParsed = false;
     let decoded = false;
     let itemsLeft = 0;

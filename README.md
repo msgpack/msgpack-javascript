@@ -46,9 +46,11 @@ npm install @msgpack/msgpack
 
 It encodes `data` and returns a byte array as `Uint8Array`.
 
-### `decode(buffer: ArrayLike<number> | Uint8Array, options?: DecodeOptions): unknown`
+### `decode(buffer: ArrayLike<number>, options?: DecodeOptions): unknown`
 
-It decodes `buffer` in a byte buffer and returns decoded data as `uknown`.
+It decodes `buffer` encoded as MessagePack, and returns a decoded object as `uknown`.
+
+`buffer` must be an array of bytes, which is typically `Uint8Array`.
 
 #### DecodeOptions
 
@@ -63,19 +65,19 @@ maxExtLength | number | `4_294_967_295` (UINT32_MAX)
 
 You can use `max${Type}Length` to limit the length of each type decoded.
 
-### `decodeAsync(stream: AsyncIterable<Uint8Array | ArrayLike<number>> | ReadableStream<Uint8Array | ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`
+### `decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`
 
 It decodes `stream` in an async iterable of byte arrays and returns decoded data as `uknown` wrapped in `Promise`. This function works asyncronously.
 
 Note that `decodeAsync()` acceps the same options as `decode()`.
 
-### `decodeArrayStream(stream: AsyncIterable<Uint8Array | ArrayLike<number>> | ReadableStream<Uint8Array | ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeArrayStream(stream: AsyncIterable< ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
 It is alike to `decodeAsync()`, but only accepts an array of items as the input `stream`, and emits the decoded item one by one.
 
 It throws errors when the input is not an array.
 
-### `decodeStream(stream: AsyncIterable<Uint8Array | ArrayLike<number>> | ReadableStream<Uint8Array | ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
 It is like to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
 
