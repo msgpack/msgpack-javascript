@@ -1,9 +1,21 @@
 import { deepStrictEqual } from "assert";
 import { decodeAsync, encode, decodeArrayStream } from "@msgpack/msgpack";
 
+const isReadableStreamConstructorAvailable: boolean = (() => {
+  try {
+    // Edge <= 18 has ReadableStream but its constructor is not available
+    new ReadableStream({
+      start() {},
+    });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
 describe("whatwg streams", () => {
   before(function() {
-    if (typeof ReadableStream === "undefined") {
+    if (!isReadableStreamConstructorAvailable) {
       this.skip();
     }
   });

@@ -42,9 +42,9 @@ script: |
   if [ "${BROWSER}" = "" ]
     then npm run test:cover
   else
-    travis_wait 300 npm run test:browser -- --browsers "$BROWSER"
+    travis_wait 600 npm run test:browser -- --browsers "$BROWSER"
   fi
 after_success: |
   if [ "${BROWSER}" = "" ]
-    then nyc report --reporter=json > coverage/coverage.json && codecov
+    then codecov -f coverage/*.json
   fi
