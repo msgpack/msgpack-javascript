@@ -67,9 +67,24 @@ You can use `max${Type}Length` to limit the length of each type decoded.
 
 ### `decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`
 
-It decodes `stream` in an async iterable of byte arrays and returns decoded data as `uknown` wrapped in `Promise`. This function works asyncronously.
+It decodes `stream` in an async iterable of byte arrays, and returns decoded object as `uknown` type, wrapped in `Promise`. This function works asyncronously.
 
-Note that `decodeAsync()` acceps the same options as `decode()`.
+`DecodeAsyncOptions` is the same as `DecodeOptions` for `decode()`.
+
+This function is designed to work with whatwg `fetch()` like this:
+
+```typescript
+import { decodeAsync } from "@msgpack/msgpack";
+
+const MSGPACK_TYPE = "application/x-msgpack";
+
+const response = await fetch(url);
+const contentType = response.headers.get("Content-Type");
+if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null) {
+  const object = await decodeAsync(response.body);
+  // do something with object
+} else { /* handle errors */ }
+```
 
 ### `decodeArrayStream(stream: AsyncIterable< ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
