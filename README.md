@@ -317,6 +317,9 @@ make test-all
 # edit the changelog
 code CHANGELOG.md
 
+# bump version
+npm version patch|minor|major
+
 # run the publishing task
 make publish
 ```
