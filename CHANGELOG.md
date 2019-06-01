@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.3.1 2019/06/01
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.3.0...v1.3.1
+
+* Fix missing exports of `decodeStream()`
+
 ## v1.3.0 2019/05/29
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.2.3...v1.3.0
