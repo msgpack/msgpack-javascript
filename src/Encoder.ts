@@ -300,7 +300,7 @@ export class Encoder {
     this.pos++;
   }
 
-  writeU8v(...values: ReadonlyArray<number>) {
+  writeU8v(...values: Array<number>) {
     const size = values.length;
     this.ensureBufferSizeToWrite(size);
 
