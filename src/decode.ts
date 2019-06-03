@@ -49,25 +49,27 @@ class CachedKeyDecoder {
     this.caches = new Array<Array<KeyCacheRecord>>(this.maxKeyLength + 1);
   }
 
-  public accepts(keyLength: number) {
-    return keyLength > 0 && keyLength <= this.maxKeyLength;
-  }
-
-  public get(bytes: Uint8Array): string | null {
-    const chunks = this.caches[bytes.length];
+  public get(bytes: Uint8Array, inputOffset: number, byteLength: number): string | null {
+    const chunks = this.caches[byteLength];
 
     if (chunks) {
-      return this.findKey(bytes, chunks);
+      return this.findKey(bytes, inputOffset, byteLength, chunks);
     } else {
       return null;
     }
   }
 
-  private findKey(bytes: Uint8Array, chunks: Array<KeyCacheRecord>): string | null {
-    const size = bytes.length;
+  private findKey(
+    bytes: Uint8Array,
+    inputOffset: number,
+    byteLength: number,
+    chunks: Array<KeyCacheRecord>,
+  ): string | null {
     let prevHits = 0;
-    let result: string | null = null;
-    FIND_CHUNK: for (let i = 0; i < chunks.length; i++) {
+    const chunksLength = chunks.length;
+    const halfLength = byteLength / 2;
+    const endPosition = inputOffset + byteLength;
+    FIND_CHUNK: for (let i = 0; i < chunksLength; i++) {
       const chunk = chunks[i];
 
       if (i > 0 && prevHits < chunk.hits) {
@@ -81,24 +83,22 @@ class CachedKeyDecoder {
         prevHits = chunk.hits;
       }
 
-      for (let j = 0; j < size / 2; j++) {
-        if (chunk.bytes[j] !== bytes[j]) {
+      for (let j = 0; j < halfLength; j++) {
+        if (chunk.bytes[j] !== bytes[inputOffset + j]) {
           continue FIND_CHUNK;
         }
 
-        if (chunk.bytes[size - j - 1] !== bytes[size - j - 1]) {
+        if (chunk.bytes[byteLength - j - 1] !== bytes[endPosition - j - 1]) {
           continue FIND_CHUNK;
         }
       }
 
       chunk.hits++;
 
-      result = chunk.key;
-
-      break;
+      return chunk.key;
     }
 
-    return result;
+    return null;
   }
 
   public cache(bytes: Uint8Array, value: string) {
@@ -117,12 +117,12 @@ class CachedKeyDecoder {
   }
 
   public decode(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
-    const stringBytes = bytes.subarray(inputOffset, inputOffset + byteLength);
-    let value = this.get(stringBytes);
+    let value = this.get(bytes, inputOffset, byteLength);
 
     if (!value) {
       value = utf8DecodeJs(bytes, inputOffset, byteLength);
-      this.cache(bytes.slice(inputOffset, inputOffset + byteLength), value);
+      const stringsBytes = bytes.slice(inputOffset, inputOffset + byteLength);
+      this.cache(stringsBytes, value);
     }
 
     return value;
@@ -135,14 +135,15 @@ class CustomDecoder extends Decoder {
 
   public decodeUtf8String(byteLength: number, headerOffset: number): string {
     let isKey = false;
+    const canBeDecodedAsKey = byteLength > 0 && byteLength < this.maxCachedKeyLength;
 
-    if (this.stack.length > 0) {
+    if (canBeDecodedAsKey && this.stack.length > 0) {
       const state = this.stack[this.stack.length - 1];
 
       isKey = state.type === State.MAP_KEY;
     }
 
-    if (isKey && byteLength > 0 && byteLength < this.maxCachedKeyLength) {
+    if (isKey && canBeDecodedAsKey) {
       const offset = this.pos + headerOffset;
       const value = this.cachedKeyDecoder.decode(this.bytes, offset, byteLength);
       this.pos += headerOffset + byteLength;
