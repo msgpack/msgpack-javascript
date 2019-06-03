@@ -5,7 +5,7 @@ import { utf8DecodeJs, TEXT_DECODER_AVAILABLE, TEXT_DECODER_THRESHOLD, utf8Decod
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { WASM_AVAILABLE, WASM_STR_THRESHOLD, utf8DecodeWasm } from "./wasmFunctions";
 
-enum State {
+export enum State {
   ARRAY,
   MAP_KEY,
   MAP_VALUE,
