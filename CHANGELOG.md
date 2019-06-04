@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.3.2 2019/06/04
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.3.1...v1.3.2
+
+* Fix typings for older TypeScript [#55](https://github.com/msgpack/msgpack-javascript/pull/55)
+
 ## v1.3.1 2019/06/01
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.3.0...v1.3.1
