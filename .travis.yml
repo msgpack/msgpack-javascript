@@ -1,25 +1,32 @@
 language: node_js
-node_js:
-  - lts/*
 addons:
   firefox: latest
 env:
-  matrix:
-    - BROWSER=
-    - BROWSER=FirefoxHeadless
-    - BROWSER=slChrome
-    - BROWSER=slFirefox
-    - BROWSER=slSafari
-    - BROWSER=slIE
-    - BROWSER=slEdge
-    - BROWSER=slIos
-    - BROWSER=slAndroid
   global:
     # SAUCE_USERNAME
     - secure: J+FOPE/vVK6yzVXHVE7xibFV/hV+Ehc78MBADLlE10YIY7Ag6JkVeomgqRFB9I8zFzj5DALkpzOLGx4iIrFs6iYiNnEcl39fkm8myHl8xIuW+KHt5QOsCtM5qmvfSEZhJV+La0lSzFicjY9VX90VLZvJOHIbiCvIFRoxnwYVw6o=
     # SAUCE_ACCESS_KEY
     - secure: ay3CSAjya+UQDi0RulLIl6q25oobwLsjLbdkeASgjBq0qN5dXgFgEpBjecBxFqPGrwzzCj9K9fR81NWV80EjLkGdcfN0oGx0wvsOo2C2ulWGHc1dRgKUnMKAA2TL3br14KMfmGn6fmr+fA7Vq+qWajQpExlG0Kuw68C9iNuKIQw=
 matrix:
+  include:
+    - node_js: 10
+    - node_js: 12
+    - node_js: lts/*
+      env: BROWSER=FirefoxHeadless
+    - node_js: lts/*
+      env: BROWSER=slChrome
+    - node_js: lts/*
+      env: BROWSER=slFirefox
+    - node_js: lts/*
+      env: BROWSER=slSafari
+    - node_js: lts/*
+      env: BROWSER=slIE
+    - node_js: lts/*
+      env: BROWSER=slEdge
+    - node_js: lts/*
+      env: BROWSER=slIos
+    - node_js: lts/*
+      env: BROWSER=slAndroid
   fast_finish: true
   allow_failures:
     # Because Travis CI does not expose credentials to pull-request builds from forked repositories.
@@ -31,7 +38,6 @@ matrix:
     - env: BROWSER=slEdge
     - env: BROWSER=slIos
     - env: BROWSER=slAndroid
-
 cache: npm
 install: |
   if [ "${BROWSER}" = "" ]
