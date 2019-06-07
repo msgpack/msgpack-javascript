@@ -4,8 +4,8 @@ import { WASM_AVAILABLE } from "../src/wasmFunctions";
 
 console.log(`WASM_AVAILABLE=${WASM_AVAILABLE}`);
 
-const ascii = "A".repeat(40000);
-const emoji = "🌏".repeat(20000);
+const ascii = "A".repeat(30);
+const emoji = "🌏".repeat(8);
 
 {
   // warm up ascii
@@ -17,13 +17,13 @@ const emoji = "🌏".repeat(20000);
   // run
 
   console.time("encode ascii");
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 1000000; i++) {
     encode(data);
   }
   console.timeEnd("encode ascii");
 
   console.time("decode ascii");
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 1000000; i++) {
     decode(encoded);
   }
   console.timeEnd("decode ascii");
@@ -40,13 +40,13 @@ const emoji = "🌏".repeat(20000);
   // run
 
   console.time("encode emoji");
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 1000000; i++) {
     encode(data);
   }
   console.timeEnd("encode emoji");
 
   console.time("decode emoji");
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 1000000; i++) {
     decode(encoded);
   }
   console.timeEnd("decode emoji");

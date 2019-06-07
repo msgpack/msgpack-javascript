@@ -8,10 +8,14 @@ import { WASM_AVAILABLE, utf8EncodeWasm, WASM_STR_THRESHOLD } from "./wasmFuncti
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
 
+const STR_CACHE_THRESHOLD = 32;
+
 export class Encoder {
   private pos = 0;
   private view = new DataView(new ArrayBuffer(this.initialBufferSize));
   private bytes = new Uint8Array(this.view.buffer);
+
+  private readonly strCache: Record<string, Uint8Array> = Object.create(null);
 
   constructor(
     readonly extensionCodec = ExtensionCodec.defaultCodec,
@@ -146,6 +150,16 @@ export class Encoder {
     const maxHeaderSize = 1 + 4;
     const strLength = object.length;
 
+    if (strLength < STR_CACHE_THRESHOLD) {
+      const buffer = this.strCache[object];
+      if (buffer != null) {
+        this.writeStringHeader(buffer.byteLength);
+        this.bytes.set(buffer, this.pos);
+        this.pos += buffer.byteLength;
+        return;
+      }
+    }
+
     if (WASM_AVAILABLE && strLength > WASM_STR_THRESHOLD) {
       // ensure max possible size
       const maxSize = maxHeaderSize + strLength * 4;
@@ -154,12 +168,14 @@ export class Encoder {
       // utf8EncodeWasm() handles headByte+size as well as string itself
       const ouputLength = utf8EncodeWasm(object, this.bytes, this.pos);
       this.pos += ouputLength;
-      return;
     } else {
       const byteLength = utf8Count(object);
       this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
       this.writeStringHeader(byteLength);
       utf8Encode(object, this.bytes, this.pos);
+      if (byteLength < STR_CACHE_THRESHOLD) {
+        this.strCache[object] = this.bytes.subarray(this.pos, this.pos + byteLength);
+      }
       this.pos += byteLength;
     }
   }
