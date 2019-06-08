@@ -8,7 +8,7 @@ This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient bi
 
 https://msgpack.org/
 
-This library is compatible with the "August 2017" revision of MessagePack specification at the point where timestamp ext was added.
+This library is a universal JavaScript, which suppors both browsers and NodeJS. In addition, because it is implemented in TypeScript, type definition files (`d.ts`) are bundled in the distribution.
 
 ## Synopsis
 
@@ -229,7 +229,15 @@ deepStrictEqual(decoded, instant);
 
 This will be default once the temporal module is standardizied, which is not a near-future, though.
 
-## MessagePack Mapping Table
+## MessagePack Specification
+
+This library is compatible with the "August 2017" revision of MessagePack specification at the point where timestamp ext was added.
+
+The specification is here:
+
+https://github.com/msgpack/msgpack
+
+### MessagePack Mapping Table
 
 The following table shows how JavaScript values are mapped to [MessagePack formats](https://github.com/msgpack/msgpack/blob/master/spec.md) and vice versa.
 
