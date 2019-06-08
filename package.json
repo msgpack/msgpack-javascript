@@ -33,7 +33,8 @@
     "lint:print-config": "eslint --print-config .eslintrc.js",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "asbuild:development": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate --debug && ts-node tools/pack-wasm.ts",
-    "asbuild:production": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate -O3 && ts-node tools/pack-wasm.ts"
+    "asbuild:production": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate -O3 && ts-node tools/pack-wasm.ts",
+    "update-dependencies": "rimraf node_modules/ package-lock.json && npm install && npm dedupe"
   },
   "repository": {
     "type": "git",
