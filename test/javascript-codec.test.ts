@@ -1,6 +1,5 @@
 import assert from "assert";
-import { encode, decode } from "@msgpack/msgpack";
-import { JavaScriptCodec } from "src/JavaScriptCodec";
+import { encode, decode, JavaScriptCodec } from "@msgpack/msgpack";
 
 describe("JavaScriptCodec", () => {
   context("mixed", () => {
