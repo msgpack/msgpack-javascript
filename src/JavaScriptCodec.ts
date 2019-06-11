@@ -2,7 +2,7 @@ import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { encode } from "./encode";
 import { decode } from "./decode";
 
-export const JavaScriptCodecType = 0;
+export const EXT_JAVASCRIPT = 0;
 
 const enum JSData {
   Map,
@@ -60,7 +60,7 @@ export const JavaScriptCodec: ExtensionCodecType = (() => {
   const ext = new ExtensionCodec();
 
   ext.register({
-    type: JavaScriptCodecType,
+    type: EXT_JAVASCRIPT,
     encode: encodeJavaScriptData,
     decode: decodeJavaScriptData,
   });

@@ -20,6 +20,6 @@ export {
   decodeTimestampExtension,
 } from "./timestamp";
 
-export { JavaScriptCodec, JavaScriptCodecType, encodeJavaScriptData, decodeJavaScriptData } from "./JavaScriptCodec";
+export { JavaScriptCodec, EXT_JAVASCRIPT, encodeJavaScriptData, decodeJavaScriptData } from "./JavaScriptCodec";
 
 export { WASM_AVAILABLE as __WASM_AVAILABLE } from "./wasmFunctions";
