@@ -46,6 +46,15 @@ npm install @msgpack/msgpack
 
 It encodes `data` and returns a byte array as `Uint8Array`.
 
+#### EncodeOptions
+
+Name|Type|Default
+----|----|----
+extensionCodec | ExtensionCodec | `ExtensinCodec.defaultCodec`
+maxDepth | number | `100`
+initialBufferSize | number | `2048`
+sortKeys | boolean | false
+
 ### `decode(buffer: ArrayLike<number>, options?: DecodeOptions): unknown`
 
 It decodes `buffer` encoded as MessagePack, and returns a decoded object as `uknown`.
