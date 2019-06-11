@@ -9,6 +9,7 @@ const enum JSData {
   Set,
   Date,
   RegExp,
+  BigInt,
 }
 
 export function encodeJavaScriptData(input: unknown): Uint8Array | null {
@@ -22,6 +23,8 @@ export function encodeJavaScriptData(input: unknown): Uint8Array | null {
     return encode([JSData.Date, input.getTime()]);
   } else if (input instanceof RegExp) {
     return encode([JSData.RegExp, [input.source, input.flags]]);
+  } else if (typeof input === "bigint") {
+    return encode([JSData.BigInt, input.toString()]);
   } else {
     return null;
   }
@@ -43,6 +46,9 @@ export function decodeJavaScriptData(data: Uint8Array) {
     case JSData.RegExp: {
       const [pattern, flags] = source;
       return new RegExp(pattern, flags);
+    }
+    case JSData.BigInt: {
+      return BigInt(source);
     }
     default: {
       throw new Error(`Unknown data type: ${jsDataType}`);
