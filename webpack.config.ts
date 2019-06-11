@@ -1,9 +1,10 @@
-"use strict";
-
-const path = require("path");
-const webpack = require("webpack");
-const { CheckEsVersionPlugin } = require("@bitjourney/check-es-version-webpack-plugin");
-const _ = require("lodash");
+import path from "path";
+// @ts-ignore
+import webpack from "webpack";
+// @ts-ignore
+import { CheckEsVersionPlugin } from "@bitjourney/check-es-version-webpack-plugin";
+// @ts-ignore
+import _ from "lodash";
 
 const config = {
   mode: "production",
@@ -51,7 +52,7 @@ const config = {
   devtool: "source-map",
 };
 
-module.exports = [
+export default [
   // default bundle does not includes wasm
   ((config) => {
     config.output.filename = "msgpack.js";
