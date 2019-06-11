@@ -224,16 +224,6 @@ export class Encoder {
     }
   }
 
-  countObjectKeys(object: Record<string, unknown>): number {
-    let count = 0;
-    for (const key in object) {
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        count++;
-      }
-    }
-    return count;
-  }
-
   encodeMap(object: Record<string, unknown>, depth: number) {
     const keys = Object.keys(object);
     if (this.sortKeys) {
