@@ -4,44 +4,48 @@ import { decode } from "./decode";
 
 export const JavaScriptCodecType = 0;
 
+const enum JSData {
+  Map,
+  Set,
+  Date,
+  RegExp,
+}
+
 export function encodeJavaScriptData(input: unknown): Uint8Array | null {
   if (input instanceof Map) {
-    return encode(["Map", [...input]]);
+    return encode([JSData.Map, [...input]]);
   } else if (input instanceof Set) {
-    return encode(["Set", [...input]]);
+    return encode([JSData.Set, [...input]]);
   } else if (input instanceof Date) {
     // Not a MessagePack timestamp because
     // it may be overrided by users
-    return encode(["Date", input.getTime()]);
+    return encode([JSData.Date, input.getTime()]);
   } else if (input instanceof RegExp) {
-    return encode(["RegExp", [input.source, input.flags]]);
+    return encode([JSData.RegExp, [input.source, input.flags]]);
   } else {
     return null;
   }
 }
 
 export function decodeJavaScriptData(data: Uint8Array) {
-  const [constructor, source] = decode(data) as [string, any];
+  const [jsDataType, source] = decode(data) as [JSData, any];
 
-  switch (constructor) {
-    case "undefined": {
-      return undefined;
-    }
-    case "Map": {
+  switch (jsDataType) {
+    case JSData.Map: {
       return new Map<unknown, unknown>(source);
     }
-    case "Set": {
+    case JSData.Set: {
       return new Set<unknown>(source);
     }
-    case "Date": {
+    case JSData.Date: {
       return new Date(source);
     }
-    case "RegExp": {
+    case JSData.RegExp: {
       const [pattern, flags] = source;
       return new RegExp(pattern, flags);
     }
     default: {
-      throw new Error(`Unknown constructor: ${constructor}`);
+      throw new Error(`Unknown data type: ${jsDataType}`);
     }
   }
 }
