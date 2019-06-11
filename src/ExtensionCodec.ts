@@ -50,18 +50,6 @@ export class ExtensionCodec implements ExtensionCodecType {
   }
 
   public tryToEncode(object: unknown): ExtData | null {
-    // built-in extensions
-    for (let i = 0; i < this.builtInEncoders.length; i++) {
-      const encoder = this.builtInEncoders[i];
-      if (encoder != null) {
-        const data = encoder(object);
-        if (data != null) {
-          const type = -1 - i;
-          return new ExtData(type, data);
-        }
-      }
-    }
-
     // custom extensions
     for (let i = 0; i < this.encoders.length; i++) {
       const encoder = this.encoders[i];
@@ -69,6 +57,18 @@ export class ExtensionCodec implements ExtensionCodecType {
         const data = encoder(object);
         if (data != null) {
           const type = i;
+          return new ExtData(type, data);
+        }
+      }
+    }
+
+    // built-in extensions
+    for (let i = 0; i < this.builtInEncoders.length; i++) {
+      const encoder = this.builtInEncoders[i];
+      if (encoder != null) {
+        const data = encoder(object);
+        if (data != null) {
+          const type = -1 - i;
           return new ExtData(type, data);
         }
       }
