@@ -301,20 +301,6 @@ export class Encoder {
     this.pos++;
   }
 
-  /**
-   * @deprecated No longer used. Will be removed in a semver-major
-   */
-  writeU8v(...values: Array<number>) {
-    const size = values.length;
-    this.ensureBufferSizeToWrite(size);
-
-    const pos = this.pos;
-    for (let i = 0; i < size; i++) {
-      this.view.setUint8(pos + i, values[i]);
-    }
-    this.pos += size;
-  }
-
   writeU8a(values: ArrayLike<number>) {
     const size = values.length;
     this.ensureBufferSizeToWrite(size);
