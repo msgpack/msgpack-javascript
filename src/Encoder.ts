@@ -17,6 +17,7 @@ export class Encoder {
     readonly extensionCodec = ExtensionCodec.defaultCodec,
     readonly maxDepth = DEFAULT_MAX_DEPTH,
     readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
+    readonly sortKeys = false,
   ) {}
 
   encode(object: unknown, depth: number): void {
@@ -223,18 +224,12 @@ export class Encoder {
     }
   }
 
-  countObjectKeys(object: Record<string, unknown>): number {
-    let count = 0;
-    for (const key in object) {
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        count++;
-      }
-    }
-    return count;
-  }
-
   encodeMap(object: Record<string, unknown>, depth: number) {
-    const size = this.countObjectKeys(object);
+    const keys = Object.keys(object);
+    if (this.sortKeys) {
+      keys.sort();
+    }
+    const size = keys.length;
     if (size < 16) {
       // fixmap
       this.writeU8(0x80 + size);
@@ -249,11 +244,11 @@ export class Encoder {
     } else {
       throw new Error(`Too large map object: ${size}`);
     }
-    for (const key in object) {
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        this.encodeString(key);
-        this.encode(object[key], depth + 1);
-      }
+
+    for (let i = 0; i < size; i++) {
+      const key = keys[i];
+      this.encodeString(key);
+      this.encode(object[key], depth + 1);
     }
   }
 
