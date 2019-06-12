@@ -1,5 +1,12 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.4.0 2019/06/12
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.3.2...v1.4.0
+
+* Added `sortKeys: boolean` option to `encode()` for canonical encoding [#64](https://github.com/msgpack/msgpack-javascript/pull/64)
+* Fixed `RangeError` in encoding BLOB [#66](https://github.com/msgpack/msgpack-javascript/pull/66)
+
 ## v1.3.2 2019/06/04
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.3.1...v1.3.2
