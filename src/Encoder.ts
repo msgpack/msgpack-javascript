@@ -80,7 +80,8 @@ export class Encoder {
           this.writeU8(object);
         } else if (object < 0x100) {
           // uint 8
-          this.writeU8v(0xcc, object);
+          this.writeU8(0xcc);
+          this.writeU8(object);
         } else if (object < 0x10000) {
           // uint 16
           this.writeU8(0xcd);
@@ -200,7 +201,7 @@ export class Encoder {
       throw new Error(`Too large binary: ${size}`);
     }
     const bytes = ensureUint8Array(object);
-    this.writeU8v(...bytes);
+    this.writeU8a(bytes);
   }
 
   encodeArray(object: Array<unknown>, depth: number) {
@@ -285,7 +286,7 @@ export class Encoder {
       throw new Error(`Too large extension object: ${size}`);
     }
     this.writeI8(ext.type);
-    this.writeU8v(...ext.data);
+    this.writeU8a(ext.data);
   }
 
   writeU8(value: number) {
@@ -295,14 +296,11 @@ export class Encoder {
     this.pos++;
   }
 
-  writeU8v(...values: Array<number>) {
+  writeU8a(values: ArrayLike<number>) {
     const size = values.length;
     this.ensureBufferSizeToWrite(size);
 
-    const pos = this.pos;
-    for (let i = 0; i < size; i++) {
-      this.view.setUint8(pos + i, values[i]);
-    }
+    this.bytes.set(values, this.pos);
     this.pos += size;
   }
 
