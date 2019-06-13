@@ -44,7 +44,16 @@ npm install @msgpack/msgpack
 
 ### `encode(data: unknown, options?: EncodeOptions): Uint8Array`
 
-It encodes `data` and returns a byte array as `Uint8Array`, throwing errors if `data` is, or includes, a non-serializable object such as `function` or a `symbol`.
+It encodes `data` and returns a byte array as `Uint8Array`, throwing errors if `data` is, or includes, a non-serializable object such as a `function` or a `symbol`.
+
+for example:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const encoded: Uint8Array = encode({ foo: "bar" });
+console.log(encoded);
+```
 
 #### EncodeOptions
 
@@ -60,6 +69,16 @@ sortKeys | boolean | false
 It decodes `buffer` encoded as MessagePack, and returns a decoded object as `uknown`.
 
 `buffer` must be an array of bytes, which is typically `Uint8Array`.
+
+for example:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const encoded: Uint8Array;
+const object = decode(encoded);
+console.log(object);
+```
 
 #### DecodeOptions
 
@@ -95,17 +114,44 @@ if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null
 } else { /* handle errors */ }
 ```
 
-### `decodeArrayStream(stream: AsyncIterable< ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
 It is alike to `decodeAsync()`, but only accepts an array of items as the input `stream`, and emits the decoded item one by one.
 
 It throws errors when the input is not an array-family.
+
+for example:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const stream: AsyncIterator<Uint8Array>;
+
+// in an async function:
+for await (const item of decodeArrayStream(stream)) {
+  console.log(item);
+}
+```
+
 
 ### `decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
 It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
 
 In other words, it decodes an unlimited stream and emits an item one by one.
+
+for example:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const stream: AsyncIterator<Uint8Array>;
+
+// in an async function:
+for await (const item of decodeArrayStream(stream)) {
+  console.log(item);
+}
+```
 
 ### Extension Types
 
