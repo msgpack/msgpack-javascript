@@ -502,7 +502,8 @@ export class Decoder {
       throw MORE_DATA;
     }
 
-    const object = new Uint8Array(this.view.buffer, this.view.byteOffset + this.pos + headOffset, byteLength);
+    const offset = this.pos + headOffset;
+    const object = this.bytes.subarray(offset, offset + byteLength);
     this.pos += headOffset + byteLength;
     return object;
   }
