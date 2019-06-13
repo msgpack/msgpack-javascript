@@ -44,7 +44,7 @@ npm install @msgpack/msgpack
 
 ### `encode(data: unknown, options?: EncodeOptions): Uint8Array`
 
-It encodes `data` and returns a byte array as `Uint8Array`.
+It encodes `data` and returns a byte array as `Uint8Array`, throwing errors if `data` is, or includes, a non-serializable object such as `function` or a `symbol`.
 
 #### EncodeOptions
 
@@ -99,11 +99,11 @@ if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null
 
 It is alike to `decodeAsync()`, but only accepts an array of items as the input `stream`, and emits the decoded item one by one.
 
-It throws errors when the input is not an array.
+It throws errors when the input is not an array-family.
 
 ### `decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
-It is like to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
+It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
 
 In other words, it decodes an unlimited stream and emits an item one by one.
 
