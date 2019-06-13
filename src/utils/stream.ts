@@ -1,9 +1,13 @@
 // utility for whatwg streams
 
+// The living standard of whatwg streams says
+// ReadableStream is also AsyncIterable, but
+// as of June 2019, no browser implements it.
+// See https://streams.spec.whatwg.org/ for details
 export type ReadableStreamLike<T> = AsyncIterable<T> | ReadableStream<T>;
 
-export function isReadableStream<T>(object: unknown): object is ReadableStream<T> {
-  return typeof ReadableStream !== "undefined" && object instanceof ReadableStream;
+export function isAsyncIterable<T>(object: object): object is AsyncIterable<T> {
+  return (object as any)[Symbol.asyncIterator] != null;
 }
 
 export async function* asyncIterableFromStream<T>(stream: ReadableStream<T>): AsyncIterable<T> {
@@ -23,9 +27,9 @@ export async function* asyncIterableFromStream<T>(stream: ReadableStream<T>): As
 }
 
 export function ensureAsyncIterabe<T>(streamLike: ReadableStreamLike<T>): AsyncIterable<T> {
-  if (isReadableStream(streamLike)) {
-    return asyncIterableFromStream(streamLike);
-  } else {
+  if (isAsyncIterable(streamLike)) {
     return streamLike;
+  } else {
+    return asyncIterableFromStream(streamLike);
   }
 }

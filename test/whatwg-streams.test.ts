@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "assert";
 import { decodeAsync, encode, decodeArrayStream } from "@msgpack/msgpack";
-
+import { ReadableStream as PonyReadableStream } from "web-streams-polyfill/ponyfill";
 const isReadableStreamConstructorAvailable: boolean = (() => {
   try {
     // Edge <= 18 has ReadableStream but its constructor is not available
@@ -13,17 +13,20 @@ const isReadableStreamConstructorAvailable: boolean = (() => {
   }
 })();
 
-describe("whatwg streams", () => {
-  before(function() {
-    if (!isReadableStreamConstructorAvailable) {
-      this.skip();
-    }
-  });
+const MyReadableStream: typeof ReadableStream = isReadableStreamConstructorAvailable
+  ? ReadableStream
+  : PonyReadableStream;
 
-  it("decodeAsync", async () => {
+// Downgrade stream not to implement AsycIterable<T>
+function downgradeReadableStream(stream: ReadableStream) {
+  (stream as any)[Symbol.asyncIterator] = undefined;
+}
+
+describe("whatwg streams", () => {
+  it("decodeArrayStream", async () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
-    const stream = new ReadableStream({
+    const stream = new MyReadableStream({
       start(controller) {
         for (const byte of encoded) {
           controller.enqueue([byte]);
@@ -31,6 +34,7 @@ describe("whatwg streams", () => {
         controller.close();
       },
     });
+    downgradeReadableStream(stream);
 
     const items: Array<unknown> = [];
     for await (const item of decodeArrayStream(stream)) {
@@ -39,10 +43,10 @@ describe("whatwg streams", () => {
     deepStrictEqual(items, data);
   });
 
-  it("reads from stream", async () => {
+  it("decodeAsync", async () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
-    const stream = new ReadableStream({
+    const stream = new MyReadableStream({
       start(controller) {
         for (const byte of encoded) {
           controller.enqueue([byte]);
@@ -50,6 +54,7 @@ describe("whatwg streams", () => {
         controller.close();
       },
     });
+    downgradeReadableStream(stream);
 
     deepStrictEqual(await decodeAsync(stream), data);
   });
