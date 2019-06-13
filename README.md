@@ -32,6 +32,40 @@ const encoded: Uint8Array = encode(object);
 deepStrictEqual(decode(encoded), object);
 ```
 
+## Table of Contents
+
+<!-- TOC depthFrom:2 anchorMode:github.com -->
+
+- [Synopsis](#synopsis)
+- [Table of Contents](#table-of-contents)
+- [Install](#install)
+- [API](#api)
+  - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
+    - [`EncodeOptions`](#encodeoptions)
+  - [`decode(buffer: ArrayLike<number>, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber-options-decodeoptions-unknown)
+    - [`DecodeOptions`](#decodeoptions)
+  - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
+  - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+  - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+  - [Extension Types](#extension-types)
+    - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
+    - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
+- [MessagePack Specification](#messagepack-specification)
+  - [MessagePack Mapping Table](#messagepack-mapping-table)
+- [Prerequsites](#prerequsites)
+  - [ECMA-262](#ecma-262)
+  - [NodeJS](#nodejs)
+- [Benchmark](#benchmark)
+- [Distrubition](#distrubition)
+- [Maintenance](#maintenance)
+- [Testing](#testing)
+  - [Relase Engineering](#relase-engineering)
+  - [Updating Dependencies](#updating-dependencies)
+- [Big Thanks](#big-thanks)
+- [License](#license)
+
+<!-- /TOC -->
+
 ## Install
 
 This library is publised as [@msgpack/msgpack](https://www.npmjs.com/package/@msgpack/msgpack) in npmjs.com.
@@ -55,7 +89,7 @@ const encoded: Uint8Array = encode({ foo: "bar" });
 console.log(encoded);
 ```
 
-#### EncodeOptions
+#### `EncodeOptions`
 
 Name|Type|Default
 ----|----|----
@@ -80,7 +114,7 @@ const object = decode(encoded);
 console.log(object);
 ```
 
-#### DecodeOptions
+#### `DecodeOptions`
 
 Name|Type|Default
 ----|----|----
