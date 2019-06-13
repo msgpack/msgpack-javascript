@@ -242,7 +242,7 @@ There is a proposal for a new date/time representations in JavaScript:
 
 * https://github.com/tc39/proposal-temporal
 
-This library maps `Date` to the MessagePack timestamp extension by default, but you can re-map the temporal module (or [@std-proposal/temporal ponyfill](https://github.com/tc39/proposal-temporal)) to the timestamp extension like this:
+This library maps `Date` to the MessagePack timestamp extension by default, but you can re-map the temporal module (or [@std-proposal/temporal ponyfill](https://github.com/std-proposal/temporal)) to the timestamp extension like this:
 
 ```typescript
 import { Instant } from "@std-proposal/temporal";
