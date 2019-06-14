@@ -10,6 +10,8 @@ https://msgpack.org/
 
 This library is a universal JavaScript, which suppors both browsers and NodeJS. In addition, because it is implemented in TypeScript, type definition files (`d.ts`) are bundled in the distribution.
 
+*Note that this is the second version of MessagePack for JavaScript. The first version, which was implemented in ES5 and was never released to npmjs.com, is tagged as [classic](https://github.com/msgpack/msgpack-javascript/tree/classic).*
+
 ## Synopsis
 
 ```typescript
