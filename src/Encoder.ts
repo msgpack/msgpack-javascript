@@ -1,4 +1,4 @@
-import { utf8Encode, utf8Count } from "./utils/utf8";
+import { utf8EncodeJs, utf8Count, TEXT_ENCODING_AVAILABLE, TEXT_ENCODER_THRESHOLD, utf8EncodeTE } from "./utils/utf8";
 import { ExtensionCodec } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
@@ -148,7 +148,13 @@ export class Encoder {
     const maxHeaderSize = 1 + 4;
     const strLength = object.length;
 
-    if (WASM_AVAILABLE && strLength > WASM_STR_THRESHOLD) {
+    if (TEXT_ENCODING_AVAILABLE && strLength > TEXT_ENCODER_THRESHOLD) {
+      const byteLength = utf8Count(object);
+      this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
+      this.writeStringHeader(byteLength);
+      utf8EncodeTE(object, this.bytes, this.pos);
+      this.pos += byteLength;
+    } else if (WASM_AVAILABLE && strLength > WASM_STR_THRESHOLD) {
       // ensure max possible size
       const maxSize = maxHeaderSize + strLength * 4;
       this.ensureBufferSizeToWrite(maxSize);
@@ -161,7 +167,7 @@ export class Encoder {
       const byteLength = utf8Count(object);
       this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
       this.writeStringHeader(byteLength);
-      utf8Encode(object, this.bytes, this.pos);
+      utf8EncodeJs(object, this.bytes, this.pos);
       this.pos += byteLength;
     }
   }
