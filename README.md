@@ -58,7 +58,7 @@ deepStrictEqual(decode(encoded), object);
   - [ECMA-262](#ecma-262)
   - [NodeJS](#nodejs)
 - [Benchmark](#benchmark)
-- [Distrubition](#distrubition)
+- [Distribution](#distribution)
 - [Maintenance](#maintenance)
   - [Testing](#testing)
   - [Continuous Integration](#continuous-integration)
@@ -384,7 +384,7 @@ obj = require("@msgpack/msgpack").decode(buf);                    |  502200 |  5
 
 Note that `Buffer.from()` for `JSON.stringify()` is added to emulate I/O where a JavaScript string must be converted into a byte array encoded in UTF-8, whereas MessagePack's `encode()` returns a byte array.
 
-## Distrubition
+## Distribution
 
 The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
 
