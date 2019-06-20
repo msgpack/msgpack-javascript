@@ -336,14 +336,14 @@ The following table shows how JavaScript values are mapped to [MessagePack forma
 Source Value|MessagePack Format|Value Decoded
 ----|----|----
 null, undefined|nil|null (*1)
-boolean (true, false)|bool format family|boolean (true, false)
-number (53-bit int)|int format family|number (53-bit int)
-number (64-bit float)|float format family|number (64-bit float)
-string|str format family|string
-ArrayBufferView |bin format family|Uint8Array (*2)
-Array|array format family|Array
-Object|map format family|Object (*3)
-Date|timestamp ext format family|Date (*4)
+boolean (true, false)|bool family|boolean (true, false)
+number (53-bit int)|int family|number (53-bit int)
+number (64-bit float)|float family|number (64-bit float)
+string|str family|string
+ArrayBufferView |bin family|Uint8Array (*2)
+Array|array family|Array
+Object|map family|Object (*3)
+Date|timestamp ext family|Date (*4)
 
 * *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
 * *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
