@@ -335,7 +335,7 @@ The following table shows how JavaScript values are mapped to [MessagePack forma
 
 Source Value|MessagePack Format|Value Decoded
 ----|----|----
-null, undefined|nil format family|null (*1)
+null, undefined|nil|null (*1)
 boolean (true, false)|bool format family|boolean (true, false)
 number (53-bit int)|int format family|number (53-bit int)
 number (64-bit float)|float format family|number (64-bit float)
@@ -362,7 +362,9 @@ This is a universal JavaScript library that supports major browsers and NodeJS.
   * Async iterations (ES2018)
   * Features added in ES2015-ES2018
 
-ES2018 standard library used in this library can be polyfilled. For example, [core-js](https://github.com/zloirock/core-js) is used as polyfills to run tests on IE11, which has only ES5 language features.
+ES2018 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js) .
+
+If you support IE11, bundle `core-js` in your application, as this library does in testing for browsers .
 
 ### NodeJS
 
