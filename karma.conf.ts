@@ -82,7 +82,7 @@ export default function configure(config: any) {
     },
     client: {
       mocha: {
-        timeout: 10000,
+        timeout: 15_000,
       },
     },
   });
