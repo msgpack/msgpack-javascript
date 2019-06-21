@@ -12,7 +12,8 @@ const config = {
   entry: "./src/index.ts",
   output: {
     path: path.resolve(__dirname, "dist.es5"),
-    libraryTarget: "commonjs",
+    libraryTarget: "umd",
+    globalObject: "this",
   },
   resolve: {
     extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".wasm"],
@@ -37,6 +38,7 @@ const config = {
   externals: {
     "base64-js": {
       commonjs: "base64-js",
+      commonjs2: "base64-js",
     },
   },
 
