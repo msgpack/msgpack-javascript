@@ -1,5 +1,13 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.4.1 2019/06/22
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.0...v1.4.1
+
+* Improved entrypoints for browsers:
+  * Build as UMD
+  * Minidifed by default
+
 ## v1.4.0 2019/06/12
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.3.2...v1.4.0
