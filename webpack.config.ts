@@ -12,6 +12,7 @@ const config = {
   entry: "./src/index.ts",
   output: {
     path: path.resolve(__dirname, "dist.es5"),
+    library: "MessagePack",
     libraryTarget: "umd",
     globalObject: "this",
   },
@@ -37,6 +38,7 @@ const config = {
     new webpack.DefinePlugin({
       "process.env.WASM": JSON.stringify(null), // use only MSGPACK_WASM
       "process.env.TEXT_ENCODING": JSON.stringify("null"),
+      "process.env.TEXT_DECODER": JSON.stringify(null),
     }),
   ],
   externals: {
