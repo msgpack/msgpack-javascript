@@ -59,6 +59,8 @@ deepStrictEqual(decode(encoded), object);
   - [NodeJS](#nodejs)
 - [Benchmark](#benchmark)
 - [Distribution](#distribution)
+  - [NPM / npmjs.com](#npm--npmjscom)
+  - [CDN / unpkg.com](#cdn--unpkgcom)
 - [Maintenance](#maintenance)
   - [Testing](#testing)
   - [Continuous Integration](#continuous-integration)
@@ -388,6 +390,8 @@ Note that `Buffer.from()` for `JSON.stringify()` is added to emulate I/O where a
 
 ## Distribution
 
+### NPM / npmjs.com
+
 The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
 
 * `dist/` is compiled into ES2015+
@@ -396,6 +400,16 @@ The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
   * `dist.es5/webpack.js` - an optional, non-minified file (UMD)
 
 If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
+
+### CDN / unpkg.com
+
+This library is availble via CDN:
+
+```html
+<script crossorigin src="https://unpkg.com/@msgpack/msgpack"></script>
+```
+
+It loads `MessagePack` module to the global object.
 
 ## Maintenance
 
