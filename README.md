@@ -390,8 +390,10 @@ Note that `Buffer.from()` for `JSON.stringify()` is added to emulate I/O where a
 
 The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
 
-* `/dist` is compiled into ES2015+
-* `/dist.es5` is compiled into ES5 and bundled to singile file
+* `dist/` is compiled into ES2015+
+* `dist.es5/` is compiled into ES5 and bundled to singile file
+  * `dist.es5/webpack.min.js` - the default, minified file (UMD)
+  * `dist.es5/webpack.js` - an optional, non-minified file (UMD)
 
 If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
 
