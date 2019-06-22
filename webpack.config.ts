@@ -34,6 +34,10 @@ const config = {
     new CheckEsVersionPlugin({
       esVersion: 5, // for IE11 support
     }),
+    new webpack.DefinePlugin({
+      "process.env.WASM": JSON.stringify(null), // use only MSGPACK_WASM
+      "process.env.TEXT_ENCODING": JSON.stringify("null"),
+    }),
   ],
   externals: {
     "base64-js": {
@@ -55,6 +59,19 @@ const config = {
 };
 
 export default [
+  // default minified bundle does not includes wasm
+  ((config) => {
+    config.output.filename = "msgpack.min.js";
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        "process.env.MSGPACK_WASM": JSON.stringify("never"),
+      }),
+      new webpack.IgnorePlugin(/\.\/dist\/wasm\/msgpack\.wasm\.js$/),
+    );
+    config.optimization.minimize = true;
+    return config;
+  })(_.cloneDeep(config)),
+
   // default bundle does not includes wasm
   ((config) => {
     config.output.filename = "msgpack.js";
@@ -62,7 +79,6 @@ export default [
       new webpack.DefinePlugin({
         // The default bundle does not includes WASM
         "process.env.MSGPACK_WASM": JSON.stringify("never"),
-        "process.env.WASM": JSON.stringify(null),
       }),
       new webpack.IgnorePlugin(/\.\/dist\/wasm\/msgpack\.wasm\.js$/),
     );
@@ -74,9 +90,7 @@ export default [
     config.output.filename = "msgpack+wasm.js";
     config.plugins.push(
       new webpack.DefinePlugin({
-        // The default bundle does not includes WASM
         "process.env.MSGPACK_WASM": JSON.stringify(null),
-        "process.env.WASM": JSON.stringify(null),
       }),
     );
     return config;

@@ -5,7 +5,7 @@
   "author": "The MessagePack community",
   "license": "ISC",
   "main": "./dist/index.js",
-  "browser": "./dist.es5/msgpack.js",
+  "browser": "./dist.es5/msgpack.min.js",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
