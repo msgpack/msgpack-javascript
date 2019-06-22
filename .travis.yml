@@ -41,7 +41,7 @@ matrix:
 cache: npm
 install: |
   if [ "${BROWSER}" = "" ]
-    then npm install -g nyc codecov
+    then which nyc codecov 2>&1 >/dev/null || npm install -g nyc codecov
   fi
   npm ci
 script: |
