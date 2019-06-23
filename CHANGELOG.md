@@ -1,10 +1,14 @@
 This is the revision history of @msgpack/msgpack
 
-## v1.4.2 2019/06/22
+## v1.4.4 2019/06/22
 
-https://github.com/msgpack/msgpack-javascript/compare/v1.4.1...v1.4.2
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.1...v1.4.4
 
 * Fix the UMD build setting to correctly setup `MessagePack` module in the global object
+
+## v1.4.3, v1.4.2
+
+Mispackaged.
 
 ## v1.4.1 2019/06/22
 
