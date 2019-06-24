@@ -364,13 +364,14 @@ This is a universal JavaScript library that supports major browsers and NodeJS.
   * Async iterations (ES2018)
   * Features added in ES2015-ES2018
 
-ES2018 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js) .
+ES2018 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js).
 
-If you support IE11, bundle `core-js` in your application, as this library does in testing for browsers .
-
+If you support IE11, import `core-js` in your application entrypoints, as this library does in testing for browsers .
 ### NodeJS
 
 NodeJS v10 is required, but NodeJS v12 or later is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
+
+NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5/msgpack`.
 
 ## Benchmark
 
@@ -396,8 +397,8 @@ The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
 
 * `dist/` is compiled into ES2015+
 * `dist.es5/` is compiled into ES5 and bundled to singile file
-  * `dist.es5/webpack.min.js` - the default, minified file (UMD)
-  * `dist.es5/webpack.js` - an optional, non-minified file (UMD)
+  * `dist.es5/msgpack.min.js` - the default, minified file (UMD)
+  * `dist.es5/msgpack.js` - an optional, non-minified file (UMD)
 
 If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
 
