@@ -120,4 +120,10 @@ describe("msgpack-test-suite", () => {
       });
     }
   });
+
+  describe("encoding in minimum values", () => {
+    it("int 8", () => {
+      assert.deepStrictEqual(encode(-128), Uint8Array.from([0xd0, 0x80]));
+    });
+  });
 });
