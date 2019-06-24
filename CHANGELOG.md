@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.4.5 2019/06/24
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.4...v1.4.5
+
+* Fix an encoding result of -128 from int16 to int8 [#73](https://github.com/msgpack/msgpack-javascript/pull/73)
+
 ## v1.4.4 2019/06/22
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.4.1...v1.4.4
