@@ -8,13 +8,13 @@ export type TimeSpec = {
   nsec: number;
 };
 
-const TIMESTAMP32_MAX_SEC = 0x100000000; // 32-bit unsigned int
-const TIMESTAMP64_MAX_SEC = 0x400000000; // 34-bit unsigned int
+const TIMESTAMP32_MAX_SEC = 0x100000000 - 1; // 32-bit unsigned int
+const TIMESTAMP64_MAX_SEC = 0x400000000 - 1; // 34-bit unsigned int
 
 export function encodeTimeSpecToTimestamp({ sec, nsec }: TimeSpec): Uint8Array {
-  if (sec >= 0 && nsec >= 0 && sec < TIMESTAMP64_MAX_SEC) {
+  if (sec >= 0 && nsec >= 0 && sec <= TIMESTAMP64_MAX_SEC) {
     // Here sec >= 0 && nsec >= 0
-    if (nsec === 0 && sec < TIMESTAMP32_MAX_SEC) {
+    if (nsec === 0 && sec <= TIMESTAMP32_MAX_SEC) {
       // timestamp 32 = { sec32 (unsigned) }
       const rv = new Uint8Array(4);
       const view = new DataView(rv.buffer);
