@@ -6,6 +6,10 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     // https://prettier.io/docs/en/eslint.html
     "plugin:prettier/recommended",
+
+    // https://github.com/benmosher/eslint-plugin-import
+    "plugin:import/recommended",
+    "plugin:import/typescript",
   ],
   plugins: [],
   parser: "@typescript-eslint/parser",
@@ -26,8 +30,12 @@ module.exports = {
     "curly": "warn",
     "no-param-reassign": "warn",
 
+    "import/no-unresolved": "off", // cannot handle `paths` in tsconfig
+    "import/no-cycle": "error",
+    "import/no-default-export": "error",
+
     "@typescript-eslint/no-unused-vars":"warn",
-    "@typescript-eslint/array-type": ["error", "generic"],
+    "@typescript-eslint/array-type": ["warn", "generic"],
     "@typescript-eslint/camelcase": "warn",
     "@typescript-eslint/class-name-casing": "warn", // to allow the initial underscore
     "@typescript-eslint/no-non-null-assertion": "warn", // NOTE: pay attention to it because it may cause unexpected behavior
@@ -35,8 +43,8 @@ module.exports = {
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
     "@typescript-eslint/no-use-before-define": "warn",
-    "@typescript-eslint/await-thenable": "error",
-    "@typescript-eslint/no-for-in-array": "error",
+    "@typescript-eslint/await-thenable": "warn",
+    "@typescript-eslint/no-for-in-array": "warn",
 
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/no-explicit-any": "off",
@@ -45,7 +53,7 @@ module.exports = {
     "@typescript-eslint/no-object-literal-type-assertion": "off",
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-parameter-properties": "off",
-    "@typescript-eslint/no-var-requires": "off", // not a part of ECMA-262
+    "@typescript-eslint/no-var-requires": "off", // enforces `import x = require("x")`, which is TypeScript-specific
     "@typescript-eslint/prefer-interface": "off",
 
     "prettier/prettier": "warn",
