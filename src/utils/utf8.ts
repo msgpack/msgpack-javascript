@@ -1,3 +1,6 @@
+export const TEXT_ENCODING_AVAILABLE =
+  process.env.TEXT_ENCODING !== "never" && (typeof TextEncoder !== "undefined" && typeof TextDecoder !== "undefined");
+
 export function utf8Count(str: string): number {
   const strLength = str.length;
 
@@ -38,7 +41,7 @@ export function utf8Count(str: string): number {
   return byteLength;
 }
 
-export function utf8Encode(str: string, output: Uint8Array, outputOffset: number): void {
+export function utf8EncodeJs(str: string, output: Uint8Array, outputOffset: number): void {
   const strLength = str.length;
   let offset = outputOffset;
   let pos = 0;
@@ -80,6 +83,22 @@ export function utf8Encode(str: string, output: Uint8Array, outputOffset: number
     output[offset++] = (value & 0x3f) | 0x80;
   }
 }
+
+const sharedTextEncoder = TEXT_ENCODING_AVAILABLE ? new TextEncoder() : undefined;
+export const TEXT_ENCODER_THRESHOLD = process.env.TEXT_ENCODING !== "force" ? 200 : 0;
+
+function utf8EncodeTEencode(str: string, output: Uint8Array, outputOffset: number): void {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  output.set(sharedTextEncoder!.encode(str), outputOffset);
+}
+
+function utf8EncodeTEencodeInto(str: string, output: Uint8Array, outputOffset: number): void {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  sharedTextEncoder!.encodeInto(str, output.subarray(outputOffset));
+}
+
+export const utf8EncodeTE =
+  sharedTextEncoder && sharedTextEncoder.encodeInto ? utf8EncodeTEencodeInto : utf8EncodeTEencode;
 
 const CHUNK_SIZE = 0x10_000;
 
@@ -132,8 +151,7 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
   return result;
 }
 
-const sharedTextDecoder = typeof TextDecoder !== "undefined" ? new TextDecoder() : null;
-export const TEXT_DECODER_AVAILABLE = process.env.TEXT_DECODER !== "never" && !!sharedTextDecoder;
+const sharedTextDecoder = TEXT_ENCODING_AVAILABLE ? new TextDecoder() : null;
 export const TEXT_DECODER_THRESHOLD = process.env.TEXT_DECODER !== "force" ? 200 : 0;
 
 export function utf8DecodeTD(bytes: Uint8Array, inputOffset: number, byteLength: number): string {

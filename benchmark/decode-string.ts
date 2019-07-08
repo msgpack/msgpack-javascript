@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { utf8Encode, utf8Count, utf8DecodeJs, utf8DecodeTD } from "../src/utils/utf8";
+import { utf8EncodeJs, utf8Count, utf8DecodeJs, utf8DecodeTD } from "../src/utils/utf8";
 import { utf8DecodeWasm } from "../src/wasmFunctions";
 
 // @ts-ignore
@@ -13,7 +13,7 @@ for (const baseStr of ["A", "あ", "🌏"]) {
   for (const str of dataSet) {
     const byteLength = utf8Count(str);
     const bytes = new Uint8Array(new ArrayBuffer(byteLength));
-    utf8Encode(str, bytes, 0);
+    utf8EncodeJs(str, bytes, 0);
 
     console.log(`\n## string "${baseStr}" x ${str.length} (byteLength=${byteLength})\n`);
 
