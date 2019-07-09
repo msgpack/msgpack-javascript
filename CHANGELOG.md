@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.4.6 2019/07/09
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.5...v1.4.6
+
+* use `TextEncoder` to encode string in UTF-8 for performance [#68](https://github.com/msgpack/msgpack-javascript/pull/68)
+
 ## v1.4.5 2019/06/24
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.4.4...v1.4.5
