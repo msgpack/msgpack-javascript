@@ -65,19 +65,18 @@ export function encodeTimestampExtension(object: unknown): Uint8Array | null {
 }
 
 export function decodeTimestampToTimeSpec(data: Uint8Array): TimeSpec {
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+
   // data may be 32, 64, or 96 bits
   switch (data.byteLength) {
     case 4: {
       // timestamp 32 = { sec32 }
-      const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
       const sec = view.getUint32(0);
       const nsec = 0;
       return { sec, nsec };
     }
     case 8: {
       // timestamp 64 = { nsec30, sec34 }
-      const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-
       const nsec30AndSecHigh2 = view.getUint32(0);
       const secLow32 = view.getUint32(4);
       const sec = (nsec30AndSecHigh2 & 0x3) * 0x100000000 + secLow32;
@@ -86,7 +85,6 @@ export function decodeTimestampToTimeSpec(data: Uint8Array): TimeSpec {
     }
     case 12: {
       // timestamp 96 = { nsec32 (unsigned), sec64 (signed) }
-      const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
       const sec = getInt64(view, 4);
       const nsec = view.getUint32(0);
