@@ -94,6 +94,18 @@ const encoded: Uint8Array = encode({ foo: "bar" });
 console.log(encoded);
 ```
 
+If you'd like to get a NodeJS `Buffer` instead of `Uint8Array`, use `Buffer.from(arrayBuffer, offset, length)` in order not to copy the underlying `ArrayBuffer`,while `Buffer.from(uint8array)` copies data:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const encoded: Uint8Array = encode({ foo: "bar" });
+
+// `buffer` refers the same ArrayBuffer as `encoded`.
+const buffer: Buffer = Buffer.from(encoded.buffer, encoded.byteOffset, encoded.byteLength);
+console.log(buffer);
+```
+
 #### `EncodeOptions`
 
 Name|Type|Default
