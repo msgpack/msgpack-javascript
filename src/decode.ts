@@ -35,7 +35,10 @@ export type DecodeOptions = Partial<
 
 export const defaultDecodeOptions: DecodeOptions = {};
 
-export function decode(buffer: ArrayLike<number>, options: DecodeOptions = defaultDecodeOptions): unknown {
+export function decode(
+  buffer: ArrayLike<number> | ArrayBuffer,
+  options: DecodeOptions = defaultDecodeOptions,
+): unknown {
   const decoder = new Decoder(
     options.extensionCodec,
     options.maxStrLength,
