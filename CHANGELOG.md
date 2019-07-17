@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.5.0 2019/07/17
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.6...v1.5.0
+
+* Improve `decode()` to handle `ArrayBuffer` [#78](https://github.com/msgpack/msgpack-javascript/pull/78)
+
 ## v1.4.6 2019/07/09
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.4.5...v1.4.6
