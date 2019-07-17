@@ -35,6 +35,11 @@ export type DecodeOptions = Partial<
 
 export const defaultDecodeOptions: DecodeOptions = {};
 
+/**
+ * It decodes a MessagePack-encoded buffer.
+ *
+ * This is a synchronous decoding function. See other variants for asynchronous decoding: `decodeAsync()`, `decodeStream()`, `decodeArrayStream()`.
+ */
 export function decode(
   buffer: ArrayLike<number> | ArrayBuffer,
   options: DecodeOptions = defaultDecodeOptions,
