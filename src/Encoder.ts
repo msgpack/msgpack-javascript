@@ -18,6 +18,7 @@ export class Encoder {
     readonly maxDepth = DEFAULT_MAX_DEPTH,
     readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
     readonly sortKeys = false,
+    readonly preferFloat32 = false,
   ) {}
 
   encode(object: unknown, depth: number): void {
@@ -118,8 +119,16 @@ export class Encoder {
         }
       }
     } else {
-      this.writeU8(0xcb);
-      this.writeF64(object);
+      // non-integer numbers
+      if (this.preferFloat32) {
+        // float 32
+        this.writeU8(0xca);
+        this.writeF32(object);
+      } else {
+        // float 64
+        this.writeU8(0xcb);
+        this.writeF64(object);
+      }
     }
   }
 
@@ -345,9 +354,14 @@ export class Encoder {
     this.pos += 4;
   }
 
+  writeF32(value: number) {
+    this.ensureBufferSizeToWrite(4);
+    this.view.setFloat32(this.pos, value);
+    this.pos += 4;
+  }
+
   writeF64(value: number) {
     this.ensureBufferSizeToWrite(8);
-
     this.view.setFloat64(this.pos, value);
     this.pos += 8;
   }
