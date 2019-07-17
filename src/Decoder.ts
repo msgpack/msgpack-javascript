@@ -68,7 +68,7 @@ export class Decoder {
     readonly maxExtLength = DEFAULT_MAX_LENGTH,
   ) {}
 
-  setBuffer(buffer: ArrayLike<number>): void {
+  setBuffer(buffer: ArrayLike<number> | ArrayBuffer): void {
     this.bytes = ensureUint8Array(buffer);
     this.view = createDataView(this.bytes);
     this.pos = 0;

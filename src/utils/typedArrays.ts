@@ -1,8 +1,10 @@
-export function ensureUint8Array(buffer: ArrayLike<number> | Uint8Array | ArrayBufferView) {
+export function ensureUint8Array(buffer: ArrayLike<number> | Uint8Array | ArrayBufferView | ArrayBuffer) {
   if (buffer instanceof Uint8Array) {
     return buffer;
   } else if (ArrayBuffer.isView(buffer)) {
     return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+  } else if (buffer instanceof ArrayBuffer) {
+    return new Uint8Array(buffer);
   } else {
     // ArrayLike<number>
     return Uint8Array.from(buffer);

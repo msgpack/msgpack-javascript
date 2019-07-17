@@ -44,7 +44,7 @@ deepStrictEqual(decode(encoded), object);
 - [API](#api)
   - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
     - [`EncodeOptions`](#encodeoptions)
-  - [`decode(buffer: ArrayLike<number>, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber-options-decodeoptions-unknown)
+  - [`decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--arraybuffer-options-decodeoptions-unknown)
     - [`DecodeOptions`](#decodeoptions)
   - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
   - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
@@ -115,11 +115,11 @@ maxDepth | number | `100`
 initialBufferSize | number | `2048`
 sortKeys | boolean | false
 
-### `decode(buffer: ArrayLike<number>, options?: DecodeOptions): unknown`
+### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`
 
 It decodes `buffer` encoded as MessagePack, and returns a decoded object as `uknown`.
 
-`buffer` must be an array of bytes, which is typically `Uint8Array`.
+`buffer` must be an array of bytes, which is typically `Uint8Array`, or `ArrayBuffer`.
 
 for example:
 

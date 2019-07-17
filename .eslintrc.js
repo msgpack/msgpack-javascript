@@ -42,6 +42,8 @@ module.exports = {
     "@typescript-eslint/prefer-for-of": "warn",
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
+    "@typescript-eslint/prefer-readonly": "warn",
+    "@typescript-eslint/prefer-regexp-exec": "warn",
     "@typescript-eslint/no-use-before-define": "warn",
     "@typescript-eslint/await-thenable": "warn",
     "@typescript-eslint/no-for-in-array": "warn",
