@@ -9,9 +9,11 @@ export type EncodeOptions = Partial<
     sortKeys: boolean;
 
     /**
-     * If `true`, float32 is preferred in encoding non-integer numbers, insted of float64.
+     * If `true`, non-integer numbers are encoded in float32, not in float64 (the default).
+     *
+     * Only use it if precisions don't matter.
      */
-    preferFloat32: boolean;
+    forceFloat32: boolean;
   }>
 >;
 
@@ -29,7 +31,7 @@ export function encode(value: unknown, options: EncodeOptions = defaultEncodeOpt
     options.maxDepth,
     options.initialBufferSize,
     options.sortKeys,
-    options.preferFloat32,
+    options.forceFloat32,
   );
   encoder.encode(value, 1);
   return encoder.getUint8Array();

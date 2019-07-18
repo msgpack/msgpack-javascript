@@ -8,18 +8,18 @@ describe("encode", () => {
     });
   });
 
-  context("preferFloat32", () => {
-    it("encodes numbers in float64 wihout preferFloat32", () => {
+  context("forceFloat32", () => {
+    it("encodes numbers in float64 wihout forceFloat32", () => {
       assert.deepStrictEqual(encode(3.14), Uint8Array.from([0xcb, 0x40, 0x9, 0x1e, 0xb8, 0x51, 0xeb, 0x85, 0x1f]));
     });
 
-    it("encodes numbers in float32 when preferFloate32=true", () => {
-      assert.deepStrictEqual(encode(3.14, { preferFloat32: true }), Uint8Array.from([0xca, 0x40, 0x48, 0xf5, 0xc3]));
+    it("encodes numbers in float32 when forceFloate32=true", () => {
+      assert.deepStrictEqual(encode(3.14, { forceFloat32: true }), Uint8Array.from([0xca, 0x40, 0x48, 0xf5, 0xc3]));
     });
 
-    it("encodes numbers in float64 with preferFloat32=false", () => {
+    it("encodes numbers in float64 with forceFloat32=false", () => {
       assert.deepStrictEqual(
-        encode(3.14, { preferFloat32: false }),
+        encode(3.14, { forceFloat32: false }),
         Uint8Array.from([0xcb, 0x40, 0x9, 0x1e, 0xb8, 0x51, 0xeb, 0x85, 0x1f]),
       );
     });

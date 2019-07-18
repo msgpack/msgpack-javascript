@@ -18,7 +18,7 @@ export class Encoder {
     readonly maxDepth = DEFAULT_MAX_DEPTH,
     readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
     readonly sortKeys = false,
-    readonly preferFloat32 = false,
+    readonly forceFloat32 = false,
   ) {}
 
   encode(object: unknown, depth: number): void {
@@ -120,7 +120,7 @@ export class Encoder {
       }
     } else {
       // non-integer numbers
-      if (this.preferFloat32) {
+      if (this.forceFloat32) {
         // float 32
         this.writeU8(0xca);
         this.writeF32(object);
