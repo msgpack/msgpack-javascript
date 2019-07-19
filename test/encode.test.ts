@@ -3,8 +3,25 @@ import { encode, decode } from "@msgpack/msgpack";
 
 describe("encode", () => {
   context("sortKeys", () => {
-    it("canonicalize encoded binaries", () => {
+    it("canonicalizes encoded binaries", () => {
       assert.deepStrictEqual(encode({ a: 1, b: 2 }, { sortKeys: true }), encode({ b: 2, a: 1 }, { sortKeys: true }));
+    });
+  });
+
+  context("forceFloat32", () => {
+    it("encodes numbers in float64 wihout forceFloat32", () => {
+      assert.deepStrictEqual(encode(3.14), Uint8Array.from([0xcb, 0x40, 0x9, 0x1e, 0xb8, 0x51, 0xeb, 0x85, 0x1f]));
+    });
+
+    it("encodes numbers in float32 when forceFloate32=true", () => {
+      assert.deepStrictEqual(encode(3.14, { forceFloat32: true }), Uint8Array.from([0xca, 0x40, 0x48, 0xf5, 0xc3]));
+    });
+
+    it("encodes numbers in float64 with forceFloat32=false", () => {
+      assert.deepStrictEqual(
+        encode(3.14, { forceFloat32: false }),
+        Uint8Array.from([0xcb, 0x40, 0x9, 0x1e, 0xb8, 0x51, 0xeb, 0x85, 0x1f]),
+      );
     });
   });
 

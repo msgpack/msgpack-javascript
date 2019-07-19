@@ -114,6 +114,7 @@ extensionCodec | ExtensionCodec | `ExtensinCodec.defaultCodec`
 maxDepth | number | `100`
 initialBufferSize | number | `2048`
 sortKeys | boolean | false
+forceFloat32 | boolean | false
 
 ### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`
 
