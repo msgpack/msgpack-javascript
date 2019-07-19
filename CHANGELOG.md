@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.6.0 2019/07/19
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.5.0...v1.6.0
+
+* Add `EncodeOptions.forceFloat32` to encode non-integer numbers in float32 (default to float64) [#79](https://github.com/msgpack/msgpack-javascript/pull/79)
+
 ## v1.5.0 2019/07/17
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.4.6...v1.5.0
