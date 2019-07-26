@@ -8,7 +8,9 @@ This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient bi
 
 https://msgpack.org/
 
-This library is compatible with the "August 2017" revision of MessagePack specification at the point where timestamp ext was added.
+This library is a universal JavaScript, which suppors both browsers and NodeJS. In addition, because it is implemented in [TypeScript](https://www.typescriptlang.org/), type definition files (`d.ts`) are bundled in the distribution.
+
+*Note that this is the second version of MessagePack for JavaScript. The first version, which was implemented in ES5 and was never released to npmjs.com, is tagged as [classic](https://github.com/msgpack/msgpack-javascript/tree/classic).*
 
 ## Synopsis
 
@@ -32,6 +34,43 @@ const encoded: Uint8Array = encode(object);
 deepStrictEqual(decode(encoded), object);
 ```
 
+## Table of Contents
+
+<!-- TOC depthFrom:2 anchorMode:github.com -->
+
+- [Synopsis](#synopsis)
+- [Table of Contents](#table-of-contents)
+- [Install](#install)
+- [API](#api)
+  - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
+    - [`EncodeOptions`](#encodeoptions)
+  - [`decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--arraybuffer-options-decodeoptions-unknown)
+    - [`DecodeOptions`](#decodeoptions)
+  - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
+  - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+  - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+  - [Extension Types](#extension-types)
+    - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
+    - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
+- [MessagePack Specification](#messagepack-specification)
+  - [MessagePack Mapping Table](#messagepack-mapping-table)
+- [Prerequsites](#prerequsites)
+  - [ECMA-262](#ecma-262)
+  - [NodeJS](#nodejs)
+- [Benchmark](#benchmark)
+- [Distribution](#distribution)
+  - [NPM / npmjs.com](#npm--npmjscom)
+  - [CDN / unpkg.com](#cdn--unpkgcom)
+- [Maintenance](#maintenance)
+  - [Testing](#testing)
+  - [Continuous Integration](#continuous-integration)
+  - [Release Engineering](#release-engineering)
+  - [Updating Dependencies](#updating-dependencies)
+- [Big Thanks](#big-thanks)
+- [License](#license)
+
+<!-- /TOC -->
+
 ## Install
 
 This library is publised as [@msgpack/msgpack](https://www.npmjs.com/package/@msgpack/msgpack) in npmjs.com.
@@ -44,15 +83,56 @@ npm install @msgpack/msgpack
 
 ### `encode(data: unknown, options?: EncodeOptions): Uint8Array`
 
-It encodes `data` and returns a byte array as `Uint8Array`.
+It encodes `data` and returns a byte array as `Uint8Array`, throwing errors if `data` is, or includes, a non-serializable object such as a `function` or a `symbol`.
 
-### `decode(buffer: ArrayLike<number>, options?: DecodeOptions): unknown`
+for example:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const encoded: Uint8Array = encode({ foo: "bar" });
+console.log(encoded);
+```
+
+If you'd like to get a NodeJS `Buffer` instead of `Uint8Array`, use `Buffer.from(arrayBuffer, offset, length)` in order not to copy the underlying `ArrayBuffer`,while `Buffer.from(uint8array)` copies data:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const encoded: Uint8Array = encode({ foo: "bar" });
+
+// `buffer` refers the same ArrayBuffer as `encoded`.
+const buffer: Buffer = Buffer.from(encoded.buffer, encoded.byteOffset, encoded.byteLength);
+console.log(buffer);
+```
+
+#### `EncodeOptions`
+
+Name|Type|Default
+----|----|----
+extensionCodec | ExtensionCodec | `ExtensinCodec.defaultCodec`
+maxDepth | number | `100`
+initialBufferSize | number | `2048`
+sortKeys | boolean | false
+forceFloat32 | boolean | false
+
+### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`
 
 It decodes `buffer` encoded as MessagePack, and returns a decoded object as `uknown`.
 
-`buffer` must be an array of bytes, which is typically `Uint8Array`.
+`buffer` must be an array of bytes, which is typically `Uint8Array`, or `ArrayBuffer`.
 
-#### DecodeOptions
+for example:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const encoded: Uint8Array;
+const object = decode(encoded);
+console.log(object);
+```
+
+#### `DecodeOptions`
 
 Name|Type|Default
 ----|----|----
@@ -86,17 +166,44 @@ if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null
 } else { /* handle errors */ }
 ```
 
-### `decodeArrayStream(stream: AsyncIterable< ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
 It is alike to `decodeAsync()`, but only accepts an array of items as the input `stream`, and emits the decoded item one by one.
 
-It throws errors when the input is not an array.
+It throws errors when the input is not an array-family.
+
+for example:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const stream: AsyncIterator<Uint8Array>;
+
+// in an async function:
+for await (const item of decodeArrayStream(stream)) {
+  console.log(item);
+}
+```
+
 
 ### `decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
-It is like to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
+It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
 
 In other words, it decodes an unlimited stream and emits an item one by one.
+
+for example:
+
+```typescript
+import { encode } from "@msgpack/msgpack";
+
+const stream: AsyncIterator<Uint8Array>;
+
+// in an async function:
+for await (const item of decodeArrayStream(stream)) {
+  console.log(item);
+}
+```
 
 ### Extension Types
 
@@ -187,7 +294,7 @@ There is a proposal for a new date/time representations in JavaScript:
 
 * https://github.com/tc39/proposal-temporal
 
-This library maps `Date` to the MessagePack timestamp extension by default, but you can re-map the temporal module (or [@std-proposal/temporal ponyfill](https://github.com/tc39/proposal-temporal)) to the timestamp extension like this:
+This library maps `Date` to the MessagePack timestamp extension by default, but you can re-map the temporal module (or [@std-proposal/temporal ponyfill](https://github.com/std-proposal/temporal)) to the timestamp extension like this:
 
 ```typescript
 import { Instant } from "@std-proposal/temporal";
@@ -229,21 +336,35 @@ deepStrictEqual(decoded, instant);
 
 This will be default once the temporal module is standardizied, which is not a near-future, though.
 
-## MessagePack Mapping Table
+## MessagePack Specification
+
+This library is compatible with the "August 2017" revision of MessagePack specification at the point where timestamp ext was added:
+
+* [x] str/bin separation, added on August 2013
+* [x] extension types, added on August 2013
+* [x] timestamp ext type, added on August 2017
+
+The livinng specification is here:
+
+https://github.com/msgpack/msgpack
+
+Note that as of June 2019 there're no versions on the MessagePack specification. See https://github.com/msgpack/msgpack/issues/195 for the discussions.
+
+### MessagePack Mapping Table
 
 The following table shows how JavaScript values are mapped to [MessagePack formats](https://github.com/msgpack/msgpack/blob/master/spec.md) and vice versa.
 
 Source Value|MessagePack Format|Value Decoded
 ----|----|----
-null, undefined|nil format family|null (*1)
-boolean (true, false)|bool format family|boolean (true, false)
-number (53-bit int)|int format family|number (53-bit int)
-number (64-bit float)|float format family|number (64-bit float)
-string|str format family|string
-ArrayBufferView |bin format family|Uint8Array (*2)
-Array|array format family|Array
-Object|map format family|Object (*3)
-Date|timestamp ext format family|Date (*4)
+null, undefined|nil|null (*1)
+boolean (true, false)|bool family|boolean (true, false)
+number (53-bit int)|int family|number (53-bit int)
+number (64-bit float)|float family|number (64-bit float)
+string|str family|string
+ArrayBufferView |bin family|Uint8Array (*2)
+Array|array family|Array
+Object|map family|Object (*3)
+Date|timestamp ext family|Date (*4)
 
 * *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
 * *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
@@ -262,11 +383,14 @@ This is a universal JavaScript library that supports major browsers and NodeJS.
   * Async iterations (ES2018)
   * Features added in ES2015-ES2018
 
-ES2018 standard library used in this library can be polyfilled. For example, [core-js](https://github.com/zloirock/core-js) is used as polyfills to run tests on IE11, which has only ES5 language features.
+ES2018 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js).
 
+If you support IE11, import `core-js` in your application entrypoints, as this library does in testing for browsers .
 ### NodeJS
 
 NodeJS v10 is required, but NodeJS v12 or later is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
+
+NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5/msgpack`.
 
 ## Benchmark
 
@@ -284,18 +408,42 @@ obj = require("@msgpack/msgpack").decode(buf);                    |  502200 |  5
 
 Note that `Buffer.from()` for `JSON.stringify()` is added to emulate I/O where a JavaScript string must be converted into a byte array encoded in UTF-8, whereas MessagePack's `encode()` returns a byte array.
 
-## Distrubition
+## Distribution
+
+### NPM / npmjs.com
 
 The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
 
-* `/dist` is compiled into ES2015+
-* `/dist.es5` is compiled into ES5 and bundled to singile file
+* `dist/` is compiled into ES2015+
+* `dist.es5/` is compiled into ES5 and bundled to singile file
+  * `dist.es5/msgpack.min.js` - the default, minified file (UMD)
+  * `dist.es5/msgpack.js` - an optional, non-minified file (UMD)
 
 If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
 
+### CDN / unpkg.com
+
+This library is availble via CDN:
+
+```html
+<script crossorigin src="https://unpkg.com/@msgpack/msgpack"></script>
+```
+
+It loads `MessagePack` module to the global object.
+
 ## Maintenance
 
-## Testing
+### Testing
+
+For simple testing:
+
+```
+npm run test
+```
+
+### Continuous Integration
+
+This library uses Travis CI.
 
 test matrix:
 
@@ -304,11 +452,11 @@ test matrix:
 * TypeScript targets
   * `target=es2019` / `target=es5`
 * JavaScript engines
-  * NodeJS, borwsers (Chrome, Firefox, Safari, IE11)
+  * NodeJS, borwsers (Chrome, Firefox, Safari, IE11, and so on)
 
 See [test:* in package.json](./package.json) and [.travis.yml](./.travis.yml) for details.
 
-### Relase Engineering
+### Release Engineering
 
 ```console
 # run tests on NodeJS, Chrome, and Firefox
@@ -322,6 +470,12 @@ npm version patch|minor|major
 
 # run the publishing task
 make publish
+```
+
+### Updating Dependencies
+
+```console
+npm run update-dependencies
 ```
 
 ## Big Thanks

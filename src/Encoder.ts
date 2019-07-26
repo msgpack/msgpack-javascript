@@ -1,4 +1,4 @@
-import { utf8Encode, utf8Count } from "./utils/utf8";
+import { utf8EncodeJs, utf8Count, TEXT_ENCODING_AVAILABLE, TEXT_ENCODER_THRESHOLD, utf8EncodeTE } from "./utils/utf8";
 import { ExtensionCodec } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
@@ -17,6 +17,8 @@ export class Encoder {
     readonly extensionCodec = ExtensionCodec.defaultCodec,
     readonly maxDepth = DEFAULT_MAX_DEPTH,
     readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
+    readonly sortKeys = false,
+    readonly forceFloat32 = false,
   ) {}
 
   encode(object: unknown, depth: number): void {
@@ -79,7 +81,8 @@ export class Encoder {
           this.writeU8(object);
         } else if (object < 0x100) {
           // uint 8
-          this.writeU8v(0xcc, object);
+          this.writeU8(0xcc);
+          this.writeU8(object);
         } else if (object < 0x10000) {
           // uint 16
           this.writeU8(0xcd);
@@ -97,7 +100,7 @@ export class Encoder {
         if (object >= -0x20) {
           // nagative fixint
           this.writeU8(0xe0 | (object + 0x20));
-        } else if (object > -0x80) {
+        } else if (object >= -0x80) {
           // int 8
           this.writeU8(0xd0);
           this.writeI8(object);
@@ -116,8 +119,16 @@ export class Encoder {
         }
       }
     } else {
-      this.writeU8(0xcb);
-      this.writeF64(object);
+      // non-integer numbers
+      if (this.forceFloat32) {
+        // float 32
+        this.writeU8(0xca);
+        this.writeF32(object);
+      } else {
+        // float 64
+        this.writeU8(0xcb);
+        this.writeF64(object);
+      }
     }
   }
 
@@ -146,7 +157,13 @@ export class Encoder {
     const maxHeaderSize = 1 + 4;
     const strLength = object.length;
 
-    if (WASM_AVAILABLE && strLength > WASM_STR_THRESHOLD) {
+    if (TEXT_ENCODING_AVAILABLE && strLength > TEXT_ENCODER_THRESHOLD) {
+      const byteLength = utf8Count(object);
+      this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
+      this.writeStringHeader(byteLength);
+      utf8EncodeTE(object, this.bytes, this.pos);
+      this.pos += byteLength;
+    } else if (WASM_AVAILABLE && strLength > WASM_STR_THRESHOLD) {
       // ensure max possible size
       const maxSize = maxHeaderSize + strLength * 4;
       this.ensureBufferSizeToWrite(maxSize);
@@ -159,7 +176,7 @@ export class Encoder {
       const byteLength = utf8Count(object);
       this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
       this.writeStringHeader(byteLength);
-      utf8Encode(object, this.bytes, this.pos);
+      utf8EncodeJs(object, this.bytes, this.pos);
       this.pos += byteLength;
     }
   }
@@ -199,7 +216,7 @@ export class Encoder {
       throw new Error(`Too large binary: ${size}`);
     }
     const bytes = ensureUint8Array(object);
-    this.writeU8v(...bytes);
+    this.writeU8a(bytes);
   }
 
   encodeArray(object: Array<unknown>, depth: number) {
@@ -223,18 +240,12 @@ export class Encoder {
     }
   }
 
-  countObjectKeys(object: Record<string, unknown>): number {
-    let count = 0;
-    for (const key in object) {
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        count++;
-      }
-    }
-    return count;
-  }
-
   encodeMap(object: Record<string, unknown>, depth: number) {
-    const size = this.countObjectKeys(object);
+    const keys = Object.keys(object);
+    if (this.sortKeys) {
+      keys.sort();
+    }
+    const size = keys.length;
     if (size < 16) {
       // fixmap
       this.writeU8(0x80 + size);
@@ -249,11 +260,11 @@ export class Encoder {
     } else {
       throw new Error(`Too large map object: ${size}`);
     }
-    for (const key in object) {
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        this.encodeString(key);
-        this.encode(object[key], depth + 1);
-      }
+
+    for (let i = 0; i < size; i++) {
+      const key = keys[i];
+      this.encodeString(key);
+      this.encode(object[key], depth + 1);
     }
   }
 
@@ -290,7 +301,7 @@ export class Encoder {
       throw new Error(`Too large extension object: ${size}`);
     }
     this.writeI8(ext.type);
-    this.writeU8v(...ext.data);
+    this.writeU8a(ext.data);
   }
 
   writeU8(value: number) {
@@ -300,14 +311,11 @@ export class Encoder {
     this.pos++;
   }
 
-  writeU8v(...values: ReadonlyArray<number>) {
+  writeU8a(values: ArrayLike<number>) {
     const size = values.length;
     this.ensureBufferSizeToWrite(size);
 
-    const pos = this.pos;
-    for (let i = 0; i < size; i++) {
-      this.view.setUint8(pos + i, values[i]);
-    }
+    this.bytes.set(values, this.pos);
     this.pos += size;
   }
 
@@ -346,9 +354,14 @@ export class Encoder {
     this.pos += 4;
   }
 
+  writeF32(value: number) {
+    this.ensureBufferSizeToWrite(4);
+    this.view.setFloat32(this.pos, value);
+    this.pos += 4;
+  }
+
   writeF64(value: number) {
     this.ensureBufferSizeToWrite(8);
-
     this.view.setFloat64(this.pos, value);
     this.pos += 8;
   }

@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 // based on https://github.com/endel/msgpack-benchmark
 "use strict";
-
+require("ts-node/register");
 const Benchmark = require("benchmark");
 const fs = require("fs");
-const msgpack = require("..");
+const msgpack = require("../src");
 
 const implementations = {
   "@msgpack/msgpack": {

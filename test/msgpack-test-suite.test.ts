@@ -92,11 +92,12 @@ describe("msgpack-test-suite", () => {
       STR16_MBS: "🌏".repeat(0x100),
       STR32: "b".repeat(0x10_000),
       STR32_MBS: "🍣".repeat(0x10_000),
-      STR32LARGE: "c".repeat(0x100_000), // may cause "RangeError: Maximum call stack size exceeded" in simple implelementions
+      STR32LARGE: "c".repeat(0x50_000), // may cause "RangeError: Maximum call stack size exceeded" in simple implelementions
       STR_INCLUDING_NUL: "foo\0bar\0",
       STR_BROKEN_FF: "\xff",
       BIN16: new Uint8Array(0x100).fill(0xff),
-      BIN32: new Uint8Array(0x10000).fill(0xff),
+      BIN32: new Uint8Array(0x10_000).fill(0xff),
+      BIN32LARGE: new Uint8Array(0x50_000).fill(0xff), // regression: caused "RangeError: Maximum call stack size exceeded"
       ARRAY16: new Array<boolean>(0x100).fill(true),
       ARRAY32: new Array<boolean>(0x10000).fill(true),
       MAP16: new Array<null>(0x100).fill(null).reduce<Record<string, number>>((acc, _val, i) => {
@@ -118,5 +119,11 @@ describe("msgpack-test-suite", () => {
         assert.deepStrictEqual(decode(new Uint8Array(encoded)), value);
       });
     }
+  });
+
+  describe("encoding in minimum values", () => {
+    it("int 8", () => {
+      assert.deepStrictEqual(encode(-128), Uint8Array.from([0xd0, 0x80]));
+    });
   });
 });

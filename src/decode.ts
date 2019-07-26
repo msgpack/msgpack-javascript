@@ -43,9 +43,9 @@ interface KeyCacheRecord {
 }
 
 class CachedKeyDecoder {
-  private caches: Array<Array<KeyCacheRecord>>;
+  private readonly caches: Array<Array<KeyCacheRecord>>;
 
-  constructor(private maxKeyLength: number = 32) {
+  constructor(private readonly maxKeyLength: number = 32) {
     this.caches = new Array<Array<KeyCacheRecord>>(this.maxKeyLength + 1);
   }
 
@@ -130,7 +130,7 @@ class CachedKeyDecoder {
 }
 
 class CustomDecoder extends Decoder {
-  private maxCachedKeyLength = 32;
+  private readonly maxCachedKeyLength = 32;
   public cachedKeyDecoder = new CachedKeyDecoder(this.maxCachedKeyLength);
 
   public decodeUtf8String(byteLength: number, headerOffset: number): string {
@@ -154,7 +154,7 @@ class CustomDecoder extends Decoder {
   }
 }
 
-const decoder = new CustomDecoder(
+const sharedDecoder = new CustomDecoder(
   defaultDecodeOptions.extensionCodec,
   defaultDecodeOptions.maxStrLength,
   defaultDecodeOptions.maxBinLength,
@@ -163,7 +163,27 @@ const decoder = new CustomDecoder(
   defaultDecodeOptions.maxExtLength,
 );
 
-export function decode(buffer: ArrayLike<number>, options: DecodeOptions = defaultDecodeOptions): unknown {
+/**
+ * It decodes a MessagePack-encoded buffer.
+ *
+ * This is a synchronous decoding function. See other variants for asynchronous decoding: `decodeAsync()`, `decodeStream()`, `decodeArrayStream()`.
+ */
+export function decode(
+  buffer: ArrayLike<number> | ArrayBuffer,
+  options: DecodeOptions = defaultDecodeOptions,
+): unknown {
+  const decoder =
+    options === defaultDecodeOptions
+      ? sharedDecoder
+      : new CustomDecoder(
+          options.extensionCodec,
+          options.maxStrLength,
+          options.maxBinLength,
+          options.maxArrayLength,
+          options.maxMapLength,
+          options.maxExtLength,
+        );
+
   decoder.setBuffer(buffer); // decodeSync() requires only one buffer
   return decoder.decodeOneSync();
 }

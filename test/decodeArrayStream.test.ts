@@ -15,7 +15,7 @@ describe("decodeArrayStream", () => {
     }
   };
 
-  it("decodes numbers array", async () => {
+  it("decodes numbers array (array8)", async () => {
     const object = [1, 2, 3, 4, 5];
 
     const result: Array<unknown> = [];
@@ -25,6 +25,40 @@ describe("decodeArrayStream", () => {
     }
 
     assert.deepStrictEqual(object, result);
+  });
+
+  it("decodes numbers of array (array16)", async () => {
+    const createStream = async function*() {
+      yield [0xdc, 0, 3];
+      yield encode(1);
+      yield encode(2);
+      yield encode(3);
+    };
+
+    const result: Array<unknown> = [];
+
+    for await (const item of decodeArrayStream(createStream())) {
+      result.push(item);
+    }
+
+    assert.deepStrictEqual(result, [1, 2, 3]);
+  });
+
+  it("decodes numbers of array (array32)", async () => {
+    const createStream = async function*() {
+      yield [0xdd, 0, 0, 0, 3];
+      yield encode(1);
+      yield encode(2);
+      yield encode(3);
+    };
+
+    const result: Array<unknown> = [];
+
+    for await (const item of decodeArrayStream(createStream())) {
+      result.push(item);
+    }
+
+    assert.deepStrictEqual(result, [1, 2, 3]);
   });
 
   it("decodes objects array", async () => {

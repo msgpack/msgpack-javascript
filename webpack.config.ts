@@ -1,9 +1,10 @@
-"use strict";
-
-const path = require("path");
-const webpack = require("webpack");
-const { CheckEsVersionPlugin } = require("@bitjourney/check-es-version-webpack-plugin");
-const _ = require("lodash");
+import path from "path";
+// @ts-ignore
+import webpack from "webpack";
+// @ts-ignore
+import { CheckEsVersionPlugin } from "@bitjourney/check-es-version-webpack-plugin";
+// @ts-ignore
+import _ from "lodash";
 
 const config = {
   mode: "production",
@@ -11,7 +12,9 @@ const config = {
   entry: "./src/index.ts",
   output: {
     path: path.resolve(__dirname, "dist.es5"),
-    libraryTarget: "commonjs",
+    library: "MessagePack",
+    libraryTarget: "umd",
+    globalObject: "this",
   },
   resolve: {
     extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".wasm"],
@@ -32,10 +35,16 @@ const config = {
     new CheckEsVersionPlugin({
       esVersion: 5, // for IE11 support
     }),
+    new webpack.DefinePlugin({
+      "process.env.WASM": JSON.stringify(null), // use only MSGPACK_WASM
+      "process.env.TEXT_ENCODING": JSON.stringify("null"),
+      "process.env.TEXT_DECODER": JSON.stringify(null),
+    }),
   ],
   externals: {
     "base64-js": {
       commonjs: "base64-js",
+      commonjs2: "base64-js",
     },
   },
 
@@ -51,7 +60,20 @@ const config = {
   devtool: "source-map",
 };
 
-module.exports = [
+export default [
+  // default minified bundle does not includes wasm
+  ((config) => {
+    config.output.filename = "msgpack.min.js";
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        "process.env.MSGPACK_WASM": JSON.stringify("never"),
+      }),
+      new webpack.IgnorePlugin(/\.\/dist\/wasm\/msgpack\.wasm\.js$/),
+    );
+    config.optimization.minimize = true;
+    return config;
+  })(_.cloneDeep(config)),
+
   // default bundle does not includes wasm
   ((config) => {
     config.output.filename = "msgpack.js";
@@ -59,7 +81,6 @@ module.exports = [
       new webpack.DefinePlugin({
         // The default bundle does not includes WASM
         "process.env.MSGPACK_WASM": JSON.stringify("never"),
-        "process.env.WASM": JSON.stringify(null),
       }),
       new webpack.IgnorePlugin(/\.\/dist\/wasm\/msgpack\.wasm\.js$/),
     );
@@ -71,9 +92,7 @@ module.exports = [
     config.output.filename = "msgpack+wasm.js";
     config.plugins.push(
       new webpack.DefinePlugin({
-        // The default bundle does not includes WASM
         "process.env.MSGPACK_WASM": JSON.stringify(null),
-        "process.env.WASM": JSON.stringify(null),
       }),
     );
     return config;

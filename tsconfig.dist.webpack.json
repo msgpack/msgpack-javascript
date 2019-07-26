@@ -1,12 +1,9 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.es5.json",
   "compilerOptions": {
-    "target": "es5",
     "module": "esnext",
-    "outDir": "./build/es5",
-    "declaration": false,
-    "downlevelIteration": true,
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "outDir": "./build/webpack"
   },
   "include": ["src/**/*.ts"]
 }

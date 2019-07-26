@@ -2,7 +2,7 @@ import assert from "assert";
 import { encode, decodeStream } from "@msgpack/msgpack";
 
 describe("decodeStream", () => {
-  it("decodes stream", async () => {
+  it("decodes stream (array8)", async () => {
     const items = [
       "foo",
       10,

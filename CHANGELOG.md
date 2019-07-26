@@ -1,5 +1,60 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.6.0 2019/07/19
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.5.0...v1.6.0
+
+* Add `EncodeOptions.forceFloat32` to encode non-integer numbers in float32 (default to float64) [#79](https://github.com/msgpack/msgpack-javascript/pull/79)
+
+## v1.5.0 2019/07/17
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.6...v1.5.0
+
+* Improve `decode()` to handle `ArrayBuffer` [#78](https://github.com/msgpack/msgpack-javascript/pull/78)
+
+## v1.4.6 2019/07/09
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.5...v1.4.6
+
+* use `TextEncoder` to encode string in UTF-8 for performance [#68](https://github.com/msgpack/msgpack-javascript/pull/68)
+
+## v1.4.5 2019/06/24
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.4...v1.4.5
+
+* Fix an encoding result of -128 from int16 to int8 [#73](https://github.com/msgpack/msgpack-javascript/pull/73)
+
+## v1.4.4 2019/06/22
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.1...v1.4.4
+
+* Fix the UMD build setting to correctly setup `MessagePack` module in the global object
+
+## v1.4.3, v1.4.2
+
+Mispackaged.
+
+## v1.4.1 2019/06/22
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.4.0...v1.4.1
+
+* Improved entrypoints for browsers:
+  * Build as UMD
+  * Minidifed by default
+
+## v1.4.0 2019/06/12
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.3.2...v1.4.0
+
+* Added `sortKeys: boolean` option to `encode()` for canonical encoding [#64](https://github.com/msgpack/msgpack-javascript/pull/64)
+* Fixed `RangeError` in encoding BLOB [#66](https://github.com/msgpack/msgpack-javascript/pull/66)
+
+## v1.3.2 2019/06/04
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.3.1...v1.3.2
+
+* Fix typings for older TypeScript [#55](https://github.com/msgpack/msgpack-javascript/pull/55)
+
 ## v1.3.1 2019/06/01
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.3.0...v1.3.1
