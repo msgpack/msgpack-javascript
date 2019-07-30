@@ -1,4 +1,5 @@
 import { utf8EncodeJs, utf8Count, TEXT_ENCODING_AVAILABLE, TEXT_ENCODER_THRESHOLD, utf8EncodeTE } from "./utils/utf8";
+import { isSafeInteger } from "./utils/int"
 import { ExtensionCodec } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
@@ -74,7 +75,7 @@ export class Encoder {
     }
   }
   encodeNumber(object: number) {
-    if (Number.isSafeInteger(object)) {
+    if (isSafeInteger(object)) {
       if (object >= 0) {
         if (object < 0x80) {
           // positive fixint

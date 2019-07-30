@@ -26,3 +26,16 @@ export function getUint64(view: DataView, offset: number) {
   const low = view.getUint32(offset + 4);
   return high * 0x1_0000_0000 + low;
 }
+
+// fix for IE which doesn't have isSafeInteger and isInteger
+// from Polyfill on developer.mozilla.org
+
+export function isSafeInteger(value: number) {
+  if (Number.isSafeInteger) {
+    return Number.isSafeInteger(value);
+  }
+  if (Number.isInteger) {
+    return Number.isInteger(value) && Math.abs(value) <= Number.MAX_SAFE_INTEGER;
+  }
+  return typeof value === 'number' && isFinite(value) && Math.floor(value) === value && Math.abs(value) <= Number.MAX_SAFE_INTEGER;
+}
