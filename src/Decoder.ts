@@ -4,6 +4,7 @@ import { getInt64, getUint64 } from "./utils/int";
 import { utf8DecodeJs, TEXT_ENCODING_AVAILABLE, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { WASM_AVAILABLE, WASM_STR_THRESHOLD, utf8DecodeWasm } from "./wasmFunctions";
+import { CachedKeyDecoder } from "./CachedKeyDecoder";
 
 enum State {
   ARRAY,
@@ -50,6 +51,8 @@ const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 
 const DEFAULT_MAX_LENGTH = 0xffff_ffff; // uint32_max
 
+const sharedCachedKeyDecoder = new CachedKeyDecoder();
+
 export class Decoder {
   totalPos = 0;
   pos = 0;
@@ -58,6 +61,9 @@ export class Decoder {
   bytes = EMPTY_BYTES;
   headByte = HEAD_BYTE_REQUIRED;
   readonly stack: Array<StackState> = [];
+
+  // TODO: parameterize this property.
+  readonly cachedKeyDecoder = sharedCachedKeyDecoder;
 
   constructor(
     readonly extensionCodec = ExtensionCodec.defaultCodec,
@@ -482,7 +488,9 @@ export class Decoder {
 
     const offset = this.pos + headerOffset;
     let object: string;
-    if (TEXT_ENCODING_AVAILABLE && byteLength > TEXT_DECODER_THRESHOLD) {
+    if (this.stateIsMapKey() && this.cachedKeyDecoder.canBeCached(byteLength)) {
+      object = this.cachedKeyDecoder.decode(this.bytes, offset, byteLength);
+    } else if (TEXT_ENCODING_AVAILABLE && byteLength > TEXT_DECODER_THRESHOLD) {
       object = utf8DecodeTD(this.bytes, offset, byteLength);
     } else if (WASM_AVAILABLE && byteLength > WASM_STR_THRESHOLD) {
       object = utf8DecodeWasm(this.bytes, offset, byteLength);
@@ -491,6 +499,14 @@ export class Decoder {
     }
     this.pos += headerOffset + byteLength;
     return object;
+  }
+
+  stateIsMapKey(): boolean {
+    if (this.stack.length > 0) {
+      const state = this.stack[this.stack.length - 1];
+      return state.type === State.MAP_KEY;
+    }
+    return false;
   }
 
   decodeBinary(byteLength: number, headOffset: number): Uint8Array {
