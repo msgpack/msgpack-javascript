@@ -6,7 +6,7 @@ import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { WASM_AVAILABLE, WASM_STR_THRESHOLD, utf8DecodeWasm } from "./wasmFunctions";
 import { CachedKeyDecoder } from "./CachedKeyDecoder";
 
-enum State {
+const enum State {
   ARRAY,
   MAP_KEY,
   MAP_VALUE,
