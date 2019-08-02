@@ -62,8 +62,9 @@ export class CachedKeyDecoder {
     }
 
     const value = utf8DecodeJs(bytes, inputOffset, byteLength);
-    const byteSlice = bytes.slice(inputOffset, inputOffset + byteLength);
-    this.store(byteSlice, value);
+    // Ensure to copy a slice of bytes because the byte may be NodeJS Buffer and Buffer#slice() returns a reference to its internal ArrayBuffer.
+    const slicedCopyOfBytes = Uint8Array.prototype.slice.call(bytes, inputOffset, inputOffset + byteLength);
+    this.store(slicedCopyOfBytes, value);
     return value;
   }
 }
