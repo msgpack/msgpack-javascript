@@ -45,7 +45,7 @@ describe("CachedKeyDecoder", () => {
         assert.deepStrictEqual(tryDecode(decoder, "foo5"), "foo5");
       }
 
-      console.dir(decoder, { depth: 100 });
+      // console.dir(decoder, { depth: 100 });
     });
   });
 
@@ -59,7 +59,7 @@ describe("CachedKeyDecoder", () => {
       assert.deepStrictEqual(tryDecode(decoder, "f"), "f");
       assert.deepStrictEqual(tryDecode(decoder, "a"), "a");
 
-      //console.dir(decoder, { depth: 100 });
+      // console.dir(decoder, { depth: 100 });
     });
 
     it("decodes str with len=maxKeyLength", () => {
