@@ -2,6 +2,7 @@ import { sauceLabs, sauceLaunchers } from "./sauceLabs";
 const path = require("path");
 const webpack = require("webpack");
 
+// eslint-disable-next-line import/no-default-export
 export default function configure(config: any) {
   config.set({
     customLaunchers: {
