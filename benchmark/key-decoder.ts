@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
-import { utf8EncodeJs, utf8Count, utf8DecodeJs, utf8DecodeTD } from "../src/utils/utf8";
-import { utf8DecodeWasm } from "../src/wasmFunctions";
+import { utf8EncodeJs, utf8Count, utf8DecodeJs } from "../src/utils/utf8";
 
 // @ts-ignore
 import Benchmark from "benchmark";
