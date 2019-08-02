@@ -1,6 +1,5 @@
 import { ExtensionCodecType } from "./ExtensionCodec";
-import { Decoder, State } from "./Decoder";
-import { utf8DecodeJs } from "./utils/utf8";
+import { Decoder } from "./Decoder";
 
 export type DecodeOptions = Partial<
   Readonly<{
@@ -36,133 +35,6 @@ export type DecodeOptions = Partial<
 
 export const defaultDecodeOptions: DecodeOptions = {};
 
-interface KeyCacheRecord {
-  readonly bytes: Uint8Array;
-  readonly key: string;
-  hits: number;
-}
-
-class CachedKeyDecoder {
-  private readonly caches: Array<Array<KeyCacheRecord>>;
-
-  constructor(private readonly maxKeyLength: number = 32) {
-    this.caches = new Array<Array<KeyCacheRecord>>(this.maxKeyLength + 1);
-  }
-
-  public get(bytes: Uint8Array, inputOffset: number, byteLength: number): string | null {
-    const chunks = this.caches[byteLength];
-
-    if (chunks) {
-      return this.findKey(bytes, inputOffset, byteLength, chunks);
-    } else {
-      return null;
-    }
-  }
-
-  private findKey(
-    bytes: Uint8Array,
-    inputOffset: number,
-    byteLength: number,
-    chunks: Array<KeyCacheRecord>,
-  ): string | null {
-    let prevHits = 0;
-    const chunksLength = chunks.length;
-    const halfLength = byteLength / 2;
-    const endPosition = inputOffset + byteLength;
-    FIND_CHUNK: for (let i = 0; i < chunksLength; i++) {
-      const chunk = chunks[i];
-
-      if (i > 0 && prevHits < chunk.hits) {
-        // Sort chunks by number of hits
-        // in order to improve search speed for most used keys
-        const prevChunk = chunks[i - 1];
-        chunks[i] = prevChunk;
-        chunks[i - 1] = chunk;
-        prevHits = prevChunk.hits;
-      } else {
-        prevHits = chunk.hits;
-      }
-
-      for (let j = 0; j < halfLength; j++) {
-        if (chunk.bytes[j] !== bytes[inputOffset + j]) {
-          continue FIND_CHUNK;
-        }
-
-        if (chunk.bytes[byteLength - j - 1] !== bytes[endPosition - j - 1]) {
-          continue FIND_CHUNK;
-        }
-      }
-
-      chunk.hits++;
-
-      return chunk.key;
-    }
-
-    return null;
-  }
-
-  public cache(bytes: Uint8Array, value: string) {
-    let chunks: Array<KeyCacheRecord> = this.caches[bytes.length];
-
-    if (!chunks) {
-      chunks = [];
-      this.caches[bytes.length] = chunks;
-    }
-
-    chunks.push({
-      bytes: bytes,
-      key: value,
-      hits: 1,
-    });
-  }
-
-  public decode(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
-    let value = this.get(bytes, inputOffset, byteLength);
-
-    if (!value) {
-      value = utf8DecodeJs(bytes, inputOffset, byteLength);
-      const stringsBytes = bytes.slice(inputOffset, inputOffset + byteLength);
-      this.cache(stringsBytes, value);
-    }
-
-    return value;
-  }
-}
-
-class CustomDecoder extends Decoder {
-  private readonly maxCachedKeyLength = 32;
-  public cachedKeyDecoder = new CachedKeyDecoder(this.maxCachedKeyLength);
-
-  public decodeUtf8String(byteLength: number, headerOffset: number): string {
-    let isKey = false;
-    const canBeDecodedAsKey = byteLength > 0 && byteLength < this.maxCachedKeyLength;
-
-    if (canBeDecodedAsKey && this.stack.length > 0) {
-      const state = this.stack[this.stack.length - 1];
-
-      isKey = state.type === State.MAP_KEY;
-    }
-
-    if (isKey && canBeDecodedAsKey) {
-      const offset = this.pos + headerOffset;
-      const value = this.cachedKeyDecoder.decode(this.bytes, offset, byteLength);
-      this.pos += headerOffset + byteLength;
-      return value;
-    } else {
-      return super.decodeUtf8String(byteLength, headerOffset);
-    }
-  }
-}
-
-const sharedDecoder = new CustomDecoder(
-  defaultDecodeOptions.extensionCodec,
-  defaultDecodeOptions.maxStrLength,
-  defaultDecodeOptions.maxBinLength,
-  defaultDecodeOptions.maxArrayLength,
-  defaultDecodeOptions.maxMapLength,
-  defaultDecodeOptions.maxExtLength,
-);
-
 /**
  * It decodes a MessagePack-encoded buffer.
  *
@@ -172,18 +44,14 @@ export function decode(
   buffer: ArrayLike<number> | ArrayBuffer,
   options: DecodeOptions = defaultDecodeOptions,
 ): unknown {
-  const decoder =
-    options === defaultDecodeOptions
-      ? sharedDecoder
-      : new CustomDecoder(
-          options.extensionCodec,
-          options.maxStrLength,
-          options.maxBinLength,
-          options.maxArrayLength,
-          options.maxMapLength,
-          options.maxExtLength,
-        );
-
+  const decoder = new Decoder(
+    options.extensionCodec,
+    options.maxStrLength,
+    options.maxBinLength,
+    options.maxArrayLength,
+    options.maxMapLength,
+    options.maxExtLength,
+  );
   decoder.setBuffer(buffer); // decodeSync() requires only one buffer
   return decoder.decodeOneSync();
 }
