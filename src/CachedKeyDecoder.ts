@@ -3,7 +3,6 @@ import { utf8DecodeJs } from "./utils/utf8";
 interface KeyCacheRecord {
   readonly bytes: Uint8Array;
   readonly value: string;
-  hits: number;
 }
 
 const DEFAULT_MAX_KEY_LENGTH = 16;
@@ -39,8 +38,6 @@ export class CachedKeyDecoder {
           continue FIND_CHUNK;
         }
       }
-
-      record.hits++;
       return record.value;
     }
     return null;
@@ -48,10 +45,14 @@ export class CachedKeyDecoder {
 
   private store(bytes: Uint8Array, value: string) {
     const records = this.caches[bytes.length - 1];
-    const hits = 1;
-    records.unshift({ bytes, value, hits });
-    if (records.length > this.maxLengthPerKey) {
-      records.pop();
+    const record: KeyCacheRecord = { bytes, value };
+
+    if (records.length >= this.maxLengthPerKey) {
+      // `records` are full!
+      // Set `record` to a randomized position.
+      records[(Math.random() * records.length) | 0] = record;
+    } else {
+      records.push(record);
     }
   }
 

@@ -35,16 +35,17 @@ describe("CachedKeyDecoder", () => {
     });
 
     it("decodes strings with purging records", () => {
-      const decoder = new CachedKeyDecoder(16, 2);
+      const decoder = new CachedKeyDecoder(16, 4);
 
-      assert.deepStrictEqual(tryDecode(decoder, "foo"), "foo");
-      assert.deepStrictEqual(tryDecode(decoder, "bar"), "bar");
+      for (let i = 0; i < 100; i++) {
+        assert.deepStrictEqual(tryDecode(decoder, "foo1"), "foo1");
+        assert.deepStrictEqual(tryDecode(decoder, "foo2"), "foo2");
+        assert.deepStrictEqual(tryDecode(decoder, "foo3"), "foo3");
+        assert.deepStrictEqual(tryDecode(decoder, "foo4"), "foo4");
+        assert.deepStrictEqual(tryDecode(decoder, "foo5"), "foo5");
+      }
 
-      // the next `tryDecode()` should purge the cache of "foo"
-      assert.deepStrictEqual(tryDecode(decoder, "baz"), "baz");
-
-      // with newly created an internal cache record
-      assert.deepStrictEqual(tryDecode(decoder, "foo"), "foo");
+      console.dir(decoder, { depth: 100 });
     });
   });
 
