@@ -1,5 +1,12 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.7.0 2019/08/2
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.6.0...v1.7.0
+
+* Introduce cache for map keys, which improves decoding in 1.5x faster for the benchmark (@sergeyzenchenko) [#54](https://github.com/msgpack/msgpack-javascript/pull/54)
+  *
+
 ## v1.6.0 2019/07/19
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.5.0...v1.6.0
