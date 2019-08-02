@@ -65,7 +65,7 @@
     "assemblyscript": "github:AssemblyScript/assemblyscript#5269a6b9c4e14983c43671328257c156cdf1de8a",
     "assert": "latest",
     "core-js": "latest",
-    "eslint": "^5",
+    "eslint": "latest",
     "eslint-config-prettier": "latest",
     "eslint-plugin-import": "latest",
     "eslint-plugin-prettier": "latest",
