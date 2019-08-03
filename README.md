@@ -200,7 +200,7 @@ import { encode } from "@msgpack/msgpack";
 const stream: AsyncIterator<Uint8Array>;
 
 // in an async function:
-for await (const item of decodeArrayStream(stream)) {
+for await (const item of decodeStream(stream)) {
   console.log(item);
 }
 ```
