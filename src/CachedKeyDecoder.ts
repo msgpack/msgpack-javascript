@@ -6,15 +6,12 @@ interface KeyCacheRecord {
 }
 
 const DEFAULT_MAX_KEY_LENGTH = 16;
-const DEFAULT_MAX_LENGTH_PER_KEY = 32;
+const DEFAULT_MAX_LENGTH_PER_KEY = 16;
 
 export class CachedKeyDecoder {
   private readonly caches: Array<Array<KeyCacheRecord>>;
 
-  constructor(
-    private readonly maxKeyLength = DEFAULT_MAX_KEY_LENGTH,
-    private readonly maxLengthPerKey = DEFAULT_MAX_LENGTH_PER_KEY,
-  ) {
+  constructor(readonly maxKeyLength = DEFAULT_MAX_KEY_LENGTH, readonly maxLengthPerKey = DEFAULT_MAX_LENGTH_PER_KEY) {
     // avoid `new Array(N)` to create a non-sparse array for performance.
     this.caches = [];
     for (let i = 0; i < this.maxKeyLength; i++) {
@@ -32,9 +29,10 @@ export class CachedKeyDecoder {
 
     FIND_CHUNK: for (let i = 0; i < recordsLength; i++) {
       const record = records[i];
+      const recordBytes = record.bytes;
 
       for (let j = 0; j < byteLength; j++) {
-        if (record.bytes[j] !== bytes[inputOffset + j]) {
+        if (recordBytes[j] !== bytes[inputOffset + j]) {
           continue FIND_CHUNK;
         }
       }
