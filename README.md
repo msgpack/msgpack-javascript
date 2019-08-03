@@ -369,7 +369,7 @@ Date|timestamp ext family|Date (*4)
 * *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
 * *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
 * *3 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
-* *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overrided by registering `-1` for the extension codec.
+* *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
 
 ## Prerequsites
 
