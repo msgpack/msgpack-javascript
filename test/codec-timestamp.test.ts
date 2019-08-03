@@ -18,6 +18,7 @@ const SPECS = {
   TIME_BEFORE_EPOCH_SEC_AND_NS: new Date(-1002),
   TIMESTAMP32: new Date(Math.floor(TIME / 1000) * 1000),
   TIMESTAMP64: new Date(TIME),
+  TIMESTAMP64_OVER_INT32: new Date(Date.UTC(2200, 0)), // cf. https://github.com/msgpack/msgpack-ruby/pull/172
   TIMESTAMP96_SEC_OVER_UINT32: new Date(0x400000000 * 1000),
   TIMESTAMP96_SEC_OVER_UINT32_WITH_NS: new Date(0x400000000 * 1000 + 2),
 
