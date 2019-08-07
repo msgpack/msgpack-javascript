@@ -53,5 +53,5 @@ export function decode(
     options.maxExtLength,
   );
   decoder.setBuffer(buffer); // decodeSync() requires only one buffer
-  return decoder.decodeOneSync();
+  return decoder.decodeSingleSync();
 }

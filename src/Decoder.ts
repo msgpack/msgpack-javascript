@@ -98,12 +98,12 @@ export class Decoder {
     return this.view.byteLength - this.pos >= size;
   }
 
-  createNoExtraBytesError(posToShow: number) {
+  createNoExtraBytesError(posToShow: number): Error {
     const { view, pos } = this;
     return new RangeError(`Extra ${view.byteLength - pos} byte(s) found at buffer[${posToShow}]`);
   }
 
-  decodeOneSync(): unknown {
+  decodeSingleSync(): unknown {
     const object = this.decodeSync();
     if (this.hasRemaining()) {
       throw this.createNoExtraBytesError(this.pos);
@@ -111,7 +111,7 @@ export class Decoder {
     return object;
   }
 
-  async decodeOneAsync(stream: AsyncIterable<ArrayLike<number>>): Promise<unknown> {
+  async decodeSingleAsync(stream: AsyncIterable<ArrayLike<number>>): Promise<unknown> {
     let decoded = false;
     let object: unknown;
     for await (const buffer of stream) {
@@ -146,53 +146,35 @@ export class Decoder {
     );
   }
 
-  async *decodeStream(stream: AsyncIterable<ArrayLike<number>>) {
-    for await (const buffer of stream) {
-      this.appendBuffer(buffer);
-
-      try {
-        while (true) {
-          const result = this.decodeSync();
-
-          yield result;
-        }
-      } catch (e) {
-        if (!(e instanceof DataViewIndexOutOfBoundsError)) {
-          throw e; // rethrow
-        }
-        // fallthrough
-      }
-    }
+  decodeArrayStream(stream: AsyncIterable<ArrayLike<number>>) {
+    return this.decodeMultiAsync(stream, true);
   }
 
-  async *decodeArrayStream(stream: AsyncIterable<ArrayLike<number>>) {
-    let headerParsed = false;
-    let decoded = false;
-    let itemsLeft = 0;
+  decodeStream(stream: AsyncIterable<ArrayLike<number>>) {
+    return this.decodeMultiAsync(stream, false);
+  }
+
+  private async *decodeMultiAsync(stream: AsyncIterable<ArrayLike<number>>, isArray: boolean) {
+    let isArrayHeaderRequired = isArray;
+    let arrayItemsLeft = -1;
 
     for await (const buffer of stream) {
-      if (decoded) {
+      if (isArray && arrayItemsLeft === 0) {
         throw this.createNoExtraBytesError(this.totalPos);
       }
 
       this.appendBuffer(buffer);
 
-      if (!headerParsed) {
-        itemsLeft = this.readArraySize();
-        headerParsed = true;
+      if (isArrayHeaderRequired) {
+        arrayItemsLeft = this.readArraySize();
+        isArrayHeaderRequired = false;
         this.complete();
       }
 
       try {
         while (true) {
-          const result = this.decodeSync();
-
-          yield result;
-
-          itemsLeft--;
-
-          if (itemsLeft === 0) {
-            decoded = true;
+          yield this.decodeSync();
+          if (--arrayItemsLeft === 0) {
             break;
           }
         }
