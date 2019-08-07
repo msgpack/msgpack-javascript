@@ -1,5 +1,10 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.8.0 2019/08/07
+
+* Adjust internal cache size according to benchmark results [bc5e681](https://github.com/msgpack/msgpack-javascript/commit/bc5e681e781881ed27efaf97ba4156b484dc7648)
+* Internal refactoring [#82](https://github.com/msgpack/msgpack-javascript/pull/82)
+
 ## v1.7.0 2019/08/2
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.6.0...v1.7.0
