@@ -19,7 +19,7 @@ export async function decodeAsync(
     options.maxMapLength,
     options.maxExtLength,
   );
-  return decoder.decodeOneAsync(stream);
+  return decoder.decodeSingleAsync(stream);
 }
 
 export function decodeArrayStream(
