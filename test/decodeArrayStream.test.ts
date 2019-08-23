@@ -70,7 +70,7 @@ describe("decodeArrayStream", () => {
 
     const result: Array<unknown> = [];
 
-    for await (let item of decodeArrayStream(createStream(objectsArrays))) {
+    for await (const item of decodeArrayStream(createStream(objectsArrays))) {
       result.push(item);
     }
 
@@ -83,7 +83,7 @@ describe("decodeArrayStream", () => {
     await assert.rejects(async () => {
       const result: Array<unknown> = [];
 
-      for await (let item of decodeArrayStream(createStream(object))) {
+      for await (const item of decodeArrayStream(createStream(object))) {
         result.push(item);
       }
     }, /.*Unrecognized array type byte:.*/i);
