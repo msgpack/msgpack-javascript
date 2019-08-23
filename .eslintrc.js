@@ -29,13 +29,14 @@ module.exports = {
     "guard-for-in": "warn",
     "curly": "warn",
     "no-param-reassign": "warn",
+    "prefer-spread": "off",
 
     "import/no-unresolved": "off", // cannot handle `paths` in tsconfig
     "import/no-cycle": "error",
     "import/no-default-export": "error",
 
-    "@typescript-eslint/no-unused-vars":"warn",
-    "@typescript-eslint/array-type": ["warn", "generic"],
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/array-type": ["warn", { default: "generic" }],
     "@typescript-eslint/camelcase": "warn",
     "@typescript-eslint/class-name-casing": "warn", // to allow the initial underscore
     "@typescript-eslint/no-non-null-assertion": "warn", // NOTE: pay attention to it because it may cause unexpected behavior
@@ -57,6 +58,7 @@ module.exports = {
     "@typescript-eslint/no-parameter-properties": "off",
     "@typescript-eslint/no-var-requires": "off", // enforces `import x = require("x")`, which is TypeScript-specific
     "@typescript-eslint/prefer-interface": "off",
+    "@typescript-eslint/no-empty-function": "off",
 
     "prettier/prettier": "warn",
   },
