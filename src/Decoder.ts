@@ -70,9 +70,6 @@ export class Decoder {
   headByte = HEAD_BYTE_REQUIRED;
   readonly stack: Array<StackState> = [];
 
-  // TODO: parameterize this property.
-  readonly cachedKeyDecoder = sharedCachedKeyDecoder;
-
   constructor(
     readonly extensionCodec = ExtensionCodec.defaultCodec,
     readonly maxStrLength = DEFAULT_MAX_LENGTH,
@@ -80,7 +77,7 @@ export class Decoder {
     readonly maxArrayLength = DEFAULT_MAX_LENGTH,
     readonly maxMapLength = DEFAULT_MAX_LENGTH,
     readonly maxExtLength = DEFAULT_MAX_LENGTH,
-    readonly shouldUseCachedKeyDecoder = true,
+    readonly cachedKeyDecoder: CachedKeyDecoder | null = sharedCachedKeyDecoder,
   ) {}
 
   setBuffer(buffer: ArrayLike<number> | ArrayBuffer): void {
@@ -480,7 +477,7 @@ export class Decoder {
 
     const offset = this.pos + headerOffset;
     let object: string;
-    if (this.shouldUseCachedKeyDecoder && this.stateIsMapKey() && this.cachedKeyDecoder.canBeCached(byteLength)) {
+    if (this.cachedKeyDecoder && this.stateIsMapKey() && this.cachedKeyDecoder.canBeCached(byteLength)) {
       object = this.cachedKeyDecoder.decode(this.bytes, offset, byteLength);
     } else if (TEXT_ENCODING_AVAILABLE && byteLength > TEXT_DECODER_THRESHOLD) {
       object = utf8DecodeTD(this.bytes, offset, byteLength);
