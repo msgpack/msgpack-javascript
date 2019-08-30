@@ -80,6 +80,7 @@ export class Decoder {
     readonly maxArrayLength = DEFAULT_MAX_LENGTH,
     readonly maxMapLength = DEFAULT_MAX_LENGTH,
     readonly maxExtLength = DEFAULT_MAX_LENGTH,
+    readonly shouldUseCachedKeyDecoder = true,
   ) {}
 
   setBuffer(buffer: ArrayLike<number> | ArrayBuffer): void {
@@ -479,7 +480,7 @@ export class Decoder {
 
     const offset = this.pos + headerOffset;
     let object: string;
-    if (this.stateIsMapKey() && this.cachedKeyDecoder.canBeCached(byteLength)) {
+    if (this.shouldUseCachedKeyDecoder && this.stateIsMapKey() && this.cachedKeyDecoder.canBeCached(byteLength)) {
       object = this.cachedKeyDecoder.decode(this.bytes, offset, byteLength);
     } else if (TEXT_ENCODING_AVAILABLE && byteLength > TEXT_DECODER_THRESHOLD) {
       object = utf8DecodeTD(this.bytes, offset, byteLength);
