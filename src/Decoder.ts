@@ -12,10 +12,18 @@ const enum State {
   MAP_VALUE,
 }
 
+type MapKeyType = string | number;
+
+const isValidMapKeyType = (key: unknown): key is MapKeyType => {
+  const keyType = typeof key;
+
+  return keyType === "string" || keyType === "number";
+};
+
 type StackMapState = {
   type: State.MAP_KEY | State.MAP_VALUE;
   size: number;
-  key: string | null;
+  key: MapKeyType | null;
   readCount: number;
   map: Record<string, unknown>;
 };
@@ -375,9 +383,10 @@ export class Decoder {
             continue DECODE;
           }
         } else if (state.type === State.MAP_KEY) {
-          if (typeof object !== "string") {
-            throw new Error("The type of key must be string but " + typeof object);
+          if (!isValidMapKeyType(object)) {
+            throw new Error("The type of key must be string or number but " + typeof object);
           }
+
           state.key = object;
           state.type = State.MAP_VALUE;
           continue DECODE;
