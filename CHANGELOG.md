@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.9.0 2019/08/31
+
+* [Make cachedKeyDecoder configurable by sergeyzenchenko · Pull Request \#85](https://github.com/msgpack/msgpack-javascript/pull/85)
+* [Add support for numbers as map keys by sergeyzenchenko · Pull Request \#84](https://github.com/msgpack/msgpack-javascript/pull/84)
+* Build with TypeScript 3.6
+
 ## v1.8.0 2019/08/07
 
 * Adjust internal cache size according to benchmark results [bc5e681](https://github.com/msgpack/msgpack-javascript/commit/bc5e681e781881ed27efaf97ba4156b484dc7648)
