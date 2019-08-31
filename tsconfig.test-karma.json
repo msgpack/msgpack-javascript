@@ -2,6 +2,7 @@
   "extends": "./tsconfig.es5.json",
   "compilerOptions": {
     "module": "esnext",
-    "outDir": "./build/karma"
+    "outDir": "./build/karma",
+    "incremental": false
   }
 }
