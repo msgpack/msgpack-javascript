@@ -1,5 +1,10 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.9.1 2019/09/20
+
+* No code changes from 1.9.0
+* Upgrade dev dependencies
+
 ## v1.9.0 2019/08/31
 
 * [Make cachedKeyDecoder configurable by sergeyzenchenko · Pull Request \#85](https://github.com/msgpack/msgpack-javascript/pull/85)
