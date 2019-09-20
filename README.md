@@ -8,7 +8,7 @@ This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient bi
 
 https://msgpack.org/
 
-This library is a universal JavaScript, which suppors both browsers and NodeJS. In addition, because it is implemented in [TypeScript](https://www.typescriptlang.org/), type definition files (`d.ts`) are bundled in the distribution.
+This library is a universal JavaScript, which supports both browsers and NodeJS. In addition, because it is implemented in [TypeScript](https://www.typescriptlang.org/), type definition files (`d.ts`) are bundled in the distribution.
 
 *Note that this is the second version of MessagePack for JavaScript. The first version, which was implemented in ES5 and was never released to npmjs.com, is tagged as [classic](https://github.com/msgpack/msgpack-javascript/tree/classic).*
 
@@ -42,30 +42,30 @@ deepStrictEqual(decode(encoded), object);
 - [Table of Contents](#table-of-contents)
 - [Install](#install)
 - [API](#api)
-  - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
-    - [`EncodeOptions`](#encodeoptions)
-  - [`decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--arraybuffer-options-decodeoptions-unknown)
-    - [`DecodeOptions`](#decodeoptions)
-  - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
-  - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
-  - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
-  - [Extension Types](#extension-types)
-    - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
-    - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
+    - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
+        - [`EncodeOptions`](#encodeoptions)
+    - [`decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--arraybuffer-options-decodeoptions-unknown)
+        - [`DecodeOptions`](#decodeoptions)
+    - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
+    - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+    - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+    - [Extension Types](#extension-types)
+        - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
+        - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
 - [MessagePack Specification](#messagepack-specification)
-  - [MessagePack Mapping Table](#messagepack-mapping-table)
+    - [MessagePack Mapping Table](#messagepack-mapping-table)
 - [Prerequsites](#prerequsites)
-  - [ECMA-262](#ecma-262)
-  - [NodeJS](#nodejs)
+    - [ECMA-262](#ecma-262)
+    - [NodeJS](#nodejs)
 - [Benchmark](#benchmark)
 - [Distribution](#distribution)
-  - [NPM / npmjs.com](#npm--npmjscom)
-  - [CDN / unpkg.com](#cdn--unpkgcom)
+    - [NPM / npmjs.com](#npm--npmjscom)
+    - [CDN / unpkg.com](#cdn--unpkgcom)
 - [Maintenance](#maintenance)
-  - [Testing](#testing)
-  - [Continuous Integration](#continuous-integration)
-  - [Release Engineering](#release-engineering)
-  - [Updating Dependencies](#updating-dependencies)
+    - [Testing](#testing)
+    - [Continuous Integration](#continuous-integration)
+    - [Release Engineering](#release-engineering)
+    - [Updating Dependencies](#updating-dependencies)
 - [Big Thanks](#big-thanks)
 - [License](#license)
 
@@ -73,7 +73,7 @@ deepStrictEqual(decode(encoded), object);
 
 ## Install
 
-This library is publised as [@msgpack/msgpack](https://www.npmjs.com/package/@msgpack/msgpack) in npmjs.com.
+This library is published to `npmjs.com` as [@msgpack/msgpack](https://www.npmjs.com/package/@msgpack/msgpack).
 
 ```shell
 npm install @msgpack/msgpack
@@ -94,7 +94,7 @@ const encoded: Uint8Array = encode({ foo: "bar" });
 console.log(encoded);
 ```
 
-If you'd like to get a NodeJS `Buffer` instead of `Uint8Array`, use `Buffer.from(arrayBuffer, offset, length)` in order not to copy the underlying `ArrayBuffer`,while `Buffer.from(uint8array)` copies data:
+If you'd like to convert the uint8array to a NodeJS `Buffer`, use `Buffer.from(arrayBuffer, offset, length)` in order not to copy the underlying `ArrayBuffer`, while `Buffer.from(uint8array)` copies it:
 
 ```typescript
 import { encode } from "@msgpack/msgpack";
@@ -118,7 +118,7 @@ forceFloat32 | boolean | false
 
 ### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`
 
-It decodes `buffer` encoded as MessagePack, and returns a decoded object as `uknown`.
+It decodes `buffer` encoded in MessagePack, and returns a decoded object as `uknown`.
 
 `buffer` must be an array of bytes, which is typically `Uint8Array`, or `ArrayBuffer`.
 
@@ -131,6 +131,8 @@ const encoded: Uint8Array;
 const object = decode(encoded);
 console.log(object);
 ```
+
+NodeJS `Buffer` is also acceptable because it is a subclass of `Uint8Array`.
 
 #### `DecodeOptions`
 
