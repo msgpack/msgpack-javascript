@@ -138,7 +138,7 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
       units.push(byte1);
     }
 
-    if (units.length - 4 >= CHUNK_SIZE) {
+    if (units.length >= CHUNK_SIZE) {
       result += String.fromCharCode(...units);
       units.length = 0;
     }
