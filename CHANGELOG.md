@@ -2,14 +2,20 @@ This is the revision history of @msgpack/msgpack
 
 ## v1.9.2 2019/10/30
 
+https://github.com/msgpack/msgpack-javascript/compare/v1.9.1...v1.9.2
+
 * Fix a possible crash in decoding long strings: [#88](https://github.com/msgpack/msgpack-javascript/pull/88) by @chrisnojima
 
 ## v1.9.1 2019/09/20
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.9.0...v1.9.1
 
 * No code changes from 1.9.0
 * Upgrade dev dependencies
 
 ## v1.9.0 2019/08/31
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.8.0...v1.9.0
 
 * [Make cachedKeyDecoder configurable by sergeyzenchenko · Pull Request \#85](https://github.com/msgpack/msgpack-javascript/pull/85)
 * [Add support for numbers as map keys by sergeyzenchenko · Pull Request \#84](https://github.com/msgpack/msgpack-javascript/pull/84)
@@ -17,8 +23,10 @@ This is the revision history of @msgpack/msgpack
 
 ## v1.8.0 2019/08/07
 
+https://github.com/msgpack/msgpack-javascript/compare/v1.7.0...v1.8.0
+
 * Adjust internal cache size according to benchmark results [bc5e681](https://github.com/msgpack/msgpack-javascript/commit/bc5e681e781881ed27efaf97ba4156b484dc7648)
-* Internal refactoring [#82](https://github.com/msgpack/msgpack-javascript/pull/82)
+* Internal refactoring [#82](https://github.com/msgpack/msgpack-javascript7/pull/82)
 
 ## v1.7.0 2019/08/2
 
