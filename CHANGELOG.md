@@ -1,5 +1,9 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.9.2 2019/10/30
+
+* Fix a possible crash in decoding long strings: [#88](https://github.com/msgpack/msgpack-javascript/pull/88) by @chrisnojima
+
 ## v1.9.1 2019/09/20
 
 * No code changes from 1.9.0
