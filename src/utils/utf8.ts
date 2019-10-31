@@ -100,7 +100,7 @@ function utf8EncodeTEencodeInto(str: string, output: Uint8Array, outputOffset: n
 export const utf8EncodeTE =
   sharedTextEncoder && sharedTextEncoder.encodeInto ? utf8EncodeTEencodeInto : utf8EncodeTEencode;
 
-const CHUNK_SIZE = 0x10_000;
+const CHUNK_SIZE = 0x1_000;
 
 export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   let offset = inputOffset;
