@@ -477,7 +477,7 @@ export class Decoder {
 
     const offset = this.pos + headerOffset;
     let object: string;
-    if (this.cachedKeyDecoder && this.stateIsMapKey() && this.cachedKeyDecoder.canBeCached(byteLength)) {
+    if (this.stateIsMapKey() && this.cachedKeyDecoder?.canBeCached(byteLength)) {
       object = this.cachedKeyDecoder.decode(this.bytes, offset, byteLength);
     } else if (TEXT_ENCODING_AVAILABLE && byteLength > TEXT_DECODER_THRESHOLD) {
       object = utf8DecodeTD(this.bytes, offset, byteLength);
