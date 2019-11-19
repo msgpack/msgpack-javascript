@@ -76,14 +76,20 @@ describe("ExtensionCodec", () => {
 
     it("encodes and decodes custom data types (synchronously)", () => {
       const set = new Set([1, 2, 3]);
-      const map = new Map([["foo", "bar"], ["bar", "baz"]]);
+      const map = new Map([
+        ["foo", "bar"],
+        ["bar", "baz"],
+      ]);
       const encoded = encode([set, map], { extensionCodec });
       assert.deepStrictEqual(decode(encoded, { extensionCodec }), [set, map]);
     });
 
     it("encodes and decodes custom data types (asynchronously)", async () => {
       const set = new Set([1, 2, 3]);
-      const map = new Map([["foo", "bar"], ["bar", "baz"]]);
+      const map = new Map([
+        ["foo", "bar"],
+        ["bar", "baz"],
+      ]);
       const encoded = encode([set, map], { extensionCodec });
       const createStream = async function*() {
         yield encoded;

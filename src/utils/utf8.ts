@@ -1,5 +1,5 @@
 export const TEXT_ENCODING_AVAILABLE =
-  process.env.TEXT_ENCODING !== "never" && (typeof TextEncoder !== "undefined" && typeof TextDecoder !== "undefined");
+  process.env.TEXT_ENCODING !== "never" && typeof TextEncoder !== "undefined" && typeof TextDecoder !== "undefined";
 
 export function utf8Count(str: string): number {
   const strLength = str.length;
