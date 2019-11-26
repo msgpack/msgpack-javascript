@@ -48,6 +48,9 @@ module.exports = {
     "@typescript-eslint/no-use-before-define": "warn",
     "@typescript-eslint/await-thenable": "warn",
     "@typescript-eslint/no-for-in-array": "warn",
+    "@typescript-eslint/prefer-nullish-coalescing": "warn",
+    "@typescript-eslint/prefer-optional-chain": "warn",
+    "@typescript-eslint/no-extra-non-null-assertion": "warn",
 
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/no-explicit-any": "off",
