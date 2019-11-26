@@ -1,6 +1,6 @@
 // WASM=never - disable WASM functions
 // WASM=force - force to use WASM functions
-const WASM: string = process.env.MSGPACK_WASM || process.env.WASM || "";
+const WASM: string = process.env.MSGPACK_WASM ?? process.env.WASM ?? "";
 export const NO_WASM = WASM === "never";
 export const FORCE_WASM = WASM === "force";
 
