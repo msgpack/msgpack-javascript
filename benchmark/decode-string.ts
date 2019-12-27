@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import { utf8EncodeJs, utf8Count, utf8DecodeJs, utf8DecodeTD } from "../src/utils/utf8";
-import { utf8DecodeWasm } from "../src/wasmFunctions";
 
 // @ts-ignore
 import Benchmark from "benchmark";
@@ -21,12 +20,6 @@ for (const baseStr of ["A", "あ", "🌏"]) {
 
     suite.add("utf8DecodeJs", () => {
       if (utf8DecodeJs(bytes, 0, byteLength) !== str) {
-        throw new Error("wrong result!");
-      }
-    });
-
-    suite.add("utf8DecodeWasm", () => {
-      if (utf8DecodeWasm(bytes, 0, byteLength) !== str) {
         throw new Error("wrong result!");
       }
     });

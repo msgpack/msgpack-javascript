@@ -2,17 +2,7 @@ import assert from "assert";
 import util from "util";
 import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
-import {
-  encode,
-  decode,
-  ExtensionCodec,
-  EXT_TIMESTAMP,
-  encodeTimeSpecToTimestamp,
-  __WASM_AVAILABLE,
-} from "@msgpack/msgpack";
-
-// eslint-disable-next-line no-console
-console.log("# configuration", { __WASM_AVAILABLE });
+import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, encodeTimeSpecToTimestamp } from "@msgpack/msgpack";
 
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({

@@ -63,6 +63,7 @@ module.exports = {
     "@typescript-eslint/no-var-requires": "off", // enforces `import x = require("x")`, which is TypeScript-specific
     "@typescript-eslint/prefer-interface": "off",
     "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/ban-ts-ignore": "off",
 
     "prettier/prettier": "warn",
   },

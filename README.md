@@ -42,30 +42,30 @@ deepStrictEqual(decode(encoded), object);
 - [Table of Contents](#table-of-contents)
 - [Install](#install)
 - [API](#api)
-    - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
-        - [`EncodeOptions`](#encodeoptions)
-    - [`decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--arraybuffer-options-decodeoptions-unknown)
-        - [`DecodeOptions`](#decodeoptions)
-    - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
-    - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
-    - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
-    - [Extension Types](#extension-types)
-        - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
-        - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
+  - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
+    - [`EncodeOptions`](#encodeoptions)
+  - [`decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--arraybuffer-options-decodeoptions-unknown)
+    - [`DecodeOptions`](#decodeoptions)
+  - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
+  - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+  - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+  - [Extension Types](#extension-types)
+    - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
+    - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
 - [MessagePack Specification](#messagepack-specification)
-    - [MessagePack Mapping Table](#messagepack-mapping-table)
+  - [MessagePack Mapping Table](#messagepack-mapping-table)
 - [Prerequsites](#prerequsites)
-    - [ECMA-262](#ecma-262)
-    - [NodeJS](#nodejs)
+  - [ECMA-262](#ecma-262)
+  - [NodeJS](#nodejs)
 - [Benchmark](#benchmark)
 - [Distribution](#distribution)
-    - [NPM / npmjs.com](#npm--npmjscom)
-    - [CDN / unpkg.com](#cdn--unpkgcom)
+  - [NPM / npmjs.com](#npm--npmjscom)
+  - [CDN / unpkg.com](#cdn--unpkgcom)
 - [Maintenance](#maintenance)
-    - [Testing](#testing)
-    - [Continuous Integration](#continuous-integration)
-    - [Release Engineering](#release-engineering)
-    - [Updating Dependencies](#updating-dependencies)
+  - [Testing](#testing)
+  - [Continuous Integration](#continuous-integration)
+  - [Release Engineering](#release-engineering)
+  - [Updating Dependencies](#updating-dependencies)
 - [Big Thanks](#big-thanks)
 - [License](#license)
 
@@ -449,8 +449,6 @@ This library uses Travis CI.
 
 test matrix:
 
-* WebAssembly availability
-  * `WASM=force` / `WASM=never`
 * TypeScript targets
   * `target=es2019` / `target=es5`
 * JavaScript engines
