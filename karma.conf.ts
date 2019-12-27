@@ -65,11 +65,7 @@ export default function configure(config: any) {
           },
         ],
       },
-      plugins: [
-        new webpack.DefinePlugin({
-          "process.env.MSGPACK_WASM": JSON.stringify(process.env.MSGPACK_WASM),
-        }),
-      ],
+      plugins: [],
       optimization: {
         minimize: false,
       },

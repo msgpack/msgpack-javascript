@@ -1,8 +1,5 @@
 /* eslint-disable no-console */
 import { encode, decode } from "../src";
-import { WASM_AVAILABLE } from "../src/wasmFunctions";
-
-console.log(`WASM_AVAILABLE=${WASM_AVAILABLE}`);
 
 const ascii = "A".repeat(40000);
 const emoji = "🌏".repeat(20000);

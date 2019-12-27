@@ -3,7 +3,6 @@ import { ExtensionCodec } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 import { ExtData } from "./ExtData";
-import { WASM_AVAILABLE, utf8EncodeWasm, WASM_STR_THRESHOLD } from "./wasmFunctions";
 
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
@@ -163,15 +162,6 @@ export class Encoder {
       this.writeStringHeader(byteLength);
       utf8EncodeTE(object, this.bytes, this.pos);
       this.pos += byteLength;
-    } else if (WASM_AVAILABLE && strLength > WASM_STR_THRESHOLD) {
-      // ensure max possible size
-      const maxSize = maxHeaderSize + strLength * 4;
-      this.ensureBufferSizeToWrite(maxSize);
-
-      // utf8EncodeWasm() handles headByte+size as well as string itself
-      const ouputLength = utf8EncodeWasm(object, this.bytes, this.pos);
-      this.pos += ouputLength;
-      return;
     } else {
       const byteLength = utf8Count(object);
       this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
