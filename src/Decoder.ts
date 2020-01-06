@@ -387,7 +387,9 @@ export class Decoder {
           state.key = object;
           state.type = State.MAP_VALUE;
           continue DECODE;
-        } else if (state.type === State.MAP_VALUE) {
+        } else {
+          // it must be `state.type === State.MAP_VALUE` here
+
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           state.map[state.key!] = object;
           state.readCount++;
