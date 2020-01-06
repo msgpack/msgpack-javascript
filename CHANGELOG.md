@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.10.0 2019/12/27
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.9.3...v1.10.0
+
+* Removed WebAssembly implementation, which introduced complexity rather than performance ([#95](https://github.com/msgpack/msgpack-javascript/pull/95))
+
 ## v1.9.3 2019/10/30
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.9.2...v1.9.3

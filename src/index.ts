@@ -26,8 +26,3 @@ export {
   encodeTimestampExtension,
   decodeTimestampExtension,
 } from "./timestamp";
-
-/**
- * @experimental WebAssembly backend is experimenal.
- */
-export { WASM_AVAILABLE as __WASM_AVAILABLE } from "./wasmFunctions";

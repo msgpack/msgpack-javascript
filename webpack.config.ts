@@ -36,17 +36,10 @@ const config = {
       esVersion: 5, // for IE11 support
     }),
     new webpack.DefinePlugin({
-      "process.env.WASM": JSON.stringify(null), // use only MSGPACK_WASM
       "process.env.TEXT_ENCODING": JSON.stringify("null"),
-      "process.env.TEXT_DECODER": JSON.stringify(null),
+      "process.env.TEXT_DECODER": JSON.stringify("null"),
     }),
   ],
-  externals: {
-    "base64-js": {
-      commonjs: "base64-js",
-      commonjs2: "base64-js",
-    },
-  },
 
   optimization: {
     noEmitOnErrors: true,
@@ -60,41 +53,17 @@ const config = {
   devtool: "source-map",
 };
 
+// eslint-disable-next-line import/no-default-export
 export default [
-  // default minified bundle does not includes wasm
   ((config) => {
     config.output.filename = "msgpack.min.js";
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        "process.env.MSGPACK_WASM": JSON.stringify("never"),
-      }),
-      new webpack.IgnorePlugin(/\.\/dist\/wasm\/msgpack\.wasm\.js$/),
-    );
     config.optimization.minimize = true;
     return config;
   })(_.cloneDeep(config)),
 
-  // default bundle does not includes wasm
   ((config) => {
     config.output.filename = "msgpack.js";
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        // The default bundle does not includes WASM
-        "process.env.MSGPACK_WASM": JSON.stringify("never"),
-      }),
-      new webpack.IgnorePlugin(/\.\/dist\/wasm\/msgpack\.wasm\.js$/),
-    );
-    return config;
-  })(_.cloneDeep(config)),
-
-  // +wsm
-  ((config) => {
-    config.output.filename = "msgpack+wasm.js";
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        "process.env.MSGPACK_WASM": JSON.stringify(null),
-      }),
-    );
+    config.optimization.minimize = false;
     return config;
   })(_.cloneDeep(config)),
 ];

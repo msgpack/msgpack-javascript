@@ -1,6 +1,6 @@
 {
   "name": "@msgpack/msgpack",
-  "version": "1.9.3",
+  "version": "1.10.0",
   "description": "MessagePack for JavaScript/ECMA-262",
   "author": "The MessagePack community",
   "license": "ISC",
@@ -10,21 +10,18 @@
   "sideEffects": false,
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "npm run clean && npm run asbuild:production && tsc -p tsconfig.dist.json && webpack",
+    "prepare": "npm run clean && tsc -p tsconfig.dist.json && webpack",
     "prepublishOnly": "run-p 'test:dist:*' && npm run test:browser",
     "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
-    "test:purejs": "TEXT_ENCODING=never MSGPACK_WASM=never mocha 'test/**/*.test.ts'",
-    "test:wasm": "npm run asbuild:production && TEXT_ENCODING=never MSGPACK_WASM=force mocha 'test/**/*.test.ts'",
+    "test:purejs": "TEXT_ENCODING=never mocha 'test/**/*.test.ts'",
     "test:te": "TEXT_ENCODING=force mocha 'test/**/*.test.ts'",
     "test:dist:purejs": "TS_NODE_PROJECT=tsconfig.test-dist-es5-purejs.json npm run test:purejs -- --reporter=dot",
-    "test:dist:wasm": "TS_NODE_PROJECT=tsconfig.test-dist-es5-wasm.json npm run test:wasm -- --reporter=dot",
     "test:cover": "npm run cover:clean && npm-run-all 'test:cover:*' && npm run cover:report",
     "test:cover:purejs": "npx nyc --no-clean npm run test:purejs",
-    "test:cover:wasm": "npx nyc --no-clean npm run test:wasm",
     "test:cover:te": "npx nyc --no-clean npm run test:te",
     "cover:clean": "rimraf .nyc_output coverage/",
-    "cover:report": "nyc report --reporter=text-summary --reporter=html --reporter=json",
+    "cover:report": "npx nyc report --reporter=text-summary --reporter=html --reporter=json",
     "test:browser": "karma start --single-run",
     "test:browser:firefox": "karma start --single-run --browsers FirefoxHeadless",
     "test:browser:chrome": "karma start --single-run --browsers ChromeHeadless",
@@ -34,8 +31,6 @@
     "lint:fix": "eslint --fix --ext .ts src test && npm run format",
     "lint:print-config": "eslint --print-config .eslintrc.js",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
-    "asbuild:development": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate --debug && ts-node tools/pack-wasm.ts",
-    "asbuild:production": "asc assembly/index.ts -b dist/wasm/msgpack.wasm -t dist/wasm/msgpack.wat --sourceMap --validate -O3 && ts-node tools/pack-wasm.ts",
     "update-dependencies": "rimraf node_modules/ package-lock.json && npm install && npm dedupe"
   },
   "homepage": "https://msgpack.org/",
@@ -57,12 +52,10 @@
   },
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",
-    "@types/base64-js": "latest",
     "@types/mocha": "latest",
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
-    "assemblyscript": "github:AssemblyScript/assemblyscript#5269a6b9c4e14983c43671328257c156cdf1de8a",
     "assert": "latest",
     "core-js": "latest",
     "eslint": "latest",
@@ -92,9 +85,7 @@
     "webpack": "latest",
     "webpack-cli": "latest"
   },
-  "dependencies": {
-    "base64-js": "^1.3.0"
-  },
+  "dependencies": {},
   "files": [
     "src/**/*.*",
     "dist/**/*.*",
