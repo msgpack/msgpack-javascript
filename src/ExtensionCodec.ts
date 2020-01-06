@@ -17,12 +17,12 @@ export class ExtensionCodec implements ExtensionCodecType {
   public static readonly defaultCodec: ExtensionCodecType = new ExtensionCodec();
 
   // built-in extensions
-  private readonly builtInEncoders: Array<ExtensionEncoderType> = [];
-  private readonly builtInDecoders: Array<ExtensionDecoderType> = [];
+  private readonly builtInEncoders: Array<ExtensionEncoderType | undefined | null> = [];
+  private readonly builtInDecoders: Array<ExtensionDecoderType | undefined | null> = [];
 
   // custom extensions
-  private readonly encoders: Array<ExtensionEncoderType> = [];
-  private readonly decoders: Array<ExtensionDecoderType> = [];
+  private readonly encoders: Array<ExtensionEncoderType | undefined | null> = [];
+  private readonly decoders: Array<ExtensionDecoderType | undefined | null> = [];
 
   public constructor() {
     this.register(timestampExtension);
