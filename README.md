@@ -342,15 +342,15 @@ This will be default once the temporal module is standardizied, which is not a n
 
 This library is compatible with the "August 2017" revision of MessagePack specification at the point where timestamp ext was added:
 
-* [x] str/bin separation, added on August 2013
-* [x] extension types, added on August 2013
-* [x] timestamp ext type, added on August 2017
+* [x] str/bin separation, added at August 2013
+* [x] extension types, added at August 2013
+* [x] timestamp ext type, added at August 2017
 
 The livinng specification is here:
 
 https://github.com/msgpack/msgpack
 
-Note that as of June 2019 there're no versions on the MessagePack specification. See https://github.com/msgpack/msgpack/issues/195 for the discussions.
+Note that as of June 2019 there're no official "version" on the MessagePack specification. See https://github.com/msgpack/msgpack/issues/195 for the discussions.
 
 ### MessagePack Mapping Table
 
