@@ -396,17 +396,17 @@ NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5/msgpack`.
 
 ## Benchmark
 
-Benchmark on NodeJS/v12.7.0
+Benchmark on NodeJS/v12.14.1
 
 operation                                                         |   op   |   ms  |  op/s
 ----------------------------------------------------------------- | ------: | ----: | ------:
-buf = Buffer.from(JSON.stringify(obj));                           |  507700 |  5000 |  101540
-buf = JSON.stringify(obj);                                        |  958100 |  5000 |  191620
-obj = JSON.parse(buf);                                            |  346500 |  5000 |   69300
-buf = require("msgpack-lite").encode(obj);                        |  361800 |  5001 |   72345
-obj = require("msgpack-lite").decode(buf);                        |  267400 |  5000 |   53480
-buf = require("@msgpack/msgpack").encode(obj);                    |  510200 |  5000 |  102040
-obj = require("@msgpack/msgpack").decode(buf);                    |  825500 |  5000 |  165100
+buf = Buffer.from(JSON.stringify(obj));                           |  627500 |  5000 |  125500
+buf = JSON.stringify(obj);                                        | 1095600 |  5000 |  219120
+obj = JSON.parse(buf);                                            | 1469100 |  5000 |  293820
+buf = require("msgpack-lite").encode(obj);                        |  541800 |  5000 |  108360
+obj = require("msgpack-lite").decode(buf);                        |  315200 |  5000 |   63040
+buf = require("@msgpack/msgpack").encode(obj);                    |  815200 |  5000 |  163040
+obj = require("@msgpack/msgpack").decode(buf);                    |  764600 |  5001 |  152889
 
 Note that `Buffer.from()` for `JSON.stringify()` is added to emulate I/O where a JavaScript string must be converted into a byte array encoded in UTF-8, whereas MessagePack's `encode()` returns a byte array.
 
