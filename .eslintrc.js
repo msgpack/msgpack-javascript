@@ -25,11 +25,11 @@ module.exports = {
     "no-var": "warn",
     "valid-typeof": "warn", // "bigint" is not yet supported
     "no-return-await": "warn",
-    // "prefer-const": "warn", // TODO: AssemblyScript has different semantics.
+    "prefer-const": "warn",
     "guard-for-in": "warn",
     "curly": "warn",
     "no-param-reassign": "warn",
-    "prefer-spread": "off",
+    "prefer-spread": "warn",
 
     "import/no-unresolved": "off", // cannot handle `paths` in tsconfig
     "import/no-cycle": "error",
@@ -48,6 +48,7 @@ module.exports = {
     "@typescript-eslint/no-use-before-define": "warn",
     "@typescript-eslint/no-for-in-array": "warn",
     "@typescript-eslint/no-unnecessary-condition": ["warn", { "allowConstantLoopConditions": true }],
+    "@typescript-eslint/no-implied-eval": "warn",
     "@typescript-eslint/prefer-for-of": "warn",
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",

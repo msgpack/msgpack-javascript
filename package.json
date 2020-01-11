@@ -28,9 +28,8 @@
     "test:watch:browser": "karma start --browsers ChromeHeadless,FirefoxHeadless",
     "test:watch:nodejs": "mocha -w 'test/**/*.test.ts'",
     "lint": "eslint --ext .ts src test",
-    "lint:fix": "eslint --fix --ext .ts src test && npm run format",
+    "lint:fix": "eslint --fix --ext .ts src test",
     "lint:print-config": "eslint --print-config .eslintrc.js",
-    "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "update-dependencies": "rimraf node_modules/ package-lock.json && npm install && npm dedupe"
   },
   "homepage": "https://msgpack.org/",

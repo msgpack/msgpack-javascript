@@ -56,7 +56,7 @@ export class CachedKeyDecoder {
 
   public decode(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
     const cachedValue = this.get(bytes, inputOffset, byteLength);
-    if (cachedValue) {
+    if (cachedValue != null) {
       return cachedValue;
     }
 
