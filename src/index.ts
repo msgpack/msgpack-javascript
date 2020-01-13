@@ -1,7 +1,7 @@
 // Main Functions:
 
-export { encode } from "./encode";
-export { decode } from "./decode";
+export { encode, EncodeOptions } from "./encode";
+export { decode, DecodeOptions } from "./decode";
 export { decodeAsync, decodeArrayStream, decodeStream } from "./decodeAsync";
 
 /**

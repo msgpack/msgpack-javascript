@@ -2,12 +2,9 @@ import { Decoder } from "./Decoder";
 import { defaultDecodeOptions, DecodeOptions } from "./decode";
 import { ensureAsyncIterabe, ReadableStreamLike } from "./utils/stream";
 
-export type DecodeAsyncOptions = DecodeOptions;
-export const defaultDecodeAsyncOptions = defaultDecodeOptions;
-
 export async function decodeAsync(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
-  options: DecodeAsyncOptions = defaultDecodeOptions,
+  options: DecodeOptions = defaultDecodeOptions,
 ): Promise<unknown> {
   const stream = ensureAsyncIterabe(streamLike);
 
@@ -24,7 +21,7 @@ export async function decodeAsync(
 
 export function decodeArrayStream(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
-  options: DecodeAsyncOptions = defaultDecodeOptions,
+  options: DecodeOptions = defaultDecodeOptions,
 ) {
   const stream = ensureAsyncIterabe(streamLike);
 
@@ -42,7 +39,7 @@ export function decodeArrayStream(
 
 export function decodeStream(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
-  options: DecodeAsyncOptions = defaultDecodeOptions,
+  options: DecodeOptions = defaultDecodeOptions,
 ) {
   const stream = ensureAsyncIterabe(streamLike);
 
