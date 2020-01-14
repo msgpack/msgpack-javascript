@@ -3,26 +3,37 @@
 import { ExtData } from "./ExtData";
 import { timestampExtension } from "./timestamp";
 
-export type ExtensionDecoderType = (data: Uint8Array, extensionType: number) => unknown;
+export type ExtensionDecoderType<ContextType> = (
+  data: Uint8Array,
+  extensionType: number,
+  context: ContextType,
+) => unknown;
 
-export type ExtensionEncoderType = (input: unknown) => Uint8Array | null;
+export type ExtensionEncoderType<ContextType> = (input: unknown, context: ContextType) => Uint8Array | null;
 
 // immutable interfce to ExtensionCodec
-export type ExtensionCodecType = {
-  tryToEncode(object: unknown): ExtData | null;
-  decode(data: Uint8Array, extType: number): unknown;
+export type ExtensionCodecType<ContextType> = {
+  dummy: ContextType;
+  tryToEncode(object: unknown, context: ContextType): ExtData | null;
+  decode(data: Uint8Array, extType: number, context: ContextType): unknown;
 };
 
-export class ExtensionCodec implements ExtensionCodecType {
-  public static readonly defaultCodec: ExtensionCodecType = new ExtensionCodec();
+const typeDummy: any = undefined;
+
+export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecType<ContextType> {
+  public static readonly defaultCodec: ExtensionCodecType<undefined> = new ExtensionCodec();
+
+  // ensures ExtensionCodecType<X> matches ExtensionCodec<X>
+  // this will make type errors a lot more clear
+  dummy: ContextType = typeDummy;
 
   // built-in extensions
-  private readonly builtInEncoders: Array<ExtensionEncoderType | undefined | null> = [];
-  private readonly builtInDecoders: Array<ExtensionDecoderType | undefined | null> = [];
+  private readonly builtInEncoders: Array<ExtensionEncoderType<ContextType> | undefined | null> = [];
+  private readonly builtInDecoders: Array<ExtensionDecoderType<ContextType> | undefined | null> = [];
 
   // custom extensions
-  private readonly encoders: Array<ExtensionEncoderType | undefined | null> = [];
-  private readonly decoders: Array<ExtensionDecoderType | undefined | null> = [];
+  private readonly encoders: Array<ExtensionEncoderType<ContextType> | undefined | null> = [];
+  private readonly decoders: Array<ExtensionDecoderType<ContextType> | undefined | null> = [];
 
   public constructor() {
     this.register(timestampExtension);
@@ -34,8 +45,8 @@ export class ExtensionCodec implements ExtensionCodecType {
     decode,
   }: {
     type: number;
-    encode: ExtensionEncoderType;
-    decode: ExtensionDecoderType;
+    encode: ExtensionEncoderType<ContextType>;
+    decode: ExtensionDecoderType<ContextType>;
   }): void {
     if (type >= 0) {
       // custom extensions
@@ -49,12 +60,12 @@ export class ExtensionCodec implements ExtensionCodecType {
     }
   }
 
-  public tryToEncode(object: unknown): ExtData | null {
+  public tryToEncode(object: unknown, context: ContextType): ExtData | null {
     // built-in extensions
     for (let i = 0; i < this.builtInEncoders.length; i++) {
       const encoder = this.builtInEncoders[i];
       if (encoder != null) {
-        const data = encoder(object);
+        const data = encoder(object, context);
         if (data != null) {
           const type = -1 - i;
           return new ExtData(type, data);
@@ -66,7 +77,7 @@ export class ExtensionCodec implements ExtensionCodecType {
     for (let i = 0; i < this.encoders.length; i++) {
       const encoder = this.encoders[i];
       if (encoder != null) {
-        const data = encoder(object);
+        const data = encoder(object, context);
         if (data != null) {
           const type = i;
           return new ExtData(type, data);
@@ -81,10 +92,10 @@ export class ExtensionCodec implements ExtensionCodecType {
     return null;
   }
 
-  public decode(data: Uint8Array, type: number): unknown {
+  public decode(data: Uint8Array, type: number, context: ContextType): unknown {
     const decoder = type < 0 ? this.builtInDecoders[-1 - type] : this.decoders[type];
     if (decoder) {
-      return decoder(data, type);
+      return decoder(data, type, context);
     } else {
       // decode() does not fail, returns ExtData instead.
       return new ExtData(type, data);

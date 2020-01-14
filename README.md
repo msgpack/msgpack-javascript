@@ -50,6 +50,7 @@ deepStrictEqual(decode(encoded), object);
   - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
   - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
   - [Extension Types](#extension-types)
+    - [Codec context](#codec-context)
     - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
     - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
 - [MessagePack Specification](#messagepack-specification)
@@ -115,6 +116,7 @@ maxDepth | number | `100`
 initialBufferSize | number | `2048`
 sortKeys | boolean | false
 forceFloat32 | boolean | false
+context | user-defined | -
 
 ### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`
 
@@ -144,6 +146,7 @@ maxBinLength | number | `4_294_967_295` (UINT32_MAX)
 maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
 maxMapLength | number | `4_294_967_295` (UINT32_MAX)
 maxExtLength | number | `4_294_967_295` (UINT32_MAX)
+context | user-defined | -
 
 You can use `max${Type}Length` to limit the length of each type decoded.
 
@@ -260,6 +263,50 @@ const decoded = decode(encoded, { extensionCodec });
 ```
 
 Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
+
+#### Codec context
+
+When using an extension codec, it may be necessary to keep encoding/decoding state, to keep track of which objects got encoded/re-created. To do this, pass a `context` to the `EncodeOptions` and `DecodeOptions` (and if using typescript, type the `ExtensionCodec` too). Don't forget to pass the `{extensionCodec, context}` along recursive encoding/decoding:
+
+```typescript
+import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
+
+class MyContext {
+  track(object: any) { /*...*/ }
+}
+
+class MyType { /* ... */ }
+
+const extensionCodec = new ExtensionCodec<MyContext>();
+
+// MyType
+const MYTYPE_EXT_TYPE = 0 // Any in 0-127
+extensionCodec.register({
+  type: MYTYPE_EXT_TYPE,
+  encode: (object, context) => {
+    if (object instanceof MyType) {
+      context.track(object); // <-- like this
+      return encode(object.toJSON(), { extensionCodec, context });
+    } else {
+      return null;
+    }
+  },
+  decode: (data, extType, context) => {
+    const decoded = decode(data, { extensionCodec, context });
+    const my = new MyType(decoded);
+    context.track(my); // <-- and like this
+    return my;
+  },
+});
+
+// and later
+import { encode, decode } from "@msgpack/msgpack";
+
+const context = new MyContext();
+
+const encoded = = encode({myType: new MyType<any>()}, { extensionCodec, context });
+const decoded = decode(encoded, { extensionCodec, context });
+```
 
 #### Handling BigInt with ExtensionCodec
 

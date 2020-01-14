@@ -1,5 +1,5 @@
 import { prettyByte } from "./utils/prettyByte";
-import { ExtensionCodec } from "./ExtensionCodec";
+import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { getInt64, getUint64 } from "./utils/int";
 import { utf8DecodeJs, TEXT_ENCODING_AVAILABLE, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
@@ -60,7 +60,7 @@ const DEFAULT_MAX_LENGTH = 0xffff_ffff; // uint32_max
 
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
 
-export class Decoder {
+export class Decoder<ContextType> {
   totalPos = 0;
   pos = 0;
 
@@ -70,7 +70,8 @@ export class Decoder {
   readonly stack: Array<StackState> = [];
 
   constructor(
-    readonly extensionCodec = ExtensionCodec.defaultCodec,
+    readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
+    readonly context: ContextType,
     readonly maxStrLength = DEFAULT_MAX_LENGTH,
     readonly maxBinLength = DEFAULT_MAX_LENGTH,
     readonly maxArrayLength = DEFAULT_MAX_LENGTH,
@@ -519,7 +520,7 @@ export class Decoder {
 
     const extType = this.view.getInt8(this.pos + headOffset);
     const data = this.decodeBinary(size, headOffset + 1 /* extType */);
-    return this.extensionCodec.decode(data, extType);
+    return this.extensionCodec.decode(data, extType, this.context);
   }
 
   lookU8() {

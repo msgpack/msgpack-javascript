@@ -1,9 +1,10 @@
 import { ExtensionCodecType } from "./ExtensionCodec";
 import { Decoder } from "./Decoder";
+import { ContextOf, SplitUndefined } from "./context";
 
-export type DecodeOptions = Partial<
-  Readonly<{
-    extensionCodec: ExtensionCodecType;
+export type DecodeOptions<ContextType = undefined> = Readonly<
+  Partial<{
+    extensionCodec: ExtensionCodecType<ContextType>;
 
     /**
      * Maximum string length.
@@ -31,7 +32,8 @@ export type DecodeOptions = Partial<
      */
     maxExtLength: number;
   }>
->;
+> &
+  ContextOf<ContextType>;
 
 export const defaultDecodeOptions: DecodeOptions = {};
 
@@ -40,12 +42,13 @@ export const defaultDecodeOptions: DecodeOptions = {};
  *
  * This is a synchronous decoding function. See other variants for asynchronous decoding: `decodeAsync()`, `decodeStream()`, `decodeArrayStream()`.
  */
-export function decode(
+export function decode<ContextType>(
   buffer: ArrayLike<number> | ArrayBuffer,
-  options: DecodeOptions = defaultDecodeOptions,
+  options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ): unknown {
-  const decoder = new Decoder(
+  const decoder = new Decoder<ContextType>(
     options.extensionCodec,
+    (options as typeof options & { context: any }).context,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
