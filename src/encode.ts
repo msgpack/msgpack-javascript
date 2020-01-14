@@ -1,9 +1,10 @@
 import { ExtensionCodecType } from "./ExtensionCodec";
 import { Encoder } from "./Encoder";
+import { ContextOf, SplitUndefined } from "./context";
 
-export type EncodeOptions = Partial<
+export type EncodeOptions<ContextType = undefined> = Partial<
   Readonly<{
-    extensionCodec: ExtensionCodecType;
+    extensionCodec: ExtensionCodecType<ContextType>;
     maxDepth: number;
     initialBufferSize: number;
     sortKeys: boolean;
@@ -15,9 +16,10 @@ export type EncodeOptions = Partial<
      */
     forceFloat32: boolean;
   }>
->;
+> &
+  ContextOf<ContextType>;
 
-const defaultEncodeOptions = {};
+const defaultEncodeOptions: EncodeOptions = {};
 
 /**
  * It encodes `value` in the MessagePack format and
@@ -25,9 +27,13 @@ const defaultEncodeOptions = {};
  *
  * The returned buffer is a slice of a larger `ArrayBuffer`, so you have to use its `#byteOffset` and `#byteLength` in order to convert it to another typed arrays including NodeJS `Buffer`.
  */
-export function encode(value: unknown, options: EncodeOptions = defaultEncodeOptions): Uint8Array {
-  const encoder = new Encoder(
+export function encode<ContextType>(
+  value: unknown,
+  options: EncodeOptions<SplitUndefined<ContextType>> = defaultEncodeOptions as any,
+): Uint8Array {
+  const encoder = new Encoder<ContextType>(
     options.extensionCodec,
+    (options as typeof options & { context: any }).context,
     options.maxDepth,
     options.initialBufferSize,
     options.sortKeys,

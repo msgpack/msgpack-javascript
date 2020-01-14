@@ -1,5 +1,5 @@
 import { utf8EncodeJs, utf8Count, TEXT_ENCODING_AVAILABLE, TEXT_ENCODER_THRESHOLD, utf8EncodeTE } from "./utils/utf8";
-import { ExtensionCodec } from "./ExtensionCodec";
+import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 import { ExtData } from "./ExtData";
@@ -7,13 +7,14 @@ import { ExtData } from "./ExtData";
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
 
-export class Encoder {
+export class Encoder<ContextType> {
   private pos = 0;
   private view = new DataView(new ArrayBuffer(this.initialBufferSize));
   private bytes = new Uint8Array(this.view.buffer);
 
   constructor(
-    readonly extensionCodec = ExtensionCodec.defaultCodec,
+    readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
+    readonly context: ContextType,
     readonly maxDepth = DEFAULT_MAX_DEPTH,
     readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
     readonly sortKeys = false,
@@ -173,7 +174,7 @@ export class Encoder {
 
   encodeObject(object: unknown, depth: number) {
     // try to encode objects with custom codec first of non-primitives
-    const ext = this.extensionCodec.tryToEncode(object);
+    const ext = this.extensionCodec.tryToEncode(object, this.context);
     if (ext != null) {
       this.encodeExtension(ext);
     } else if (Array.isArray(object)) {

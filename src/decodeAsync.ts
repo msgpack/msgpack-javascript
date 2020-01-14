@@ -1,15 +1,17 @@
 import { Decoder } from "./Decoder";
 import { defaultDecodeOptions, DecodeOptions } from "./decode";
 import { ensureAsyncIterabe, ReadableStreamLike } from "./utils/stream";
+import { SplitUndefined } from "./context";
 
-export async function decodeAsync(
+export async function decodeAsync<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
-  options: DecodeOptions = defaultDecodeOptions,
+  options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ): Promise<unknown> {
   const stream = ensureAsyncIterabe(streamLike);
 
-  const decoder = new Decoder(
+  const decoder = new Decoder<ContextType>(
     options.extensionCodec,
+    (options as typeof options & { context: any }).context,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
@@ -19,14 +21,15 @@ export async function decodeAsync(
   return decoder.decodeSingleAsync(stream);
 }
 
-export function decodeArrayStream(
+export function decodeArrayStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
-  options: DecodeOptions = defaultDecodeOptions,
+  options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ) {
   const stream = ensureAsyncIterabe(streamLike);
 
-  const decoder = new Decoder(
+  const decoder = new Decoder<ContextType>(
     options.extensionCodec,
+    (options as typeof options & { context: any }).context,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
@@ -37,14 +40,15 @@ export function decodeArrayStream(
   return decoder.decodeArrayStream(stream);
 }
 
-export function decodeStream(
+export function decodeStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
-  options: DecodeOptions = defaultDecodeOptions,
+  options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ) {
   const stream = ensureAsyncIterabe(streamLike);
 
-  const decoder = new Decoder(
+  const decoder = new Decoder<ContextType>(
     options.extensionCodec,
+    (options as typeof options & { context: any }).context,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
