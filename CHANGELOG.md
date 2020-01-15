@@ -1,5 +1,12 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.11.0 2020/01/15
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.10.1...v1.11.0
+
+* Added support for custom context for keeping track of objects ([#101](https://github.com/msgpack/msgpack-javascript/pull/101) by @grantila)
+* Export ``EncodeOptions` and `DecodeOptions` ([#100](https://github.com/msgpack/msgpack-javascript/pull/100))
+
 ## v1.10.1 2020/01/11
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.10.0...v1.10.1
