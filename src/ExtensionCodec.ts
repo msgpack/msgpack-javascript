@@ -13,19 +13,17 @@ export type ExtensionEncoderType<ContextType> = (input: unknown, context: Contex
 
 // immutable interfce to ExtensionCodec
 export type ExtensionCodecType<ContextType> = {
-  dummy: ContextType;
+  __brand?: ContextType;
   tryToEncode(object: unknown, context: ContextType): ExtData | null;
   decode(data: Uint8Array, extType: number, context: ContextType): unknown;
 };
-
-const typeDummy: any = undefined;
 
 export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecType<ContextType> {
   public static readonly defaultCodec: ExtensionCodecType<undefined> = new ExtensionCodec();
 
   // ensures ExtensionCodecType<X> matches ExtensionCodec<X>
   // this will make type errors a lot more clear
-  dummy: ContextType = typeDummy;
+  __brand?: ContextType;
 
   // built-in extensions
   private readonly builtInEncoders: Array<ExtensionEncoderType<ContextType> | undefined | null> = [];
