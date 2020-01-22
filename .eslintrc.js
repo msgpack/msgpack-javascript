@@ -49,6 +49,7 @@ module.exports = {
     "@typescript-eslint/no-for-in-array": "warn",
     "@typescript-eslint/no-unnecessary-condition": ["warn", { "allowConstantLoopConditions": true }],
     "@typescript-eslint/no-implied-eval": "warn",
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
     "@typescript-eslint/prefer-for-of": "warn",
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
