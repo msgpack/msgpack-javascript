@@ -8,7 +8,7 @@ This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient bi
 
 https://msgpack.org/
 
-This library is a universal JavaScript, which supports both browsers and NodeJS. In addition, because it is implemented in [TypeScript](https://www.typescriptlang.org/), type definition files (`d.ts`) are bundled in the distribution.
+This library is a universal JavaScript, meaning it is compatible with all the major browsers and NodeJS. In addition, because it is implemented in [TypeScript](https://www.typescriptlang.org/), type definition files (`d.ts`) are bundled in the distribution.
 
 *Note that this is the second version of MessagePack for JavaScript. The first version, which was implemented in ES5 and was never released to npmjs.com, is tagged as [classic](https://github.com/msgpack/msgpack-javascript/tree/classic).*
 
