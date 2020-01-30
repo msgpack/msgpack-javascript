@@ -241,7 +241,7 @@ extensionCodec.register({
 // Map<T>
 const MAP_EXT_TYPE = 1; // Any in 0-127
 extensionCodec.register({
-  type: 1,
+  type: MAP_EXT_TYPE,
   encode: (object: unknown): Uint8Array => {
     if (object instanceof Map) {
       return encode([...object]);
