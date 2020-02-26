@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.11.1 2020/02/26
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.11.0...v1.11.1
+
+* Fix use of `process.env` for browsers (#104)
+
 ## v1.11.0 2020/01/15
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.10.1...v1.11.0
