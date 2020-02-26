@@ -36,8 +36,8 @@ const config = {
       esVersion: 5, // for IE11 support
     }),
     new webpack.DefinePlugin({
-      "process.env.TEXT_ENCODING": JSON.stringify("null"),
-      "process.env.TEXT_DECODER": JSON.stringify("null"),
+      "process.env.TEXT_ENCODING": "undefined",
+      "process.env.TEXT_DECODER": "undefined",
     }),
   ],
 
