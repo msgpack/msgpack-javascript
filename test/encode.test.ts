@@ -25,6 +25,20 @@ describe("encode", () => {
     });
   });
 
+  context("ignoreUndefined", () => {
+    it("encodes { foo: undefined } as is by default", () => {
+      assert.deepStrictEqual(decode(encode({ foo: undefined })), { foo: null });
+    });
+
+    it("encodes { foo: undefined } as is with `ignoreUndefined: false`", () => {
+      assert.deepStrictEqual(decode(encode({ foo: undefined }, { ignoreUndefined: false })), { foo: null });
+    });
+
+    it("encodes { foo: undefined } to {} with `ignoreUndefined: true`", () => {
+      assert.deepStrictEqual(decode(encode({ foo: undefined }, { ignoreUndefined: true })), {});
+    });
+  });
+
   context("ArrayBuffer as buffer", () => {
     const buffer = encode([1, 2, 3]);
     const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteLength);
