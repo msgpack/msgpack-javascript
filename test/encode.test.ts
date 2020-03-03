@@ -27,15 +27,18 @@ describe("encode", () => {
 
   context("ignoreUndefined", () => {
     it("encodes { foo: undefined } as is by default", () => {
-      assert.deepStrictEqual(decode(encode({ foo: undefined })), { foo: null });
+      assert.deepStrictEqual(decode(encode({ foo: undefined, bar: 42 })), { foo: null, bar: 42 });
     });
 
     it("encodes { foo: undefined } as is with `ignoreUndefined: false`", () => {
-      assert.deepStrictEqual(decode(encode({ foo: undefined }, { ignoreUndefined: false })), { foo: null });
+      assert.deepStrictEqual(decode(encode({ foo: undefined, bar: 42 }, { ignoreUndefined: false })), {
+        foo: null,
+        bar: 42,
+      });
     });
 
     it("encodes { foo: undefined } to {} with `ignoreUndefined: true`", () => {
-      assert.deepStrictEqual(decode(encode({ foo: undefined }, { ignoreUndefined: true })), {});
+      assert.deepStrictEqual(decode(encode({ foo: undefined, bar: 42 }, { ignoreUndefined: true })), { bar: 42 });
     });
   });
 
