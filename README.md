@@ -116,6 +116,7 @@ maxDepth | number | `100`
 initialBufferSize | number | `2048`
 sortKeys | boolean | false
 forceFloat32 | boolean | false
+ignoreUndefined | boolean | false
 context | user-defined | -
 
 ### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`

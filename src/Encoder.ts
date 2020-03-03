@@ -19,6 +19,7 @@ export class Encoder<ContextType> {
     readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
     readonly sortKeys = false,
     readonly forceFloat32 = false,
+    readonly ignoreUndefined = false,
   ) {}
 
   encode(object: unknown, depth: number): void {
@@ -231,12 +232,26 @@ export class Encoder<ContextType> {
     }
   }
 
+  countWithoutUndefined(object: Record<string, unknown>, keys: ReadonlyArray<string>): number {
+    let count = 0;
+
+    for (const key of keys) {
+      if (object[key] !== undefined) {
+        count++;
+      }
+    }
+
+    return count;
+  }
+
   encodeMap(object: Record<string, unknown>, depth: number) {
     const keys = Object.keys(object);
     if (this.sortKeys) {
       keys.sort();
     }
-    const size = keys.length;
+
+    const size = this.ignoreUndefined ? this.countWithoutUndefined(object, keys) : keys.length;
+
     if (size < 16) {
       // fixmap
       this.writeU8(0x80 + size);
@@ -252,10 +267,13 @@ export class Encoder<ContextType> {
       throw new Error(`Too large map object: ${size}`);
     }
 
-    for (let i = 0; i < size; i++) {
-      const key = keys[i];
-      this.encodeString(key);
-      this.encode(object[key], depth + 1);
+    for (const key of keys) {
+      const value = object[key];
+
+      if (!(this.ignoreUndefined && value === undefined)) {
+        this.encodeString(key);
+        this.encode(value, depth + 1);
+      }
     }
   }
 

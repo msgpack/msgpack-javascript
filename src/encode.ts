@@ -15,6 +15,14 @@ export type EncodeOptions<ContextType = undefined> = Partial<
      * Only use it if precisions don't matter.
      */
     forceFloat32: boolean;
+
+    /**
+     * If `true`, an object property with `undefined` value are ignored.
+     * e.g. `{ foo: undefined }` will be encoded as `{}`, as `JSON.stringify()` does.
+     *
+     * The default is `false`. Note that it needs more time to encode.
+     */
+    ignoreUndefined: boolean;
   }>
 > &
   ContextOf<ContextType>;
@@ -38,6 +46,7 @@ export function encode<ContextType>(
     options.initialBufferSize,
     options.sortKeys,
     options.forceFloat32,
+    options.ignoreUndefined,
   );
   encoder.encode(value, 1);
   return encoder.getUint8Array();
