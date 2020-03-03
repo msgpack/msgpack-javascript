@@ -1,5 +1,12 @@
 This is the revision history of @msgpack/msgpack
 
+## v1.12.0 2020/03/03
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.11.1...v1.12.0
+
+* Add `EncodeOptions#ignoreUndefined` [#107](https://github.com/msgpack/msgpack-javascript/pull/107)
+  * Like `JSON.stringify()`, less payload size, but taking more time to encode
+
 ## v1.11.1 2020/02/26
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.11.0...v1.11.1
