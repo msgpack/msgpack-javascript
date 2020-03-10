@@ -13,9 +13,7 @@ const isReadableStreamConstructorAvailable: boolean = (() => {
   }
 })();
 
-const MyReadableStream: typeof ReadableStream = isReadableStreamConstructorAvailable
-  ? ReadableStream
-  : PonyReadableStream;
+const MyReadableStream: any = isReadableStreamConstructorAvailable ? ReadableStream : PonyReadableStream;
 
 // Downgrade stream not to implement AsycIterable<T>
 function downgradeReadableStream(stream: ReadableStream) {
@@ -27,7 +25,7 @@ describe("whatwg streams", () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
     const stream = new MyReadableStream({
-      start(controller) {
+      start(controller: any) {
         for (const byte of encoded) {
           controller.enqueue([byte]);
         }
@@ -47,7 +45,7 @@ describe("whatwg streams", () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
     const stream = new MyReadableStream({
-      start(controller) {
+      start(controller: any) {
         for (const byte of encoded) {
           controller.enqueue([byte]);
         }
