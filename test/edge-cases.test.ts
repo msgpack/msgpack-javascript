@@ -31,7 +31,7 @@ describe("edge cases", () => {
 
   context("try to decode a map with non-string keys (asynchronous)", () => {
     it("throws errors", async () => {
-      const createStream = async function*() {
+      const createStream = async function* () {
         yield [0x81]; // fixmap size=1
         yield encode(null);
         yield encode(null);
@@ -65,7 +65,7 @@ describe("edge cases", () => {
     });
 
     it("throws errors (asynchronous)", async () => {
-      const createStream = async function*() {
+      const createStream = async function* () {
         yield [0x92]; // fixarray size=2
         yield encode(null);
       };
@@ -87,7 +87,7 @@ describe("edge cases", () => {
     });
 
     it("throws errors (asynchronous)", async () => {
-      const createStream = async function*() {
+      const createStream = async function* () {
         yield [0x90]; // fixarray size=0
         yield encode(null);
       };
@@ -98,7 +98,7 @@ describe("edge cases", () => {
     });
 
     it("throws errors (asynchronous)", async () => {
-      const createStream = async function*() {
+      const createStream = async function* () {
         yield [0x90, ...encode(null)]; // fixarray size=0 + nil
       };
 

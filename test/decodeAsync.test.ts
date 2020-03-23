@@ -7,7 +7,7 @@ describe("decodeAsync", () => {
   }
 
   it("decodes nil", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield wrapWithNoisyBuffer(0xc0); // nil
     };
 
@@ -16,7 +16,7 @@ describe("decodeAsync", () => {
   });
 
   it("decodes fixarray [nil]", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield wrapWithNoisyBuffer(0x91); // fixarray size=1
       yield [0xc0]; // nil
     };
@@ -26,7 +26,7 @@ describe("decodeAsync", () => {
   });
 
   it("decodes fixmap {'foo': 'bar'}", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield [0x81]; // fixmap size=1
       yield encode("foo");
       yield encode("bar");
@@ -37,7 +37,7 @@ describe("decodeAsync", () => {
   });
 
   it("decodes multi-byte integer byte-by-byte", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield [0xcd]; // uint 16
       yield [0x12];
       yield [0x34];
@@ -47,7 +47,7 @@ describe("decodeAsync", () => {
   });
 
   it("decodes fixstr byte-by-byte", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield [0xa3]; // fixstr size=3
       yield [0x66]; // "f"
       yield [0x6f]; // "o"
@@ -58,7 +58,7 @@ describe("decodeAsync", () => {
   });
 
   it("decodes binary byte-by-byte", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield [0xc4]; // bin 8
       yield [0x03]; // bin size=3
       yield [0x66]; // "f"
@@ -70,7 +70,7 @@ describe("decodeAsync", () => {
   });
 
   it("decodes binary with noisy buffer", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield wrapWithNoisyBuffer(0xc5); // bin 16
       yield [0x00];
       yield [0x00]; // bin size=0
@@ -100,7 +100,7 @@ describe("decodeAsync", () => {
       bin0: Uint8Array.from([]),
     };
 
-    const createStream = async function*() {
+    const createStream = async function* () {
       for (const byte of encode(object)) {
         yield [byte];
       }

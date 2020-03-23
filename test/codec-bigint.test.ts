@@ -18,7 +18,7 @@ extensionCodec.register({
 });
 
 describe("codec BigInt", () => {
-  before(function() {
+  before(function () {
     if (typeof BigInt === "undefined") {
       this.skip();
     }

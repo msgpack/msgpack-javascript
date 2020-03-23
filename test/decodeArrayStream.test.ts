@@ -9,7 +9,7 @@ describe("decodeArrayStream", () => {
     };
   };
 
-  const createStream = async function*(object: any) {
+  const createStream = async function* (object: any) {
     for (const byte of encode(object)) {
       yield [byte];
     }
@@ -28,7 +28,7 @@ describe("decodeArrayStream", () => {
   });
 
   it("decodes numbers of array (array16)", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield [0xdc, 0, 3];
       yield encode(1);
       yield encode(2);
@@ -45,7 +45,7 @@ describe("decodeArrayStream", () => {
   });
 
   it("decodes numbers of array (array32)", async () => {
-    const createStream = async function*() {
+    const createStream = async function* () {
       yield [0xdd, 0, 0, 0, 3];
       yield encode(1);
       yield encode(2);

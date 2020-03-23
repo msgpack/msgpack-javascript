@@ -91,7 +91,7 @@ describe("ExtensionCodec", () => {
         ["bar", "baz"],
       ]);
       const encoded = encode([set, map], { extensionCodec });
-      const createStream = async function*() {
+      const createStream = async function* () {
         yield encoded;
       };
       assert.deepStrictEqual(await decodeAsync(createStream(), { extensionCodec }), [set, map]);
@@ -169,7 +169,7 @@ describe("ExtensionCodec", () => {
       const magic2 = new Magic({ foo: new Magic("inner") });
       const test = [magic1, magic2];
       const encoded = encode(test, { extensionCodec, context });
-      const createStream = async function*() {
+      const createStream = async function* () {
         yield encoded;
       };
       assert.deepStrictEqual(await decodeAsync(createStream(), { extensionCodec, context }), test);
