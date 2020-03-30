@@ -56,6 +56,7 @@
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "assert": "latest",
+    "blob-polyfill": "latest",
     "core-js": "latest",
     "eslint": "latest",
     "eslint-config-prettier": "latest",
