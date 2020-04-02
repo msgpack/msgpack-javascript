@@ -68,7 +68,7 @@
     "karma-cli": "latest",
     "karma-firefox-launcher": "latest",
     "karma-mocha": "latest",
-    "karma-sauce-launcher": "^2",
+    "karma-sauce-launcher": "latest",
     "karma-sourcemap-loader": "latest",
     "karma-webpack": "latest",
     "lodash": "latest",
