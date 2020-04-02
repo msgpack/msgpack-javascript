@@ -10,8 +10,11 @@ describe("Blob", () => {
     assert.deepStrictEqual(decode(await blob.arrayBuffer()), "Hello!");
   });
 
-  it("decodes it with `decodeAsync()`", async () => {
+  it("decodes it with `decodeAsync()`", async function () {
     const blob = new MyBlob([encode("Hello!")]);
+    if (!blob.stream) {
+      this.skip();
+    }
     assert.deepStrictEqual(await decodeAsync(blob.stream()), "Hello!");
   });
 });
