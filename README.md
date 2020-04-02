@@ -53,6 +53,7 @@ deepStrictEqual(decode(encoded), object);
     - [Codec context](#codec-context)
     - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
     - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
+- [Decoding a Blob](#decoding-a-blob)
 - [MessagePack Specification](#messagepack-specification)
   - [MessagePack Mapping Table](#messagepack-mapping-table)
 - [Prerequsites](#prerequsites)
@@ -385,6 +386,25 @@ deepStrictEqual(decoded, instant);
 ```
 
 This will be default once the temporal module is standardizied, which is not a near-future, though.
+
+## Decoding a Blob
+
+[`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) is a binary data container provided by browsers. To read its contents, you can use `Blob#arrayBuffer()` or `Blob#stream()`. `Blob#stream()`
+is recommended if your target platform support it. This is because streaming
+decode should be faster for large objects. In both ways, you need to use
+asynchronous API.
+
+```typescript
+// (1) Blob#arrayBuffer(): Promise<ArrayBuffer>
+async function f(blob: Blob) {
+  const object = decode(await blob.arrayBuffer());
+}
+
+// (2) Blob#stream(): ReadableStream<Uint8Array>
+async function g(blob: Blob) {
+  const object = await decodeAsync(blob.stream());
+}
+```
 
 ## MessagePack Specification
 
