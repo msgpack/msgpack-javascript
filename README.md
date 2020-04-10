@@ -129,7 +129,7 @@ It decodes `buffer` encoded in MessagePack, and returns a decoded object as `ukn
 for example:
 
 ```typescript
-import { encode } from "@msgpack/msgpack";
+import { decode } from "@msgpack/msgpack";
 
 const encoded: Uint8Array;
 const object = decode(encoded);
