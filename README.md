@@ -464,8 +464,9 @@ NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5/msgpack`.
 
 ## Benchmark
 
-V8's built-in JSON has been improved continuouosly, esp. `JSON.parse()` is [significantly improved in V8 7.6](https://v8.dev/blog/v8-release-76), it is the fastest deserializer so far,
-as the benchmark result bellow suggests.
+Run-time performance is not the only reason to use MessagePack, but a benchmark suite is provided to monitor the performance of this library continuously.
+
+V8's built-in JSON has been improved for years, esp. `JSON.parse()` is [significantly improved in V8/7.6](https://v8.dev/blog/v8-release-76), it is the fastest deserializer as of 2019, as the benchmark result bellow suggests.
 
 However, MessagePack can handles binary data effectively, actual performance depends on situations. You'd better take benchmark on your own use-case if performance matters.
 
