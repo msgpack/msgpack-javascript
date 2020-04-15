@@ -464,19 +464,23 @@ NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5/msgpack`.
 
 ## Benchmark
 
-Benchmark on NodeJS/v12.14.1
+V8's built-in JSON has been improved continuouosly, esp. `JSON.parse()` is [significantly improved in V8 7.6](https://v8.dev/blog/v8-release-76), it is the fastest deserializer so far,
+as the benchmark result bellow suggests.
+
+However, MessagePack can handles binary data effectively, actual performance depends on situations. You'd better take benchmark on your own use-case if performance matters.
+
+Benchmark on NodeJS/v12.16.2 (v8/7.8)
 
 operation                                                         |   op   |   ms  |  op/s
 ----------------------------------------------------------------- | ------: | ----: | ------:
-buf = Buffer.from(JSON.stringify(obj));                           |  627500 |  5000 |  125500
-buf = JSON.stringify(obj);                                        | 1095600 |  5000 |  219120
-obj = JSON.parse(buf);                                            | 1469100 |  5000 |  293820
-buf = require("msgpack-lite").encode(obj);                        |  541800 |  5000 |  108360
-obj = require("msgpack-lite").decode(buf);                        |  315200 |  5000 |   63040
-buf = require("@msgpack/msgpack").encode(obj);                    |  815200 |  5000 |  163040
-obj = require("@msgpack/msgpack").decode(buf);                    |  764600 |  5001 |  152889
+buf = Buffer.from(JSON.stringify(obj));                           |  768400 |  5000 |  153680
+obj = JSON.parse(buf);                                            | 1557500 |  5000 |  311500
+buf = require("msgpack-lite").encode(obj);                        |  588100 |  5000 |  117620
+obj = require("msgpack-lite").decode(buf);                        |  315800 |  5001 |   63147
+buf = require("@msgpack/msgpack").encode(obj);                    |  948200 |  5000 |  189640
+obj = require("@msgpack/msgpack").decode(buf);                    |  778900 |  5000 |  155780
 
-Note that `Buffer.from()` for `JSON.stringify()` is added to emulate I/O where a JavaScript string must be converted into a byte array encoded in UTF-8, whereas MessagePack's `encode()` returns a byte array.
+Note that `Buffer.from()` for `JSON.stringify()` is necessary to emulate I/O where a JavaScript string must be converted into a byte array encoded in UTF-8, whereas MessagePack's `encode()` returns a byte array.
 
 ## Distribution
 
