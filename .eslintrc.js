@@ -57,6 +57,7 @@ module.exports = {
     "@typescript-eslint/prefer-regexp-exec": "warn",
     "@typescript-eslint/prefer-nullish-coalescing": "warn",
     "@typescript-eslint/prefer-optional-chain": "warn",
+    "@typescript-eslint/prefer-ts-expect-error": "warn",
 
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
