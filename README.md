@@ -455,7 +455,8 @@ This is a universal JavaScript library that supports major browsers and NodeJS.
 
 ES2018 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js).
 
-If you support IE11, import `core-js` in your application entrypoints, as this library does in testing for browsers .
+If you support IE11, import `core-js` in your application entrypoints, as this library does in testing for browsers.
+
 ### NodeJS
 
 NodeJS v10 is required, but NodeJS v12 or later is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
