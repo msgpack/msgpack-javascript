@@ -32,6 +32,7 @@ profile-decode:
 
 benchmark:
 	npx ts-node benchmark/benchmark-from-msgpack-lite.ts
+	@echo
 	node benchmark/msgpack-benchmark.js
 
 .PHONY: test dist validate-branch benchmark

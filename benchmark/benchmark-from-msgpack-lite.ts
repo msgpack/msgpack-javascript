@@ -34,7 +34,8 @@ var COL2 = 7;
 var COL3 = 5;
 var COL4 = 7;
 
-console.log(`Benchmark on NodeJS/${process.version}\n`)
+const v8version = process.versions.v8.split(/\./, 2).join('.');
+console.log(`Benchmark on NodeJS/${process.version} (V8/${v8version})\n`)
 console.log(rpad("operation", COL1), "|", "  op  ", "|", "  ms ", "|", " op/s ");
 console.log(rpad("", COL1, "-"), "|", lpad(":", COL2, "-"), "|", lpad(":", COL3, "-"), "|", lpad(":", COL4, "-"));
 
