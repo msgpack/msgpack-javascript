@@ -395,14 +395,14 @@ decode should be faster for large objects. In both ways, you need to use
 asynchronous API.
 
 ```typescript
-// (1) Blob#arrayBuffer(): Promise<ArrayBuffer>
-async function f(blob: Blob) {
-  const object = decode(await blob.arrayBuffer());
-}
-
-// (2) Blob#stream(): ReadableStream<Uint8Array>
-async function g(blob: Blob) {
-  const object = await decodeAsync(blob.stream());
+async function decodeFromBlob(blob: Blob): unknown {
+  if (blob.stream) {
+    // Blob#stream(): ReadableStream<Uint8Array> (recommended)
+    return await decodeAsync(blob.stream());
+  } else {
+    // Blob#arrayBuffer(): Promise<ArrayBuffer> (if stream() is not available)
+    return decode(await blob.arrayBuffer());
+  }
 }
 ```
 
