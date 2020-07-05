@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 export type SplitTypes<T, U> = U extends T ? U : Exclude<T, U>;
 export type SplitUndefined<T> = SplitTypes<T, undefined>;
 

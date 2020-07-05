@@ -37,8 +37,11 @@ module.exports = {
 
     "@typescript-eslint/await-thenable": "warn",
     "@typescript-eslint/array-type": ["warn", { default: "generic" }],
-    "@typescript-eslint/camelcase": "warn",
-    "@typescript-eslint/class-name-casing": "warn", // to allow the initial underscore
+    "@typescript-eslint/naming-convention": [
+      "warn",
+      { "selector": "default", "format": ["camelCase", "UPPER_CASE", "PascalCase"], "leadingUnderscore": "allow" },
+      { "selector": "typeLike", "format": ["PascalCase"], "leadingUnderscore": "allow" },
+    ],
     "@typescript-eslint/restrict-plus-operands": ["warn", { "checkCompoundAssignments": true }],
     "@typescript-eslint/no-non-null-assertion": "warn", // NOTE: pay attention to it because it may cause unexpected behavior
     "@typescript-eslint/no-throw-literal": "warn",
@@ -61,6 +64,7 @@ module.exports = {
     "@typescript-eslint/prefer-ts-expect-error": "warn",
 
     "@typescript-eslint/indent": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-member-accessibility": "off",
     "@typescript-eslint/no-explicit-any": "off",

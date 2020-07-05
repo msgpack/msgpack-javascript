@@ -13,6 +13,7 @@ export type ExtensionEncoderType<ContextType> = (input: unknown, context: Contex
 
 // immutable interfce to ExtensionCodec
 export type ExtensionCodecType<ContextType> = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   __brand?: ContextType;
   tryToEncode(object: unknown, context: ContextType): ExtData | null;
   decode(data: Uint8Array, extType: number, context: ContextType): unknown;
@@ -23,6 +24,7 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
 
   // ensures ExtensionCodecType<X> matches ExtensionCodec<X>
   // this will make type errors a lot more clear
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   __brand?: ContextType;
 
   // built-in extensions

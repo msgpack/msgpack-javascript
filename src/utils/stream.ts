@@ -6,7 +6,7 @@
 // See https://streams.spec.whatwg.org/ for details
 export type ReadableStreamLike<T> = AsyncIterable<T> | ReadableStream<T>;
 
-export function isAsyncIterable<T>(object: object): object is AsyncIterable<T> {
+export function isAsyncIterable<T>(object: ReadableStreamLike<T>): object is AsyncIterable<T> {
   return (object as any)[Symbol.asyncIterator] != null;
 }
 
