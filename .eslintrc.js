@@ -18,12 +18,10 @@ module.exports = {
   },
   settings: {},
   rules: {
-    "no-undef": "off", // useless in TypeScript
     "no-constant-condition": ["warn", { checkLoops: false }],
     "no-useless-escape": "warn",
     "no-console": "warn",
     "no-var": "warn",
-    "valid-typeof": "warn", // "bigint" is not yet supported
     "no-return-await": "warn",
     "prefer-const": "warn",
     "guard-for-in": "warn",
@@ -33,7 +31,7 @@ module.exports = {
 
     "import/no-unresolved": "off", // cannot handle `paths` in tsconfig
     "import/no-cycle": "error",
-    "import/no-default-export": "error",
+    "import/no-default-export": "warn",
 
     "@typescript-eslint/await-thenable": "warn",
     "@typescript-eslint/array-type": ["warn", { default: "generic" }],
@@ -54,6 +52,7 @@ module.exports = {
     "@typescript-eslint/no-implied-eval": "warn",
     "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
     "@typescript-eslint/no-invalid-void-type": "warn",
+    "@typescript-eslint/no-loss-of-precision": "warn",
     "@typescript-eslint/prefer-for-of": "warn",
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
@@ -65,16 +64,11 @@ module.exports = {
 
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/explicit-member-accessibility": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-object-literal-type-assertion": "off",
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-parameter-properties": "off",
-    "@typescript-eslint/no-var-requires": "off", // enforces `import x = require("x")`, which is TypeScript-specific
-    "@typescript-eslint/prefer-interface": "off",
-    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
 
     "prettier/prettier": "warn",
   },
