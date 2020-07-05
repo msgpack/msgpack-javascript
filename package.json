@@ -30,7 +30,7 @@
     "lint": "eslint --ext .ts src test",
     "lint:fix": "eslint --fix --ext .ts src test",
     "lint:print-config": "eslint --print-config .eslintrc.js",
-    "update-dependencies": "rimraf node_modules/ package-lock.json && npm install && npm dedupe"
+    "update-dependencies": "npx rimraf node_modules/ package-lock.json && npm install && npm dedupe"
   },
   "homepage": "https://msgpack.org/",
   "repository": {
