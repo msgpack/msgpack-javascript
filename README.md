@@ -524,7 +524,7 @@ This library uses Travis CI.
 test matrix:
 
 * TypeScript targets
-  * `target=es2020` / `target=es5`
+  * `target=es2019` / `target=es5`
 * JavaScript engines
   * NodeJS, borwsers (Chrome, Firefox, Safari, IE11, and so on)
 
