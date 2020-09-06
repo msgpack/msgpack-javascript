@@ -8,7 +8,14 @@ interface KeyCacheRecord {
 const DEFAULT_MAX_KEY_LENGTH = 16;
 const DEFAULT_MAX_LENGTH_PER_KEY = 16;
 
-export class CachedKeyDecoder {
+export interface KeyDecoder {
+  canBeCached(byteLength: number): boolean;
+  decode(bytes: Uint8Array, inputOffset: number, byteLength: number): string;
+}
+
+export class CachedKeyDecoder implements KeyDecoder {
+  hit = 0;
+  miss = 0;
   private readonly caches: Array<Array<KeyCacheRecord>>;
 
   constructor(readonly maxKeyLength = DEFAULT_MAX_KEY_LENGTH, readonly maxLengthPerKey = DEFAULT_MAX_LENGTH_PER_KEY) {
@@ -57,8 +64,10 @@ export class CachedKeyDecoder {
   public decode(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
     const cachedValue = this.get(bytes, inputOffset, byteLength);
     if (cachedValue != null) {
+      this.hit++;
       return cachedValue;
     }
+    this.miss++;
 
     const value = utf8DecodeJs(bytes, inputOffset, byteLength);
     // Ensure to copy a slice of bytes because the byte may be NodeJS Buffer and Buffer#slice() returns a reference to its internal ArrayBuffer.

@@ -3,7 +3,7 @@ import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { getInt64, getUint64 } from "./utils/int";
 import { utf8DecodeJs, TEXT_ENCODING_AVAILABLE, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
-import { CachedKeyDecoder } from "./CachedKeyDecoder";
+import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
 
 const enum State {
   ARRAY,
@@ -77,7 +77,7 @@ export class Decoder<ContextType> {
     readonly maxArrayLength = DEFAULT_MAX_LENGTH,
     readonly maxMapLength = DEFAULT_MAX_LENGTH,
     readonly maxExtLength = DEFAULT_MAX_LENGTH,
-    readonly cachedKeyDecoder: CachedKeyDecoder | null = sharedCachedKeyDecoder,
+    readonly keyDecoder: KeyDecoder | null = sharedCachedKeyDecoder,
   ) {}
 
   private reinitializeState() {
@@ -494,8 +494,8 @@ export class Decoder<ContextType> {
 
     const offset = this.pos + headerOffset;
     let object: string;
-    if (this.stateIsMapKey() && this.cachedKeyDecoder?.canBeCached(byteLength)) {
-      object = this.cachedKeyDecoder.decode(this.bytes, offset, byteLength);
+    if (this.stateIsMapKey() && this.keyDecoder?.canBeCached(byteLength)) {
+      object = this.keyDecoder.decode(this.bytes, offset, byteLength);
     } else if (TEXT_ENCODING_AVAILABLE && byteLength > TEXT_DECODER_THRESHOLD) {
       object = utf8DecodeTD(this.bytes, offset, byteLength);
     } else {

@@ -69,6 +69,11 @@ if (msgpack_msgpack) {
   buf = bench('buf = /* @msgpack/msgpack */ encoder.encode(obj);', (data) => encoder.encode(data), data);
   obj = bench('obj = /* @msgpack/msgpack */ decoder.decodeSync(buf);', (buf) => decoder.decodeSync(buf), buf);
   runTest(obj);
+
+  if (process.env.CACHE_HIT_RATE) {
+    const {hit, miss} = decoder.keyDecoder;
+    console.log(`CACHE_HIT_RATE: cache hit rate in CachedKeyDecoder: hit=${hit}, hiss=${miss}, hit rate=${hit / (hit + miss)}`);
+  }
 }
 
 if (msgpack_js_v5) {
