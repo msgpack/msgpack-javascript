@@ -61,23 +61,23 @@ const DEFAULT_MAX_LENGTH = 0xffff_ffff; // uint32_max
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
 
 export class Decoder<ContextType> {
-  totalPos = 0;
-  pos = 0;
+  private totalPos = 0;
+  private pos = 0;
 
-  view = EMPTY_VIEW;
-  bytes = EMPTY_BYTES;
-  headByte = HEAD_BYTE_REQUIRED;
-  readonly stack: Array<StackState> = [];
+  private view = EMPTY_VIEW;
+  private bytes = EMPTY_BYTES;
+  private headByte = HEAD_BYTE_REQUIRED;
+  private readonly stack: Array<StackState> = [];
 
-  constructor(
-    readonly context: ContextType,
-    readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
-    readonly maxStrLength = DEFAULT_MAX_LENGTH,
-    readonly maxBinLength = DEFAULT_MAX_LENGTH,
-    readonly maxArrayLength = DEFAULT_MAX_LENGTH,
-    readonly maxMapLength = DEFAULT_MAX_LENGTH,
-    readonly maxExtLength = DEFAULT_MAX_LENGTH,
-    readonly keyDecoder: KeyDecoder | null = sharedCachedKeyDecoder,
+  public constructor(
+    private readonly context: ContextType,
+    private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
+    private readonly maxStrLength = DEFAULT_MAX_LENGTH,
+    private readonly maxBinLength = DEFAULT_MAX_LENGTH,
+    private readonly maxArrayLength = DEFAULT_MAX_LENGTH,
+    private readonly maxMapLength = DEFAULT_MAX_LENGTH,
+    private readonly maxExtLength = DEFAULT_MAX_LENGTH,
+    private readonly keyDecoder: KeyDecoder | null = sharedCachedKeyDecoder,
   ) {}
 
   private reinitializeState() {
@@ -85,13 +85,13 @@ export class Decoder<ContextType> {
     this.headByte = HEAD_BYTE_REQUIRED;
   }
 
-  setBuffer(buffer: ArrayLike<number> | ArrayBuffer): void {
+  private setBuffer(buffer: ArrayLike<number> | ArrayBuffer): void {
     this.bytes = ensureUint8Array(buffer);
     this.view = createDataView(this.bytes);
     this.pos = 0;
   }
 
-  appendBuffer(buffer: ArrayLike<number>) {
+  public appendBuffer(buffer: ArrayLike<number>) {
     if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
       this.setBuffer(buffer);
     } else {
@@ -105,11 +105,11 @@ export class Decoder<ContextType> {
     }
   }
 
-  hasRemaining(size = 1) {
+  private hasRemaining(size = 1) {
     return this.view.byteLength - this.pos >= size;
   }
 
-  createNoExtraBytesError(posToShow: number): Error {
+  private createNoExtraBytesError(posToShow: number): Error {
     const { view, pos } = this;
     return new RangeError(`Extra ${view.byteLength - pos} of ${view.byteLength} byte(s) found at buffer[${posToShow}]`);
   }
@@ -118,7 +118,7 @@ export class Decoder<ContextType> {
    * A synchronous interface to decode a byte buffer. It mutates the decoder instance.
    * @param buffer A byte buffer encoded in MessagePack.
    */
-  decodeSync(buffer: ArrayLike<number> | ArrayBuffer): unknown {
+  public decodeSync(buffer: ArrayLike<number> | ArrayBuffer): unknown {
     this.reinitializeState();
     this.setBuffer(buffer);
     return this.doDecodeSingleSync();
@@ -132,7 +132,7 @@ export class Decoder<ContextType> {
     return object;
   }
 
-  async decodeSingleAsync(stream: AsyncIterable<ArrayLike<number>>): Promise<unknown> {
+  public async decodeSingleAsync(stream: AsyncIterable<ArrayLike<number>>): Promise<unknown> {
     let decoded = false;
     let object: unknown;
     for await (const buffer of stream) {
@@ -167,11 +167,11 @@ export class Decoder<ContextType> {
     );
   }
 
-  decodeArrayStream(stream: AsyncIterable<ArrayLike<number>>) {
+  public decodeArrayStream(stream: AsyncIterable<ArrayLike<number>>) {
     return this.decodeMultiAsync(stream, true);
   }
 
-  decodeStream(stream: AsyncIterable<ArrayLike<number>>) {
+  public decodeStream(stream: AsyncIterable<ArrayLike<number>>) {
     return this.decodeMultiAsync(stream, false);
   }
 
@@ -425,7 +425,7 @@ export class Decoder<ContextType> {
     }
   }
 
-  readHeadByte(): number {
+  private readHeadByte(): number {
     if (this.headByte === HEAD_BYTE_REQUIRED) {
       this.headByte = this.readU8();
       // console.log("headByte", prettyByte(this.headByte));
@@ -434,11 +434,11 @@ export class Decoder<ContextType> {
     return this.headByte;
   }
 
-  complete(): void {
+  private complete(): void {
     this.headByte = HEAD_BYTE_REQUIRED;
   }
 
-  readArraySize(): number {
+  private readArraySize(): number {
     const headByte = this.readHeadByte();
 
     switch (headByte) {
@@ -456,7 +456,7 @@ export class Decoder<ContextType> {
     }
   }
 
-  pushMapState(size: number) {
+  private pushMapState(size: number) {
     if (size > this.maxMapLength) {
       throw new Error(`Max length exceeded: map length (${size}) > maxMapLengthLength (${this.maxMapLength})`);
     }
@@ -470,7 +470,7 @@ export class Decoder<ContextType> {
     });
   }
 
-  pushArrayState(size: number) {
+  private pushArrayState(size: number) {
     if (size > this.maxArrayLength) {
       throw new Error(`Max length exceeded: array length (${size}) > maxArrayLength (${this.maxArrayLength})`);
     }
@@ -483,7 +483,7 @@ export class Decoder<ContextType> {
     });
   }
 
-  decodeUtf8String(byteLength: number, headerOffset: number): string {
+  private decodeUtf8String(byteLength: number, headerOffset: number): string {
     if (byteLength > this.maxStrLength) {
       throw new Error(`Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`);
     }
@@ -505,7 +505,7 @@ export class Decoder<ContextType> {
     return object;
   }
 
-  stateIsMapKey(): boolean {
+  private stateIsMapKey(): boolean {
     if (this.stack.length > 0) {
       const state = this.stack[this.stack.length - 1];
       return state.type === State.MAP_KEY;
@@ -513,7 +513,7 @@ export class Decoder<ContextType> {
     return false;
   }
 
-  decodeBinary(byteLength: number, headOffset: number): Uint8Array {
+  private decodeBinary(byteLength: number, headOffset: number): Uint8Array {
     if (byteLength > this.maxBinLength) {
       throw new Error(`Max length exceeded: bin length (${byteLength}) > maxBinLength (${this.maxBinLength})`);
     }
@@ -528,7 +528,7 @@ export class Decoder<ContextType> {
     return object;
   }
 
-  decodeExtension(size: number, headOffset: number): unknown {
+  private decodeExtension(size: number, headOffset: number): unknown {
     if (size > this.maxExtLength) {
       throw new Error(`Max length exceeded: ext length (${size}) > maxExtLength (${this.maxExtLength})`);
     }
@@ -538,73 +538,73 @@ export class Decoder<ContextType> {
     return this.extensionCodec.decode(data, extType, this.context);
   }
 
-  lookU8() {
+  private lookU8() {
     return this.view.getUint8(this.pos);
   }
 
-  lookU16() {
+  private lookU16() {
     return this.view.getUint16(this.pos);
   }
 
-  lookU32() {
+  private lookU32() {
     return this.view.getUint32(this.pos);
   }
 
-  readU8(): number {
+  private readU8(): number {
     const value = this.view.getUint8(this.pos);
     this.pos++;
     return value;
   }
 
-  readI8(): number {
+  private readI8(): number {
     const value = this.view.getInt8(this.pos);
     this.pos++;
     return value;
   }
 
-  readU16(): number {
+  private readU16(): number {
     const value = this.view.getUint16(this.pos);
     this.pos += 2;
     return value;
   }
 
-  readI16(): number {
+  private readI16(): number {
     const value = this.view.getInt16(this.pos);
     this.pos += 2;
     return value;
   }
 
-  readU32(): number {
+  private readU32(): number {
     const value = this.view.getUint32(this.pos);
     this.pos += 4;
     return value;
   }
 
-  readI32(): number {
+  private readI32(): number {
     const value = this.view.getInt32(this.pos);
     this.pos += 4;
     return value;
   }
 
-  readU64(): number {
+  private readU64(): number {
     const value = getUint64(this.view, this.pos);
     this.pos += 8;
     return value;
   }
 
-  readI64(): number {
+  private readI64(): number {
     const value = getInt64(this.view, this.pos);
     this.pos += 8;
     return value;
   }
 
-  readF32() {
+  private readF32() {
     const value = this.view.getFloat32(this.pos);
     this.pos += 4;
     return value;
   }
 
-  readF64() {
+  private readF64() {
     const value = this.view.getFloat64(this.pos);
     this.pos += 8;
     return value;
