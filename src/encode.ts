@@ -40,8 +40,8 @@ export function encode<ContextType>(
   options: EncodeOptions<SplitUndefined<ContextType>> = defaultEncodeOptions as any,
 ): Uint8Array {
   const encoder = new Encoder<ContextType>(
-    (options as typeof options & { context: any }).context,
     options.extensionCodec,
+    (options as typeof options & { context: any }).context,
     options.maxDepth,
     options.initialBufferSize,
     options.sortKeys,

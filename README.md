@@ -50,7 +50,7 @@ deepStrictEqual(decode(encoded), object);
   - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
   - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
   - [Extension Types](#extension-types)
-    - [Codec context](#codec-context)
+    - [ExtensionCodec context](#extensioncodec-context)
     - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
     - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
 - [Decoding a Blob](#decoding-a-blob)
@@ -266,7 +266,7 @@ const decoded = decode(encoded, { extensionCodec });
 
 Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
 
-#### Codec context
+#### ExtensionCodec context
 
 When using an extension codec, it may be necessary to keep encoding/decoding state, to keep track of which objects got encoded/re-created. To do this, pass a `context` to the `EncodeOptions` and `DecodeOptions` (and if using typescript, type the `ExtensionCodec` too). Don't forget to pass the `{extensionCodec, context}` along recursive encoding/decoding:
 

@@ -9,8 +9,8 @@ const createStream = async function* (...args: any) {
 
 describe("shared instances", () => {
   context("encode() and decodeSync()", () => {
-    const encoder = new Encoder(undefined);
-    const decoder = new Decoder(undefined);
+    const encoder = new Encoder();
+    const decoder = new Decoder();
 
     it("runs #1", () => {
       const object = {
@@ -46,8 +46,8 @@ describe("shared instances", () => {
   });
 
   context("encode() and decodeAsync()", () => {
-    const encoder = new Encoder(undefined);
-    const decoder = new Decoder(undefined);
+    const encoder = new Encoder();
+    const decoder = new Decoder();
 
     it("runs #1", async () => {
       const object = {
@@ -83,8 +83,8 @@ describe("shared instances", () => {
   });
 
   context("encode() and decodeStream()", () => {
-    const encoder = new Encoder(undefined);
-    const decoder = new Decoder(undefined);
+    const encoder = new Encoder();
+    const decoder = new Decoder();
 
     it("runs #1", async () => {
       const object = {
@@ -128,8 +128,8 @@ describe("shared instances", () => {
   });
 
   context("encode() and decodeArrayStream()", () => {
-    const encoder = new Encoder(undefined);
-    const decoder = new Decoder(undefined);
+    const encoder = new Encoder();
+    const decoder = new Decoder();
 
     it("runs #1", async () => {
       const object = {

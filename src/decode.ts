@@ -47,8 +47,8 @@ export function decode<ContextType>(
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ): unknown {
   const decoder = new Decoder<ContextType>(
-    (options as typeof options & { context: any }).context,
     options.extensionCodec,
+    (options as typeof options & { context: any }).context,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,

@@ -70,8 +70,8 @@ export class Decoder<ContextType> {
   private readonly stack: Array<StackState> = [];
 
   public constructor(
-    private readonly context: ContextType,
     private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
+    private readonly context: ContextType = undefined as any,
     private readonly maxStrLength = DEFAULT_MAX_LENGTH,
     private readonly maxBinLength = DEFAULT_MAX_LENGTH,
     private readonly maxArrayLength = DEFAULT_MAX_LENGTH,

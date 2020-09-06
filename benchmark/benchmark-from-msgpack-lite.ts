@@ -67,7 +67,7 @@ if (msgpack_msgpack) {
   const encoder = new msgpack_msgpack.Encoder();
   const decoder = new msgpack_msgpack.Decoder();
   buf = bench('buf = /* @msgpack/msgpack */ encoder.encode(obj);', (data) => encoder.encode(data), data);
-  obj = bench('obj = /* @msgpack/msgpack */ decoder.decodeSync(buf);', (buf) => decoder.decodeSync(buf), buf);
+  obj = bench('obj = /* @msgpack/msgpack */ decoder.decode(buf);', (buf) => decoder.decode(buf), buf);
   runTest(obj);
 
   if (process.env.CACHE_HIT_RATE) {

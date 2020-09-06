@@ -13,8 +13,8 @@ export class Encoder<ContextType> {
   private bytes = new Uint8Array(this.view.buffer);
 
   public constructor(
-    private readonly context: ContextType,
     private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
+    private readonly context: ContextType = undefined as any,
     private readonly maxDepth = DEFAULT_MAX_DEPTH,
     private readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
     private readonly sortKeys = false,
