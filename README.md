@@ -49,7 +49,8 @@ deepStrictEqual(decode(encoded), object);
   - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
   - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
   - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
-  - [Extension Types](#extension-types)
+  - [Reusing Encoder and Decoder instances](#reusing-encoder-and-decoder-instances)
+- [Extension Types](#extension-types)
     - [ExtensionCodec context](#extensioncodec-context)
     - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
     - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
@@ -212,7 +213,27 @@ for await (const item of decodeStream(stream)) {
 }
 ```
 
-### Extension Types
+### Reusing Encoder and Decoder instances
+
+`Encoder` and `Decoder` classes is provided for better performance:
+
+```typescript
+import { deepStrictEqual } from "assert";
+import { Encoder, Decoder } from "@msgpack/msgpack";
+
+const encoder = new Encoder();
+const decoder = new Decoder();
+
+const encoded: Uint8Array = encoder.encode(object);
+deepStrictEqual(decoder.decode(encoded), object);
+```
+
+According to our benchmark, reusing `Encoder` instance is about 2% faster
+than `encode()` function, and reusing `Decoder` instance is about 35% faster
+than `decode()` function. Note that the result should vary in environments
+and data structure.
+
+## Extension Types
 
 To handle [MessagePack Extension Types](https://github.com/msgpack/msgpack/blob/master/spec.md#extension-types), this library provides `ExtensionCodec` class.
 
