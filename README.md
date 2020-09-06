@@ -49,8 +49,9 @@ deepStrictEqual(decode(encoded), object);
   - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
   - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
   - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
-  - [Extension Types](#extension-types)
-    - [Codec context](#codec-context)
+  - [Reusing Encoder and Decoder instances](#reusing-encoder-and-decoder-instances)
+- [Extension Types](#extension-types)
+    - [ExtensionCodec context](#extensioncodec-context)
     - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
     - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
 - [Decoding a Blob](#decoding-a-blob)
@@ -212,7 +213,27 @@ for await (const item of decodeStream(stream)) {
 }
 ```
 
-### Extension Types
+### Reusing Encoder and Decoder instances
+
+`Encoder` and `Decoder` classes is provided for better performance:
+
+```typescript
+import { deepStrictEqual } from "assert";
+import { Encoder, Decoder } from "@msgpack/msgpack";
+
+const encoder = new Encoder();
+const decoder = new Decoder();
+
+const encoded: Uint8Array = encoder.encode(object);
+deepStrictEqual(decoder.decode(encoded), object);
+```
+
+According to our benchmark, reusing `Encoder` instance is about 2% faster
+than `encode()` function, and reusing `Decoder` instance is about 35% faster
+than `decode()` function. Note that the result should vary in environments
+and data structure.
+
+## Extension Types
 
 To handle [MessagePack Extension Types](https://github.com/msgpack/msgpack/blob/master/spec.md#extension-types), this library provides `ExtensionCodec` class.
 
@@ -266,7 +287,7 @@ const decoded = decode(encoded, { extensionCodec });
 
 Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
 
-#### Codec context
+#### ExtensionCodec context
 
 When using an extension codec, it may be necessary to keep encoding/decoding state, to keep track of which objects got encoded/re-created. To do this, pass a `context` to the `EncodeOptions` and `DecodeOptions` (and if using typescript, type the `ExtensionCodec` too). Don't forget to pass the `{extensionCodec, context}` along recursive encoding/decoding:
 

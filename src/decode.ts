@@ -55,6 +55,5 @@ export function decode<ContextType>(
     options.maxMapLength,
     options.maxExtLength,
   );
-  decoder.setBuffer(buffer); // decodeSync() requires only one buffer
-  return decoder.decodeSingleSync();
+  return decoder.decode(buffer);
 }

@@ -48,6 +48,5 @@ export function encode<ContextType>(
     options.forceFloat32,
     options.ignoreUndefined,
   );
-  encoder.encode(value, 1);
-  return encoder.getUint8Array();
+  return encoder.encode(value);
 }

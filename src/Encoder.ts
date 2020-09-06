@@ -12,17 +12,31 @@ export class Encoder<ContextType> {
   private view = new DataView(new ArrayBuffer(this.initialBufferSize));
   private bytes = new Uint8Array(this.view.buffer);
 
-  constructor(
-    readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
-    readonly context: ContextType,
-    readonly maxDepth = DEFAULT_MAX_DEPTH,
-    readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
-    readonly sortKeys = false,
-    readonly forceFloat32 = false,
-    readonly ignoreUndefined = false,
+  public constructor(
+    private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
+    private readonly context: ContextType = undefined as any,
+    private readonly maxDepth = DEFAULT_MAX_DEPTH,
+    private readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
+    private readonly sortKeys = false,
+    private readonly forceFloat32 = false,
+    private readonly ignoreUndefined = false,
   ) {}
 
-  encode(object: unknown, depth: number): void {
+  private getUint8Array(): Uint8Array {
+    return this.bytes.subarray(0, this.pos);
+  }
+
+  private reinitializeState() {
+    this.pos = 0;
+  }
+
+  public encode(object: unknown): Uint8Array {
+    this.reinitializeState();
+    this.doEncode(object, 1);
+    return this.getUint8Array();
+  }
+
+  private doEncode(object: unknown, depth: number): void {
     if (depth > this.maxDepth) {
       throw new Error(`Too deep objects in depth ${depth}`);
     }
@@ -40,11 +54,7 @@ export class Encoder<ContextType> {
     }
   }
 
-  getUint8Array(): Uint8Array {
-    return this.bytes.subarray(0, this.pos);
-  }
-
-  ensureBufferSizeToWrite(sizeToWrite: number) {
+  private ensureBufferSizeToWrite(sizeToWrite: number) {
     const requiredSize = this.pos + sizeToWrite;
 
     if (this.view.byteLength < requiredSize) {
@@ -52,7 +62,7 @@ export class Encoder<ContextType> {
     }
   }
 
-  resizeBuffer(newSize: number) {
+  private resizeBuffer(newSize: number) {
     const newBuffer = new ArrayBuffer(newSize);
     const newBytes = new Uint8Array(newBuffer);
     const newView = new DataView(newBuffer);
@@ -63,18 +73,18 @@ export class Encoder<ContextType> {
     this.bytes = newBytes;
   }
 
-  encodeNil() {
+  private encodeNil() {
     this.writeU8(0xc0);
   }
 
-  encodeBoolean(object: boolean) {
+  private encodeBoolean(object: boolean) {
     if (object === false) {
       this.writeU8(0xc2);
     } else {
       this.writeU8(0xc3);
     }
   }
-  encodeNumber(object: number) {
+  private encodeNumber(object: number) {
     if (Number.isSafeInteger(object)) {
       if (object >= 0) {
         if (object < 0x80) {
@@ -133,7 +143,7 @@ export class Encoder<ContextType> {
     }
   }
 
-  writeStringHeader(byteLength: number) {
+  private writeStringHeader(byteLength: number) {
     if (byteLength < 32) {
       // fixstr
       this.writeU8(0xa0 + byteLength);
@@ -154,7 +164,7 @@ export class Encoder<ContextType> {
     }
   }
 
-  encodeString(object: string) {
+  private encodeString(object: string) {
     const maxHeaderSize = 1 + 4;
     const strLength = object.length;
 
@@ -173,7 +183,7 @@ export class Encoder<ContextType> {
     }
   }
 
-  encodeObject(object: unknown, depth: number) {
+  private encodeObject(object: unknown, depth: number) {
     // try to encode objects with custom codec first of non-primitives
     const ext = this.extensionCodec.tryToEncode(object, this.context);
     if (ext != null) {
@@ -190,7 +200,7 @@ export class Encoder<ContextType> {
     }
   }
 
-  encodeBinary(object: ArrayBufferView) {
+  private encodeBinary(object: ArrayBufferView) {
     const size = object.byteLength;
     if (size < 0x100) {
       // bin 8
@@ -211,7 +221,7 @@ export class Encoder<ContextType> {
     this.writeU8a(bytes);
   }
 
-  encodeArray(object: Array<unknown>, depth: number) {
+  private encodeArray(object: Array<unknown>, depth: number) {
     const size = object.length;
     if (size < 16) {
       // fixarray
@@ -228,11 +238,11 @@ export class Encoder<ContextType> {
       throw new Error(`Too large array: ${size}`);
     }
     for (const item of object) {
-      this.encode(item, depth + 1);
+      this.doEncode(item, depth + 1);
     }
   }
 
-  countWithoutUndefined(object: Record<string, unknown>, keys: ReadonlyArray<string>): number {
+  private countWithoutUndefined(object: Record<string, unknown>, keys: ReadonlyArray<string>): number {
     let count = 0;
 
     for (const key of keys) {
@@ -244,7 +254,7 @@ export class Encoder<ContextType> {
     return count;
   }
 
-  encodeMap(object: Record<string, unknown>, depth: number) {
+  private encodeMap(object: Record<string, unknown>, depth: number) {
     const keys = Object.keys(object);
     if (this.sortKeys) {
       keys.sort();
@@ -272,12 +282,12 @@ export class Encoder<ContextType> {
 
       if (!(this.ignoreUndefined && value === undefined)) {
         this.encodeString(key);
-        this.encode(value, depth + 1);
+        this.doEncode(value, depth + 1);
       }
     }
   }
 
-  encodeExtension(ext: ExtData) {
+  private encodeExtension(ext: ExtData) {
     const size = ext.data.length;
     if (size === 1) {
       // fixext 1
@@ -313,14 +323,14 @@ export class Encoder<ContextType> {
     this.writeU8a(ext.data);
   }
 
-  writeU8(value: number) {
+  private writeU8(value: number) {
     this.ensureBufferSizeToWrite(1);
 
     this.view.setUint8(this.pos, value);
     this.pos++;
   }
 
-  writeU8a(values: ArrayLike<number>) {
+  private writeU8a(values: ArrayLike<number>) {
     const size = values.length;
     this.ensureBufferSizeToWrite(size);
 
@@ -328,61 +338,61 @@ export class Encoder<ContextType> {
     this.pos += size;
   }
 
-  writeI8(value: number) {
+  private writeI8(value: number) {
     this.ensureBufferSizeToWrite(1);
 
     this.view.setInt8(this.pos, value);
     this.pos++;
   }
 
-  writeU16(value: number) {
+  private writeU16(value: number) {
     this.ensureBufferSizeToWrite(2);
 
     this.view.setUint16(this.pos, value);
     this.pos += 2;
   }
 
-  writeI16(value: number) {
+  private writeI16(value: number) {
     this.ensureBufferSizeToWrite(2);
 
     this.view.setInt16(this.pos, value);
     this.pos += 2;
   }
 
-  writeU32(value: number) {
+  private writeU32(value: number) {
     this.ensureBufferSizeToWrite(4);
 
     this.view.setUint32(this.pos, value);
     this.pos += 4;
   }
 
-  writeI32(value: number) {
+  private writeI32(value: number) {
     this.ensureBufferSizeToWrite(4);
 
     this.view.setInt32(this.pos, value);
     this.pos += 4;
   }
 
-  writeF32(value: number) {
+  private writeF32(value: number) {
     this.ensureBufferSizeToWrite(4);
     this.view.setFloat32(this.pos, value);
     this.pos += 4;
   }
 
-  writeF64(value: number) {
+  private writeF64(value: number) {
     this.ensureBufferSizeToWrite(8);
     this.view.setFloat64(this.pos, value);
     this.pos += 8;
   }
 
-  writeU64(value: number) {
+  private writeU64(value: number) {
     this.ensureBufferSizeToWrite(8);
 
     setUint64(this.view, this.pos, value);
     this.pos += 8;
   }
 
-  writeI64(value: number) {
+  private writeI64(value: number) {
     this.ensureBufferSizeToWrite(8);
 
     setInt64(this.view, this.pos, value);

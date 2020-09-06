@@ -45,7 +45,7 @@ module.exports = {
     "@typescript-eslint/no-throw-literal": "warn",
     "@typescript-eslint/no-extra-semi": "warn",
     "@typescript-eslint/no-extra-non-null-assertion": "warn",
-    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-use-before-define": "warn",
     "@typescript-eslint/no-for-in-array": "warn",
     "@typescript-eslint/no-unnecessary-condition": ["warn", { "allowConstantLoopConditions": true }],

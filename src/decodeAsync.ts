@@ -18,7 +18,7 @@ export async function decodeAsync<ContextType>(
     options.maxMapLength,
     options.maxExtLength,
   );
-  return decoder.decodeSingleAsync(stream);
+  return decoder.decodeAsync(stream);
 }
 
 export function decodeArrayStream<ContextType>(
