@@ -22,7 +22,7 @@ export class Encoder<ContextType> {
     private readonly ignoreUndefined = false,
   ) {}
 
-  public getUint8Array(): Uint8Array {
+  private getUint8Array(): Uint8Array {
     return this.bytes.subarray(0, this.pos);
   }
 

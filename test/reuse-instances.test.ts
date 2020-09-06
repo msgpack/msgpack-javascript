@@ -25,7 +25,7 @@ describe("shared instances", () => {
       };
 
       const encoded: Uint8Array = encoder.encode(object);
-      deepStrictEqual(decoder.decodeSync(encoded), object);
+      deepStrictEqual(decoder.decode(encoded), object);
     });
 
     it("runs #2", () => {
@@ -41,7 +41,7 @@ describe("shared instances", () => {
       };
 
       const encoded: Uint8Array = encoder.encode(object);
-      deepStrictEqual(decoder.decodeSync(encoded), object);
+      deepStrictEqual(decoder.decode(encoded), object);
     });
   });
 

@@ -91,7 +91,7 @@ export class Decoder<ContextType> {
     this.pos = 0;
   }
 
-  public appendBuffer(buffer: ArrayLike<number>) {
+  private appendBuffer(buffer: ArrayLike<number>) {
     if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
       this.setBuffer(buffer);
     } else {
@@ -114,11 +114,7 @@ export class Decoder<ContextType> {
     return new RangeError(`Extra ${view.byteLength - pos} of ${view.byteLength} byte(s) found at buffer[${posToShow}]`);
   }
 
-  /**
-   * A synchronous interface to decode a byte buffer. It mutates the decoder instance.
-   * @param buffer A byte buffer encoded in MessagePack.
-   */
-  public decodeSync(buffer: ArrayLike<number> | ArrayBuffer): unknown {
+  public decode(buffer: ArrayLike<number> | ArrayBuffer): unknown {
     this.reinitializeState();
     this.setBuffer(buffer);
     return this.doDecodeSingleSync();

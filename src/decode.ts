@@ -55,5 +55,5 @@ export function decode<ContextType>(
     options.maxMapLength,
     options.maxExtLength,
   );
-  return decoder.decodeSync(buffer);
+  return decoder.decode(buffer);
 }
