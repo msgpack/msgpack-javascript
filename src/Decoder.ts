@@ -132,7 +132,7 @@ export class Decoder<ContextType> {
     return object;
   }
 
-  public async decodeSingleAsync(stream: AsyncIterable<ArrayLike<number>>): Promise<unknown> {
+  public async decodeAsync(stream: AsyncIterable<ArrayLike<number>>): Promise<unknown> {
     let decoded = false;
     let object: unknown;
     for await (const buffer of stream) {
