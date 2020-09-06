@@ -8,7 +8,6 @@ var msgpack_lite = try_require("msgpack-lite");
 var msgpack_js = try_require("msgpack-js");
 var msgpack_js_v5 = try_require("msgpack-js-v5");
 var msgpack5 = try_require("msgpack5");
-var msgpack_unpack = try_require("msgpack-unpack");
 var notepack = try_require("notepack");
 
 msgpack5 = msgpack5 && msgpack5();
@@ -64,6 +63,12 @@ if (msgpack_msgpack) {
   buf = bench('buf = require("@msgpack/msgpack").encode(obj);', msgpack_msgpack.encode, data);
   obj = bench('obj = require("@msgpack/msgpack").decode(buf);', msgpack_msgpack.decode, buf);
   runTest(obj);
+
+  const encoder = new msgpack_msgpack.Encoder();
+  const decoder = new msgpack_msgpack.Decoder();
+  buf = bench('buf = /* @msgpack/msgpack */ encoder.encode(obj);', (data) => encoder.encode(data), data);
+  obj = bench('obj = /* @msgpack/msgpack */ decoder.decodeSync(buf);', (buf) => decoder.decodeSync(buf), buf);
+  runTest(obj);
 }
 
 if (msgpack_js_v5) {
@@ -87,11 +92,6 @@ if (msgpack5) {
 if (notepack) {
   buf = bench('buf = require("notepack").encode(obj);', notepack.encode, data);
   obj = bench('obj = require("notepack").decode(buf);', notepack.decode, buf);
-  runTest(obj);
-}
-
-if (msgpack_unpack) {
-  obj = bench('obj = require("msgpack-unpack").decode(buf);', msgpack_unpack, packed);
   runTest(obj);
 }
 

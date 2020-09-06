@@ -10,8 +10,8 @@ export async function decodeAsync<ContextType>(
   const stream = ensureAsyncIterabe(streamLike);
 
   const decoder = new Decoder<ContextType>(
-    options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.extensionCodec,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
@@ -28,8 +28,8 @@ export function decodeArrayStream<ContextType>(
   const stream = ensureAsyncIterabe(streamLike);
 
   const decoder = new Decoder<ContextType>(
-    options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.extensionCodec,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
@@ -47,8 +47,8 @@ export function decodeStream<ContextType>(
   const stream = ensureAsyncIterabe(streamLike);
 
   const decoder = new Decoder<ContextType>(
-    options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.extensionCodec,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,

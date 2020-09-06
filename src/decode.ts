@@ -47,14 +47,13 @@ export function decode<ContextType>(
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ): unknown {
   const decoder = new Decoder<ContextType>(
-    options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.extensionCodec,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
     options.maxMapLength,
     options.maxExtLength,
   );
-  decoder.setBuffer(buffer); // decodeSync() requires only one buffer
-  return decoder.decodeSingleSync();
+  return decoder.decodeSync(buffer);
 }

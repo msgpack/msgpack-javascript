@@ -40,14 +40,13 @@ export function encode<ContextType>(
   options: EncodeOptions<SplitUndefined<ContextType>> = defaultEncodeOptions as any,
 ): Uint8Array {
   const encoder = new Encoder<ContextType>(
-    options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.extensionCodec,
     options.maxDepth,
     options.initialBufferSize,
     options.sortKeys,
     options.forceFloat32,
     options.ignoreUndefined,
   );
-  encoder.encode(value, 1);
-  return encoder.getUint8Array();
+  return encoder.encode(value);
 }

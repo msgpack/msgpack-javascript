@@ -13,8 +13,8 @@ export class Encoder<ContextType> {
   private bytes = new Uint8Array(this.view.buffer);
 
   constructor(
-    readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
     readonly context: ContextType,
+    readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
     readonly maxDepth = DEFAULT_MAX_DEPTH,
     readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
     readonly sortKeys = false,
@@ -22,7 +22,17 @@ export class Encoder<ContextType> {
     readonly ignoreUndefined = false,
   ) {}
 
-  encode(object: unknown, depth: number): void {
+  private reinitializeState() {
+    this.pos = 0;
+  }
+
+  encode(object: unknown): Uint8Array {
+    this.reinitializeState();
+    this.doEncode(object, 1);
+    return this.getUint8Array();
+  }
+
+  doEncode(object: unknown, depth: number): void {
     if (depth > this.maxDepth) {
       throw new Error(`Too deep objects in depth ${depth}`);
     }
@@ -228,7 +238,7 @@ export class Encoder<ContextType> {
       throw new Error(`Too large array: ${size}`);
     }
     for (const item of object) {
-      this.encode(item, depth + 1);
+      this.doEncode(item, depth + 1);
     }
   }
 
@@ -272,7 +282,7 @@ export class Encoder<ContextType> {
 
       if (!(this.ignoreUndefined && value === undefined)) {
         this.encodeString(key);
-        this.encode(value, depth + 1);
+        this.doEncode(value, depth + 1);
       }
     }
   }

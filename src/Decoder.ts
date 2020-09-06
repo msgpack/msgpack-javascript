@@ -70,8 +70,8 @@ export class Decoder<ContextType> {
   readonly stack: Array<StackState> = [];
 
   constructor(
-    readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
     readonly context: ContextType,
+    readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
     readonly maxStrLength = DEFAULT_MAX_LENGTH,
     readonly maxBinLength = DEFAULT_MAX_LENGTH,
     readonly maxArrayLength = DEFAULT_MAX_LENGTH,
@@ -79,6 +79,11 @@ export class Decoder<ContextType> {
     readonly maxExtLength = DEFAULT_MAX_LENGTH,
     readonly cachedKeyDecoder: CachedKeyDecoder | null = sharedCachedKeyDecoder,
   ) {}
+
+  private reinitializeState() {
+    this.totalPos = 0;
+    this.headByte = HEAD_BYTE_REQUIRED;
+  }
 
   setBuffer(buffer: ArrayLike<number> | ArrayBuffer): void {
     this.bytes = ensureUint8Array(buffer);
@@ -106,11 +111,21 @@ export class Decoder<ContextType> {
 
   createNoExtraBytesError(posToShow: number): Error {
     const { view, pos } = this;
-    return new RangeError(`Extra ${view.byteLength - pos} byte(s) found at buffer[${posToShow}]`);
+    return new RangeError(`Extra ${view.byteLength - pos} of ${view.byteLength} byte(s) found at buffer[${posToShow}]`);
   }
 
-  decodeSingleSync(): unknown {
-    const object = this.decodeSync();
+  /**
+   * A synchronous interface to decode a byte buffer. It mutates the decoder instance.
+   * @param buffer A byte buffer encoded in MessagePack.
+   */
+  decodeSync(buffer: ArrayLike<number> | ArrayBuffer): unknown {
+    this.reinitializeState();
+    this.setBuffer(buffer);
+    return this.doDecodeSingleSync();
+  }
+
+  private doDecodeSingleSync(): unknown {
+    const object = this.doDecodeSync();
     if (this.hasRemaining()) {
       throw this.createNoExtraBytesError(this.pos);
     }
@@ -128,7 +143,7 @@ export class Decoder<ContextType> {
       this.appendBuffer(buffer);
 
       try {
-        object = this.decodeSync();
+        object = this.doDecodeSync();
         decoded = true;
       } catch (e) {
         if (!(e instanceof DataViewIndexOutOfBoundsError)) {
@@ -179,7 +194,7 @@ export class Decoder<ContextType> {
 
       try {
         while (true) {
-          yield this.decodeSync();
+          yield this.doDecodeSync();
           if (--arrayItemsLeft === 0) {
             break;
           }
@@ -194,7 +209,7 @@ export class Decoder<ContextType> {
     }
   }
 
-  decodeSync(): unknown {
+  private doDecodeSync(): unknown {
     DECODE: while (true) {
       const headByte = this.readHeadByte();
       let object: unknown;
