@@ -1,5 +1,13 @@
 This is the revision history of @msgpack/msgpack
 
+## v2.0.0 2020/09/06
+
+https://github.com/msgpack/msgpack-javascript/compare/v1.12.2...v2.0.0
+
+* Officially introduce direct use of `Encoder` and `Decoder` for better performance
+  * The major version was bumped because it changed the interface to `Encoder` and `Decoder`
+* Build with TypeScript 4.0
+
 ## v1.12.2 2020/05/14
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.12.1...v1.12.2
