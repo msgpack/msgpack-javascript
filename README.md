@@ -486,7 +486,7 @@ NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5/msgpack`.
 
 ## Benchmark
 
-Run-time performance is not the only reason to use MessagePack, but a benchmark suite is provided to monitor the performance of this library continuously.
+Run-time performance is not the only reason to use MessagePack, but it's important to choose MessagePack libraries, so a benchmark suite is provided to monitor the performance of this library.
 
 V8's built-in JSON has been improved for years, esp. `JSON.parse()` is [significantly improved in V8/7.6](https://v8.dev/blog/v8-release-76), it is the fastest deserializer as of 2019, as the benchmark result bellow suggests.
 
