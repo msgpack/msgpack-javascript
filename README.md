@@ -118,6 +118,7 @@ maxDepth | number | `100`
 initialBufferSize | number | `2048`
 sortKeys | boolean | false
 forceFloat32 | boolean | false
+forceFloat | boolean | false
 ignoreUndefined | boolean | false
 context | user-defined | -
 

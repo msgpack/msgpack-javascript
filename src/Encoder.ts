@@ -20,6 +20,7 @@ export class Encoder<ContextType> {
     private readonly sortKeys = false,
     private readonly forceFloat32 = false,
     private readonly ignoreUndefined = false,
+    private readonly forceFloat = false,
   ) {}
 
   private getUint8Array(): Uint8Array {
@@ -85,7 +86,7 @@ export class Encoder<ContextType> {
     }
   }
   private encodeNumber(object: number) {
-    if (Number.isSafeInteger(object)) {
+    if (Number.isSafeInteger(object) && !this.forceFloat) {
       if (object >= 0) {
         if (object < 0x80) {
           // positive fixint
