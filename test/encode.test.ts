@@ -26,32 +26,26 @@ describe("encode", () => {
   });
 
   context("forceFloat", () => {
-    it("encodes integers as integers without forceFloat", () => {
+    it("encodes integers as integers without forceIntegerToFloat", () => {
       assert.deepStrictEqual(encode(3), Uint8Array.from([0x3]));
     });
 
-    it("encodes integers as floating point when forceFloat=true", () => {
+    it("encodes integers as floating point when forceIntegerToFloat=true", () => {
       assert.deepStrictEqual(
-        encode(3, { forceFloat: true }),
+        encode(3, { forceIntegerToFloat: true }),
         Uint8Array.from([0xcb, 0x40, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
       );
     });
 
-    it("encodes integers as floating point when forceFloat=true", () => {
+    it("encodes integers as float32 when forceIntegerToFloat=true and forceFloat32=true", () => {
       assert.deepStrictEqual(
-        encode(3, { forceFloat: true }),
-        Uint8Array.from([0xcb, 0x40, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+        encode(3, { forceIntegerToFloat: true, forceFloat32: true }),
+        Uint8Array.from([0xca, 0x40, 0x40, 0x00, 0x00]),
       );
     });
 
-    it("encodes integers as float32 when forceFloat=true and forceFloat32=true", () => {
-      assert.deepStrictEqual(
-        encode(3, { forceFloat: true, forceFloat32: true }),
-        Uint8Array.from([0xca, 0x40, 0x40, 0x00, 0x00]));
-    });
-
-    it("encodes integers as integers when forceFloat=false", () => {
-      assert.deepStrictEqual(encode(3, { forceFloat: false }), Uint8Array.from([0x3]));
+    it("encodes integers as integers when forceIntegerToFloat=false", () => {
+      assert.deepStrictEqual(encode(3, { forceIntegerToFloat: false }), Uint8Array.from([0x3]));
     });
   });
 

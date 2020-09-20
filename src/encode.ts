@@ -30,7 +30,7 @@ export type EncodeOptions<ContextType = undefined> = Partial<
      *
      * The default is `false`.
      */
-    forceFloat: boolean;
+    forceIntegerToFloat: boolean;
   }>
 > &
   ContextOf<ContextType>;
@@ -55,7 +55,7 @@ export function encode<ContextType>(
     options.sortKeys,
     options.forceFloat32,
     options.ignoreUndefined,
-    options.forceFloat,
+    options.forceIntegerToFloat,
   );
   return encoder.encode(value);
 }
