@@ -23,6 +23,14 @@ export type EncodeOptions<ContextType = undefined> = Partial<
      * The default is `false`. Note that it needs more time to encode.
      */
     ignoreUndefined: boolean;
+
+    /**
+     * If `true`, integer numbers are encoded as floating point,
+     * with the `forceFloat32` option taken into account.
+     *
+     * The default is `false`.
+     */
+    forceIntegerToFloat: boolean;
   }>
 > &
   ContextOf<ContextType>;
@@ -47,6 +55,7 @@ export function encode<ContextType>(
     options.sortKeys,
     options.forceFloat32,
     options.ignoreUndefined,
+    options.forceIntegerToFloat,
   );
   return encoder.encode(value);
 }
