@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v2.1.0 2020/09/21
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.0.0...v2.1.0
+
+* Added `forceIntegerToFloat` option to `EncodeOptions` by @carbotaniuman ([#123](https://github.com/msgpack/msgpack-javascript/pull/123))
+
 ## v2.0.0 2020/09/06
 
 https://github.com/msgpack/msgpack-javascript/compare/v1.12.2...v2.0.0
