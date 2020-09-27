@@ -5,7 +5,7 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/src/configs/recommended.json
     "plugin:@typescript-eslint/recommended",
     // https://prettier.io/docs/en/eslint.html
-    "plugin:prettier/recommended",
+    "prettier",
 
     // https://github.com/benmosher/eslint-plugin-import
     "plugin:import/recommended",
@@ -69,7 +69,5 @@ module.exports = {
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/ban-ts-comment": "off",
-
-    "prettier/prettier": "warn",
   },
 };
