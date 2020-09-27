@@ -184,7 +184,7 @@ It throws errors when the input is not an array-family.
 for example:
 
 ```typescript
-import { encode } from "@msgpack/msgpack";
+import { decodeArrayStream } from "@msgpack/msgpack";
 
 const stream: AsyncIterator<Uint8Array>;
 
@@ -204,7 +204,7 @@ In other words, it decodes an unlimited stream and emits an item one by one.
 for example:
 
 ```typescript
-import { encode } from "@msgpack/msgpack";
+import { decodeStream } from "@msgpack/msgpack";
 
 const stream: AsyncIterator<Uint8Array>;
 
