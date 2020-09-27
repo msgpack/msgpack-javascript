@@ -1,8 +1,10 @@
-export const TEXT_ENCODING_AVAILABLE =
+const TEXT_ENCODING_AVAILABLE =
   typeof process !== "undefined" &&
   process.env.TEXT_ENCODING !== "never" &&
   typeof TextEncoder !== "undefined" &&
   typeof TextDecoder !== "undefined";
+
+const STR_SIZE_MAX = 0xffff_ffff; // uint32_max
 
 export function utf8Count(str: string): number {
   const strLength = str.length;
@@ -88,7 +90,11 @@ export function utf8EncodeJs(str: string, output: Uint8Array, outputOffset: numb
 }
 
 const sharedTextEncoder = TEXT_ENCODING_AVAILABLE ? new TextEncoder() : undefined;
-export const TEXT_ENCODER_THRESHOLD = typeof process !== "undefined" && process.env.TEXT_ENCODING !== "force" ? 200 : 0;
+export const TEXT_ENCODER_THRESHOLD = !TEXT_ENCODING_AVAILABLE
+  ? STR_SIZE_MAX
+  : typeof process !== "undefined" && process.env.TEXT_ENCODING !== "force"
+  ? 200
+  : 0;
 
 function utf8EncodeTEencode(str: string, output: Uint8Array, outputOffset: number): void {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -154,7 +160,11 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
 }
 
 const sharedTextDecoder = TEXT_ENCODING_AVAILABLE ? new TextDecoder() : null;
-export const TEXT_DECODER_THRESHOLD = typeof process !== "undefined" && process.env.TEXT_DECODER !== "force" ? 200 : 0;
+export const TEXT_DECODER_THRESHOLD = !TEXT_ENCODING_AVAILABLE
+  ? STR_SIZE_MAX
+  : typeof process !== "undefined" && process.env.TEXT_DECODER !== "force"
+  ? 200
+  : 0;
 
 export function utf8DecodeTD(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   const stringBytes = bytes.subarray(inputOffset, inputOffset + byteLength);

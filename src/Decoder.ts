@@ -1,7 +1,7 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { getInt64, getUint64 } from "./utils/int";
-import { utf8DecodeJs, TEXT_ENCODING_AVAILABLE, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
+import { utf8DecodeJs, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
 
@@ -492,7 +492,7 @@ export class Decoder<ContextType> {
     let object: string;
     if (this.stateIsMapKey() && this.keyDecoder?.canBeCached(byteLength)) {
       object = this.keyDecoder.decode(this.bytes, offset, byteLength);
-    } else if (TEXT_ENCODING_AVAILABLE && byteLength > TEXT_DECODER_THRESHOLD) {
+    } else if (byteLength > TEXT_DECODER_THRESHOLD) {
       object = utf8DecodeTD(this.bytes, offset, byteLength);
     } else {
       object = utf8DecodeJs(this.bytes, offset, byteLength);
