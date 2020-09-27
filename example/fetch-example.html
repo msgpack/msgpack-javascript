@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <script src="../dist.es5/msgpack.min.js"></script>
+  <style>
+    main {
+      width: 80%;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>Fetch API example</h1>
+    <p>Open DevTool and see the console logs.</p>
+    <script id="script">
+      const MSGPACK_TYPE = "application/x-msgpack";
+
+      const url = "http://127.0.0.1:8080/";
+
+      (async () => {
+        // decode()
+        {
+          const response = await fetch(url);
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null) {
+            const object = await MessagePack.decodeAsync(response.body);
+            console.log("decode:", object);
+          } else {
+            console.error("Something is wrong!");
+          }
+
+        }
+
+        // decodeAsync()
+        {
+          const response = await fetch(url);
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null) {
+            const object = MessagePack.decode(await response.arrayBuffer());
+            console.log("decodeAsync:", object);
+          } else {
+            console.error("Something is wrong!");
+          }
+        }
+      })()
+    </script>
+    <script>
+      const script = document.getElementById("script");
+      document.write("<pre><code>");
+      document.write(script.innerText.replace(/^ {6}/gms, ""));
+      document.write("</code><pre>");
+    </script>
+  </main>
+</body>
+
+</html>
