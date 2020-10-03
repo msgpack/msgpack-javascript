@@ -60,6 +60,7 @@ deepStrictEqual(decode(encoded), object);
 - [Prerequsites](#prerequsites)
   - [ECMA-262](#ecma-262)
   - [NodeJS](#nodejs)
+  - [TypeScript](#typescript)
 - [Benchmark](#benchmark)
 - [Distribution](#distribution)
   - [NPM / npmjs.com](#npm--npmjscom)
@@ -484,6 +485,12 @@ If you support IE11, import `core-js` in your application entrypoints, as this l
 NodeJS v10 is required, but NodeJS v12 or later is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
 
 NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5/msgpack`.
+
+### TypeScript
+
+This module requires definitions of `AsyncIterator` and whatwg streams, which is specified with `"lib": ["ES2020", "DOM"]` in `tsconfig.json`.
+
+For the TypeScript version, the latest TypeScript is tested in development, but older versions of TypeScript might be able to compile this module.
 
 ## Benchmark
 
