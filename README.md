@@ -481,7 +481,7 @@ If you support IE11, import `core-js` in your application entrypoints, as this l
 
 NodeJS v10 is required, but NodeJS v12 or later is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
 
-NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5/msgpack`.
+NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5+umd/msgpack`.
 
 ### TypeScript
 
@@ -522,9 +522,10 @@ Note that `Buffer.from()` for `JSON.stringify()` is necessary to emulate I/O whe
 The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
 
 * `dist/` is compiled into ES2015+
-* `dist.es5/` is compiled into ES5 and bundled to singile file
-  * `dist.es5/msgpack.min.js` - the default, minified file (UMD)
-  * `dist.es5/msgpack.js` - an optional, non-minified file (UMD)
+* `dist.es5+umd/` is compiled into ES5 and bundled to singile file
+  * `dist.es5+umd/msgpack.min.js` - the default, minified file (UMD)
+  * `dist.es5+umd/msgpack.js` - an optional, non-minified file (UMD)
+* `dist.es5+esm/` is compiled into ES5 and placed as ES modules
 
 If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
 

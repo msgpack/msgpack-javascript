@@ -4,7 +4,7 @@
     "outDir": "./build/test-dist-es5-purejs",
     "noImplicitAny": false,
     "paths": {
-      "@msgpack/msgpack": ["./dist.es5/msgpack"]
+      "@msgpack/msgpack": ["./dist.es5+umd/msgpack"]
     }
   }
 }

@@ -89,7 +89,7 @@
   "files": [
     "src/**/*.*",
     "dist/**/*.*",
-    "dist.es5/**/*.*",
+    "dist.es5+umd/**/*.*",
     "dist.es5+esm/**/*.*"
   ]
 }
