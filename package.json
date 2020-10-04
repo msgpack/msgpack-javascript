@@ -5,12 +5,13 @@
   "author": "The MessagePack community",
   "license": "ISC",
   "main": "./dist/index.js",
-  "browser": "./dist.es5/msgpack.min.js",
+  "browser": "./dist.es5+umd/msgpack.min.js",
+  "module": "./dist.es5+esm/index.js",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "npm run clean && tsc -p tsconfig.dist.json && webpack",
+    "prepare": "npm run clean && webpack && tsc --build tsconfig.dist.json tsconfig.dist.es5+esm.json && ts-node tools/esmify.ts dist.es5+esm/*.js dist.es5+esm/*/*.js",
     "prepublishOnly": "run-p 'test:dist:*' && npm run test:browser",
     "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
@@ -88,6 +89,7 @@
   "files": [
     "src/**/*.*",
     "dist/**/*.*",
-    "dist.es5/**/*.*"
+    "dist.es5/**/*.*",
+    "dist.es5+esm/**/*.*"
   ]
 }
