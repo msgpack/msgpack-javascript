@@ -489,6 +489,8 @@ This module requires definitions of `AsyncIterator` and whatwg streams, which is
 
 For the TypeScript version, the latest TypeScript is tested in development, but older versions of TypeScript might be able to compile this module.
 
+We also recommend enabling `strict` mode (or `strictNullCheck` mode at least). Specifically when you use `ExtensionCodec` with the ContextType that you defines, the type checking for `EncodeOptions` argument of `encode` function and `DecodeOptions` arugument of `decode` function will fail because ts compiler cannot infer the `EncodeOptions`/`DecodeOptions` generic type appropriately unless `strictNullChecks` property is set to be `true` in `tsconfig.json`.
+
 ## Benchmark
 
 Run-time performance is not the only reason to use MessagePack, but it's important to choose MessagePack libraries, so a benchmark suite is provided to monitor the performance of this library.
