@@ -117,10 +117,7 @@ export class Decoder<ContextType> {
   public decode(buffer: ArrayLike<number> | ArrayBuffer): unknown {
     this.reinitializeState();
     this.setBuffer(buffer);
-    return this.doDecodeSingleSync();
-  }
 
-  private doDecodeSingleSync(): unknown {
     const object = this.doDecodeSync();
     if (this.hasRemaining()) {
       throw this.createExtraByteError(this.pos);
