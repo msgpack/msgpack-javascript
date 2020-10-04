@@ -159,7 +159,7 @@ export class Decoder<ContextType> {
 
     const { headByte, pos, totalPos } = this;
     throw new RangeError(
-      `Insufficient data in parcing ${prettyByte(headByte)} at ${totalPos} (${pos} in the current buffer)`,
+      `Insufficient data in parsing ${prettyByte(headByte)} at ${totalPos} (${pos} in the current buffer)`,
     );
   }
 
