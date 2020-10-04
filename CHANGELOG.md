@@ -1,5 +1,11 @@
 This is the revision history of @msgpack/msgpack
 
+## v2.2.0 2020/10/04
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.1.1...v2.2.0
+
+* Now `package.json` has a `module` field to support ES modules
+
 ## v2.1.1 2020/10/04
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.1.0...v2.1.1
