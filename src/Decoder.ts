@@ -78,7 +78,7 @@ export class Decoder<ContextType> {
     private readonly maxMapLength = DEFAULT_MAX_LENGTH,
     private readonly maxExtLength = DEFAULT_MAX_LENGTH,
     private readonly keyDecoder: KeyDecoder | null = sharedCachedKeyDecoder,
-  ) {}
+  ) { }
 
   private reinitializeState() {
     this.totalPos = 0;
@@ -109,7 +109,7 @@ export class Decoder<ContextType> {
     return this.view.byteLength - this.pos >= size;
   }
 
-  private createNoExtraBytesError(posToShow: number): Error {
+  private createExtraByteError(posToShow: number): Error {
     const { view, pos } = this;
     return new RangeError(`Extra ${view.byteLength - pos} of ${view.byteLength} byte(s) found at buffer[${posToShow}]`);
   }
@@ -123,7 +123,7 @@ export class Decoder<ContextType> {
   private doDecodeSingleSync(): unknown {
     const object = this.doDecodeSync();
     if (this.hasRemaining()) {
-      throw this.createNoExtraBytesError(this.pos);
+      throw this.createExtraByteError(this.pos);
     }
     return object;
   }
@@ -133,7 +133,7 @@ export class Decoder<ContextType> {
     let object: unknown;
     for await (const buffer of stream) {
       if (decoded) {
-        throw this.createNoExtraBytesError(this.totalPos);
+        throw this.createExtraByteError(this.totalPos);
       }
 
       this.appendBuffer(buffer);
@@ -152,7 +152,7 @@ export class Decoder<ContextType> {
 
     if (decoded) {
       if (this.hasRemaining()) {
-        throw this.createNoExtraBytesError(this.totalPos);
+        throw this.createExtraByteError(this.totalPos);
       }
       return object;
     }
@@ -177,7 +177,7 @@ export class Decoder<ContextType> {
 
     for await (const buffer of stream) {
       if (isArray && arrayItemsLeft === 0) {
-        throw this.createNoExtraBytesError(this.totalPos);
+        throw this.createExtraByteError(this.totalPos);
       }
 
       this.appendBuffer(buffer);
