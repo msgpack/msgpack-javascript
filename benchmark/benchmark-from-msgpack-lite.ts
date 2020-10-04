@@ -72,7 +72,7 @@ if (msgpack_msgpack) {
 
   if (process.env.CACHE_HIT_RATE) {
     const {hit, miss} = decoder.keyDecoder;
-    console.log(`CACHE_HIT_RATE: cache hit rate in CachedKeyDecoder: hit=${hit}, hiss=${miss}, hit rate=${hit / (hit + miss)}`);
+    console.log(`CACHE_HIT_RATE: cache hit rate in CachedKeyDecoder: hit=${hit}, miss=${miss}, hit rate=${hit / (hit + miss)}`);
   }
 }
 
