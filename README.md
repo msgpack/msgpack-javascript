@@ -280,10 +280,7 @@ extensionCodec.register({
   },
 });
 
-// and later
-import { encode, decode } from "@msgpack/msgpack";
-
-const encoded = = encode([new Set<any>(), new Map<any, any>()], { extensionCodec });
+const encoded = encode([new Set<any>(), new Map<any, any>()], { extensionCodec });
 const decoded = decode(encoded, { extensionCodec });
 ```
 
