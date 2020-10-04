@@ -1,24 +1,34 @@
 // Main Functions:
 
-export { encode, EncodeOptions } from "./encode";
-export { decode, DecodeOptions } from "./decode";
-export { decodeAsync, decodeArrayStream, decodeStream } from "./decodeAsync";
+import { encode } from "./encode";
+export { encode };
+import type { EncodeOptions } from "./encode";
+export type { EncodeOptions };
 
-/**
- * @experimental `Decoder` is exported for experimental use.
- */
-export { Decoder } from "./Decoder";
+import { decode } from "./decode";
+export { decode };
+import type { DecodeOptions } from "./decode";
+export { DecodeOptions };
 
-/**
- * @experimental `Encoder` is exported for experimental use.
- */
-export { Encoder } from "./Encoder";
+import { decodeAsync, decodeArrayStream, decodeStream } from "./decodeAsync";
+export { decodeAsync, decodeArrayStream, decodeStream };
+
+import { Decoder } from "./Decoder";
+export { Decoder };
+
+import { Encoder } from "./Encoder";
+export { Encoder };
 
 // Utilitiies for Extension Types:
 
-export { ExtensionCodec, ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType } from "./ExtensionCodec";
-export { ExtData } from "./ExtData";
-export {
+import { ExtensionCodec } from "./ExtensionCodec";
+export { ExtensionCodec };
+import type { ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType } from "./ExtensionCodec";
+export type { ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType };
+import { ExtData } from "./ExtData";
+export { ExtData };
+
+import {
   EXT_TIMESTAMP,
   encodeDateToTimeSpec,
   encodeTimeSpecToTimestamp,
@@ -26,3 +36,11 @@ export {
   encodeTimestampExtension,
   decodeTimestampExtension,
 } from "./timestamp";
+export {
+  EXT_TIMESTAMP,
+  encodeDateToTimeSpec,
+  encodeTimeSpecToTimestamp,
+  decodeTimestampToTimeSpec,
+  encodeTimestampExtension,
+  decodeTimestampExtension,
+};

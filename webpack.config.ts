@@ -1,9 +1,9 @@
 import path from "path";
-// @ts-ignore
+// @ts-expect-error
 import webpack from "webpack";
-// @ts-ignore
+// @ts-expect-error
 import { CheckEsVersionPlugin } from "@bitjourney/check-es-version-webpack-plugin";
-// @ts-ignore
+// @ts-expect-error
 import _ from "lodash";
 
 const config = {
@@ -11,7 +11,7 @@ const config = {
 
   entry: "./src/index.ts",
   output: {
-    path: path.resolve(__dirname, "dist.es5"),
+    path: path.resolve(__dirname, "dist.es5+umd"),
     library: "MessagePack",
     libraryTarget: "umd",
     globalObject: "this",
