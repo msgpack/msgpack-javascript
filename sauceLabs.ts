@@ -5,16 +5,15 @@ const IS_LOCAL = !process.env.TRAVIS_BUILD_NUMBER;
 export type SauceLauncher = {
   base: "SauceLabs";
   browserName: string;
+  platformName?: string;
 
   // for PC
-  version?: string;
-  platform?: string;
+  browserVersion?: string;
 
   // for mobile
   deviceOrientation?: string,
   deviceName?: string;
   appiumVersion?: string;
-  platformName?: string;
   platformVersion?: string;
 };
 
@@ -36,32 +35,32 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
   slChrome: {
     base: "SauceLabs",
     browserName: "chrome",
-    version: "latest",
-    platform: "Windows 10",
+    browserVersion: "latest",
+    platformName: "Windows 10",
   },
   slFirefox: {
     base: "SauceLabs",
     browserName: "Firefox",
-    version: "latest",
-    platform: "Windows 10",
+    browserVersion: "latest",
+    platformName: "Windows 10",
   },
   slSafari: {
     base: "SauceLabs",
     browserName: "Safari",
-    version: "latest",
-    platform: "macOS 10.15",
+    browserVersion: "latest",
+    platformName: "macOS 10.15",
   },
   slEdge: {
     base: "SauceLabs",
     browserName: "MicrosoftEdge",
-    version: "latest",
-    platform: "Windows 10",
+    browserVersion: "latest",
+    platformName: "Windows 10",
   },
   slIE: {
     base: "SauceLabs",
     browserName: "Internet Explorer",
-    version: "latest",
-    platform: "Windows 10",
+    browserVersion: "latest",
+    platformName: "Windows 8",
   },
 
   slIos: {
@@ -69,7 +68,6 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     browserName: "Safari",
     platformName: "iOS",
     platformVersion: "13.4",
-    deviceOrientation: "portrait",
     deviceName: "iPhone Simulator",
   },
 
@@ -78,7 +76,6 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     browserName: "Chrome",
     platformName: "Android",
     platformVersion: "11.0",
-    deviceOrientation: "portrait",
     deviceName: "Android GoogleAPI Emulator",
   },
 };
