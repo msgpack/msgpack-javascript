@@ -5,8 +5,9 @@
   "author": "The MessagePack community",
   "license": "ISC",
   "main": "./dist/index.js",
-  "browser": "./dist.es5+umd/msgpack.min.js",
   "module": "./dist.es5+esm/index.js",
+  "cdn": "./dist.es5+umd/msgpack.min.js",
+  "unpkg": "./dist.es5+umd/msgpack.min.js",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
