@@ -48,8 +48,7 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     base: "SauceLabs",
     browserName: "Safari",
     version: "latest",
-    // "macOS 10.14" is unstable for now
-    platform: "macOS 10.13",
+    platform: "macOS 10.15",
   },
   slEdge: {
     base: "SauceLabs",
@@ -68,15 +67,15 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     base: "SauceLabs",
     browserName: "Safari",
     platformName: "iOS",
-    platformVersion: "latest",
-    deviceName: "iPhone X Simulator",
+    platformVersion: "13.4",
+    deviceName: "iPhone Simulator",
   },
 
   slAndroid: {
     base: "SauceLabs",
     browserName: "Chrome",
     platformName: "Android",
-    platformVersion: "latest",
-    deviceName: "Android Emulator",
+    platformVersion: "11.0",
+    deviceName: "Android GoogleAPI Emulator",
   },
 };
