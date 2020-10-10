@@ -5,15 +5,15 @@ const IS_LOCAL = !process.env.TRAVIS_BUILD_NUMBER;
 export type SauceLauncher = {
   base: "SauceLabs";
   browserName: string;
+  platformName?: string;
 
   // for PC
-  version?: string;
-  platform?: string;
+  browserVersion?: string;
 
   // for mobile
+  deviceOrientation?: string,
   deviceName?: string;
   appiumVersion?: string;
-  platformName?: string;
   platformVersion?: string;
 };
 
@@ -35,48 +35,47 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
   slChrome: {
     base: "SauceLabs",
     browserName: "chrome",
-    version: "latest",
-    platform: "Windows 10",
+    browserVersion: "latest",
+    platformName: "Windows 10",
   },
   slFirefox: {
     base: "SauceLabs",
     browserName: "Firefox",
-    version: "latest",
-    platform: "Windows 10",
+    browserVersion: "latest",
+    platformName: "Windows 10",
   },
   slSafari: {
     base: "SauceLabs",
     browserName: "Safari",
-    version: "latest",
-    // "macOS 10.14" is unstable for now
-    platform: "macOS 10.13",
+    browserVersion: "latest",
+    platformName: "macOS 10.15",
   },
   slEdge: {
     base: "SauceLabs",
     browserName: "MicrosoftEdge",
-    version: "latest",
-    platform: "Windows 10",
+    browserVersion: "latest",
+    platformName: "Windows 10",
   },
   slIE: {
     base: "SauceLabs",
     browserName: "Internet Explorer",
-    version: "latest",
-    platform: "Windows 10",
+    browserVersion: "latest",
+    platformName: "Windows 8",
   },
 
   slIos: {
     base: "SauceLabs",
     browserName: "Safari",
     platformName: "iOS",
-    platformVersion: "latest",
-    deviceName: "iPhone X Simulator",
+    platformVersion: "13.4",
+    deviceName: "iPhone Simulator",
   },
 
   slAndroid: {
     base: "SauceLabs",
     browserName: "Chrome",
     platformName: "Android",
-    platformVersion: "latest",
-    deviceName: "Android Emulator",
+    platformVersion: "11.0",
+    deviceName: "Android GoogleAPI Emulator",
   },
 };
