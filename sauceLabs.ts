@@ -11,6 +11,7 @@ export type SauceLauncher = {
   platform?: string;
 
   // for mobile
+  deviceOrientation?: string,
   deviceName?: string;
   appiumVersion?: string;
   platformName?: string;
@@ -68,6 +69,7 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     browserName: "Safari",
     platformName: "iOS",
     platformVersion: "13.4",
+    deviceOrientation: "portrait",
     deviceName: "iPhone Simulator",
   },
 
@@ -76,6 +78,7 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
     browserName: "Chrome",
     platformName: "Android",
     platformVersion: "11.0",
+    deviceOrientation: "portrait",
     deviceName: "Android GoogleAPI Emulator",
   },
 };
