@@ -42,11 +42,11 @@ export const defaultDecodeOptions: DecodeOptions = {};
  *
  * This is a synchronous decoding function. See other variants for asynchronous decoding: `decodeAsync()`, `decodeStream()`, `decodeArrayStream()`.
  */
-export function decode<ContextType>(
+export function decode<ContextType = undefined>(
   buffer: ArrayLike<number> | ArrayBuffer,
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ): unknown {
-  const decoder = new Decoder<ContextType>(
+  const decoder = new Decoder(
     options.extensionCodec,
     (options as typeof options & { context: any }).context,
     options.maxStrLength,
