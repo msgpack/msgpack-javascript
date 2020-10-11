@@ -43,11 +43,11 @@ const defaultEncodeOptions: EncodeOptions = {};
  *
  * The returned buffer is a slice of a larger `ArrayBuffer`, so you have to use its `#byteOffset` and `#byteLength` in order to convert it to another typed arrays including NodeJS `Buffer`.
  */
-export function encode<ContextType>(
+export function encode<ContextType = undefined>(
   value: unknown,
   options: EncodeOptions<SplitUndefined<ContextType>> = defaultEncodeOptions as any,
 ): Uint8Array {
-  const encoder = new Encoder<ContextType>(
+  const encoder = new Encoder(
     options.extensionCodec,
     (options as typeof options & { context: any }).context,
     options.maxDepth,
