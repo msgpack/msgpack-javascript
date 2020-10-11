@@ -12,7 +12,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "npm run clean && webpack && tsc --build tsconfig.dist.json tsconfig.dist.es5+esm.json && ts-node tools/esmify.ts dist.es5+esm/*.js dist.es5+esm/*/*.js",
+    "prepare": "npm run clean && webpack --bail && tsc --build tsconfig.dist.json tsconfig.dist.es5+esm.json && ts-node tools/esmify.ts dist.es5+esm/*.js dist.es5+esm/*/*.js",
     "prepublishOnly": "run-p 'test:dist:*' && npm run test:browser",
     "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
@@ -84,7 +84,7 @@
     "tsconfig-paths": "latest",
     "typescript": "latest",
     "web-streams-polyfill": "latest",
-    "webpack": "^4",
+    "webpack": "latest",
     "webpack-cli": "latest"
   },
   "dependencies": {},
