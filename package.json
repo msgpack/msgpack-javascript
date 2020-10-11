@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",
+    "@types/lodash": "latest",
     "@types/mocha": "latest",
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
@@ -83,7 +84,7 @@
     "tsconfig-paths": "latest",
     "typescript": "latest",
     "web-streams-polyfill": "latest",
-    "webpack": "latest",
+    "webpack": "^4",
     "webpack-cli": "latest"
   },
   "dependencies": {},

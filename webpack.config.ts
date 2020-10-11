@@ -1,10 +1,9 @@
 import path from "path";
 // @ts-expect-error
 import webpack from "webpack";
+import _ from "lodash";
 // @ts-expect-error
 import { CheckEsVersionPlugin } from "@bitjourney/check-es-version-webpack-plugin";
-// @ts-expect-error
-import _ from "lodash";
 
 const config = {
   mode: "production",
@@ -15,6 +14,7 @@ const config = {
     library: "MessagePack",
     libraryTarget: "umd",
     globalObject: "this",
+    filename: undefined as string | undefined,
   },
   resolve: {
     extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".wasm"],
@@ -43,7 +43,7 @@ const config = {
 
   optimization: {
     noEmitOnErrors: true,
-    minimize: false,
+    minimize: undefined as boolean | undefined,
   },
 
   // We don't need NodeJS stuff on browsers!
