@@ -59,8 +59,8 @@ export const sauceLaunchers: Record<string, SauceLauncher> = {
   slIE: {
     base: "SauceLabs",
     browserName: "Internet Explorer",
-    browserVersion: "latest",
-    platformName: "Windows 8",
+    browserVersion: "11.285",
+    platformName: "Windows 10",
   },
 
   slIos: {
