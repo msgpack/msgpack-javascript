@@ -1,5 +1,12 @@
 This is the revision history of @msgpack/msgpack
 
+## v2.3.0 2020/10/17
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.2.1...v2.3.0
+
+* Change the extension of ESM files from `.js` to `.mjs` [#144](https://github.com/msgpack/msgpack-javascript/pull/144)
+* Make the package work with `strictNullChecks: false` [#139](https://github.com/msgpack/msgpack-javascript/pull/139) by @bananaumai
+
 ## v2.2.1 2020/10/11
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.2.0...v2.2.1
