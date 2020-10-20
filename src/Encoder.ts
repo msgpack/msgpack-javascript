@@ -24,7 +24,7 @@ export class Encoder<ContextType> {
   ) {}
 
   private getUint8Array(): Uint8Array {
-    return this.bytes.subarray(0, this.pos);
+    return this.bytes.slice(0, this.pos);
   }
 
   private reinitializeState() {
