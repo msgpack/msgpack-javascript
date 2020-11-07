@@ -41,6 +41,7 @@ matrix:
     - env: BROWSER=slAndroid
 cache: npm
 install: |
+  npm npm install -g npm
   if [ "${BROWSER}" = "" ]
     then npm install -g nyc codecov
   fi
