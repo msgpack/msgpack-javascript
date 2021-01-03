@@ -45,5 +45,15 @@ export {
   decodeTimestampExtension,
 };
 
-export { JavaScriptCodec, EXT_JAVASCRIPT, encodeJavaScriptData, decodeJavaScriptData } from "./JavaScriptCodec";
-
+import {
+  JavaScriptCodec,
+  EXT_JAVASCRIPT,
+  encodeJavaScriptStructure,
+  decodeJavaScriptStructure,
+} from "./JavaScriptCodec";
+export {
+  JavaScriptCodec,
+  EXT_JAVASCRIPT,
+  encodeJavaScriptStructure,
+  decodeJavaScriptStructure,
+};
