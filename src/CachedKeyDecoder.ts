@@ -31,11 +31,9 @@ export class CachedKeyDecoder implements KeyDecoder {
   }
 
   private get(bytes: Uint8Array, inputOffset: number, byteLength: number): string | null {
-    const records = this.caches[byteLength - 1];
-    const recordsLength = records.length;
+    const records = this.caches[byteLength - 1]!;
 
-    FIND_CHUNK: for (let i = 0; i < recordsLength; i++) {
-      const record = records[i];
+    FIND_CHUNK: for (const record of records) {
       const recordBytes = record.bytes;
 
       for (let j = 0; j < byteLength; j++) {
@@ -49,7 +47,7 @@ export class CachedKeyDecoder implements KeyDecoder {
   }
 
   private store(bytes: Uint8Array, value: string) {
-    const records = this.caches[bytes.length - 1];
+    const records = this.caches[bytes.length - 1]!;
     const record: KeyCacheRecord = { bytes, value };
 
     if (records.length >= this.maxLengthPerKey) {

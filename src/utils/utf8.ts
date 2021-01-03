@@ -97,12 +97,10 @@ export const TEXT_ENCODER_THRESHOLD = !TEXT_ENCODING_AVAILABLE
   : 0;
 
 function utf8EncodeTEencode(str: string, output: Uint8Array, outputOffset: number): void {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   output.set(sharedTextEncoder!.encode(str), outputOffset);
 }
 
 function utf8EncodeTEencodeInto(str: string, output: Uint8Array, outputOffset: number): void {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   sharedTextEncoder!.encodeInto(str, output.subarray(outputOffset));
 }
 
@@ -117,24 +115,24 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
   const units: Array<number> = [];
   let result = "";
   while (offset < end) {
-    const byte1 = bytes[offset++];
+    const byte1 = bytes[offset++]!;
     if ((byte1 & 0x80) === 0) {
       // 1 byte
       units.push(byte1);
     } else if ((byte1 & 0xe0) === 0xc0) {
       // 2 bytes
-      const byte2 = bytes[offset++] & 0x3f;
+      const byte2 = bytes[offset++]! & 0x3f;
       units.push(((byte1 & 0x1f) << 6) | byte2);
     } else if ((byte1 & 0xf0) === 0xe0) {
       // 3 bytes
-      const byte2 = bytes[offset++] & 0x3f;
-      const byte3 = bytes[offset++] & 0x3f;
+      const byte2 = bytes[offset++]! & 0x3f;
+      const byte3 = bytes[offset++]! & 0x3f;
       units.push(((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
     } else if ((byte1 & 0xf8) === 0xf0) {
       // 4 bytes
-      const byte2 = bytes[offset++] & 0x3f;
-      const byte3 = bytes[offset++] & 0x3f;
-      const byte4 = bytes[offset++] & 0x3f;
+      const byte2 = bytes[offset++]! & 0x3f;
+      const byte3 = bytes[offset++]! & 0x3f;
+      const byte4 = bytes[offset++]! & 0x3f;
       let unit = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
       if (unit > 0xffff) {
         unit -= 0x10000;
@@ -168,6 +166,5 @@ export const TEXT_DECODER_THRESHOLD = !TEXT_ENCODING_AVAILABLE
 
 export function utf8DecodeTD(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   const stringBytes = bytes.subarray(inputOffset, inputOffset + byteLength);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return sharedTextDecoder!.decode(stringBytes);
 }

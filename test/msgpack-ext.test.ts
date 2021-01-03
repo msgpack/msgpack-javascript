@@ -22,7 +22,7 @@ describe("msgpack-ext", () => {
   } as Record<string, [number, ExtData]>;
 
   for (const name of Object.keys(SPECS)) {
-    const [msgpackType, extData] = SPECS[name];
+    const [msgpackType, extData] = SPECS[name]!;
 
     it(`preserves ExtData by decode(encode(${name}))`, () => {
       const encoded = encode(extData);

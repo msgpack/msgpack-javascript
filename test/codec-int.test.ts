@@ -16,7 +16,7 @@ const INT64SPECS = {
 describe("codec: int64 / uint64", () => {
   context("int 64", () => {
     for (const name of Object.keys(INT64SPECS)) {
-      const value = INT64SPECS[name];
+      const value = INT64SPECS[name]!;
 
       it(`sets and gets ${value} (${value < 0 ? "-" : ""}0x${Math.abs(value).toString(16)})`, () => {
         const b = new Uint8Array(8);
