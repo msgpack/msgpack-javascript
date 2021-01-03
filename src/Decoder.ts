@@ -78,7 +78,7 @@ export class Decoder<ContextType> {
     private readonly maxMapLength = DEFAULT_MAX_LENGTH,
     private readonly maxExtLength = DEFAULT_MAX_LENGTH,
     private readonly keyDecoder: KeyDecoder | null = sharedCachedKeyDecoder,
-  ) { }
+  ) {}
 
   private reinitializeState() {
     this.totalPos = 0;
@@ -378,7 +378,7 @@ export class Decoder<ContextType> {
       const stack = this.stack;
       while (stack.length > 0) {
         // arrays and maps
-        const state = stack[stack.length - 1];
+        const state = stack[stack.length - 1]!;
         if (state.type === State.ARRAY) {
           state.array[state.position] = object;
           state.position++;
@@ -399,7 +399,6 @@ export class Decoder<ContextType> {
         } else {
           // it must be `state.type === State.MAP_VALUE` here
 
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           state.map[state.key!] = object;
           state.readCount++;
 
@@ -500,7 +499,7 @@ export class Decoder<ContextType> {
 
   private stateIsMapKey(): boolean {
     if (this.stack.length > 0) {
-      const state = this.stack[this.stack.length - 1];
+      const state = this.stack[this.stack.length - 1]!;
       return state.type === State.MAP_KEY;
     }
     return false;

@@ -2,8 +2,6 @@ import assert from "assert";
 import util from "util";
 import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, decodeAsync } from "../src";
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 describe("ExtensionCodec", () => {
   context("timestamp", () => {
     const defaultCodec = ExtensionCodec.defaultCodec;
