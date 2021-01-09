@@ -1,16 +1,16 @@
 import assert from "assert";
 import util from "util";
-import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, decodeAsync } from "../src";
+import { encode, decode, ExtensionCodec, decodeAsync } from "../src";
 
 describe("ExtensionCodec", () => {
   context("timestamp", () => {
-    const defaultCodec = ExtensionCodec.defaultCodec;
+    const extensionCodec = ExtensionCodec.defaultCodec;
 
     it("encodes and decodes a date without milliseconds (timestamp 32)", () => {
       const date = new Date(1556633024000);
-      const encoded = defaultCodec.tryToEncode(date, undefined);
+      const encoded = encode(date, { extensionCodec });
       assert.deepStrictEqual(
-        defaultCodec.decode(encoded!.data, EXT_TIMESTAMP, undefined),
+        decode(encoded, { extensionCodec }),
         date,
         `date: ${date.toISOString()}, encoded: ${util.inspect(encoded)}`,
       );
@@ -18,9 +18,9 @@ describe("ExtensionCodec", () => {
 
     it("encodes and decodes a date with milliseconds (timestamp 64)", () => {
       const date = new Date(1556633024123);
-      const encoded = defaultCodec.tryToEncode(date, undefined);
+      const encoded = encode(date, { extensionCodec });
       assert.deepStrictEqual(
-        defaultCodec.decode(encoded!.data, EXT_TIMESTAMP, undefined),
+        decode(encoded, { extensionCodec }),
         date,
         `date: ${date.toISOString()}, encoded: ${util.inspect(encoded)}`,
       );
@@ -28,9 +28,9 @@ describe("ExtensionCodec", () => {
 
     it("encodes and decodes a future date (timestamp 96)", () => {
       const date = new Date(0x400000000 * 1000);
-      const encoded = defaultCodec.tryToEncode(date, undefined);
+      const encoded = encode(date, { extensionCodec });
       assert.deepStrictEqual(
-        defaultCodec.decode(encoded!.data, EXT_TIMESTAMP, undefined),
+        decode(encoded, { extensionCodec }),
         date,
         `date: ${date.toISOString()}, encoded: ${util.inspect(encoded)}`,
       );
