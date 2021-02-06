@@ -1,13 +1,13 @@
 import { Decoder } from "./Decoder";
 import { defaultDecodeOptions, DecodeOptions } from "./decode";
-import { ensureAsyncIterabe, ReadableStreamLike } from "./utils/stream";
+import { ensureAsyncIterable, ReadableStreamLike } from "./utils/stream";
 import { SplitUndefined } from "./context";
 
 export async function decodeAsync<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ): Promise<unknown> {
-  const stream = ensureAsyncIterabe(streamLike);
+  const stream = ensureAsyncIterable(streamLike);
 
   const decoder = new Decoder(
     options.extensionCodec,
@@ -25,7 +25,7 @@ export function decodeArrayStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ) {
-  const stream = ensureAsyncIterabe(streamLike);
+  const stream = ensureAsyncIterable(streamLike);
 
   const decoder = new Decoder(
     options.extensionCodec,
@@ -44,7 +44,7 @@ export function decodeStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number>>,
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ) {
-  const stream = ensureAsyncIterabe(streamLike);
+  const stream = ensureAsyncIterable(streamLike);
 
   const decoder = new Decoder(
     options.extensionCodec,
