@@ -125,9 +125,9 @@ context | user-defined | -
 
 ### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`
 
-It decodes `buffer` encoded in MessagePack, and returns a decoded object as `uknown`.
+It decodes `buffer` encoded in MessagePack, and returns a decoded object as `unknown`.
 
-`buffer` must be an array of bytes, which is typically `Uint8Array`, or `ArrayBuffer`.
+`buffer` must be an array of bytes, which is typically `Uint8Array` or `ArrayBuffer`, but `Array<number>` is okay.
 
 for example:
 
@@ -545,7 +545,7 @@ If you use NodeJS and/or webpack, their module resolvers use the suitable one au
 
 ### CDN / unpkg.com
 
-This library is availble via CDN:
+This library is available via CDN:
 
 ```html
 <script crossorigin src="https://unpkg.com/@msgpack/msgpack"></script>
@@ -572,7 +572,7 @@ test matrix:
 * TypeScript targets
   * `target=es2019` / `target=es5`
 * JavaScript engines
-  * NodeJS, borwsers (Chrome, Firefox, Safari, IE11, and so on)
+  * NodeJS, browsers (Chrome, Firefox, Safari, IE11, and so on)
 
 See [test:* in package.json](./package.json) and [.travis.yml](./.travis.yml) for details.
 
