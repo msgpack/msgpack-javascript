@@ -57,7 +57,7 @@ deepStrictEqual(decode(encoded), object);
 - [Decoding a Blob](#decoding-a-blob)
 - [MessagePack Specification](#messagepack-specification)
   - [MessagePack Mapping Table](#messagepack-mapping-table)
-- [Prerequsites](#prerequsites)
+- [Prerequisites](#prerequisites)
   - [ECMA-262](#ecma-262)
   - [NodeJS](#nodejs)
   - [TypeScript](#typescript)
@@ -212,6 +212,22 @@ const stream: AsyncIterator<Uint8Array>;
 // in an async function:
 for await (const item of decodeStream(stream)) {
   console.log(item);
+}
+```
+
+If you have a multi-values MessagePack binary, you can use `decodeStream()`, but you need to convert it to a stream or an async generator like this:
+
+```typescript
+// A function that generates an AsyncGenerator
+const createStream = async function* (): AsyncGenerator<Uint8Array> {
+  yield encoded;
+};
+
+const result: Array<unknown> = [];
+
+// Decodes it with for-await
+for await (const item of decodeStream(createStream())) {
+  result.push(item);
 }
 ```
 
@@ -461,7 +477,7 @@ Date|timestamp ext family|Date (*4)
 * *3 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
 * *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
 
-## Prerequsites
+## Prerequisites
 
 This is a universal JavaScript library that supports major browsers and NodeJS.
 
