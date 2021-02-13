@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+jobs:
+  nodejs:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: ['12', '14']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - run: npm install -g npm
+    - run: npm install -g nyc codecov
+    - run: npm ci
+    - run: npm run test:cover
+    - run: codecov -f coverage/*.json
+
+  browser:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        browser: [ChromeHeadless, FirefoxHeadless]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14'
+
+    - run: npm install -g npm
+    - run: npm ci
+    - run: npm run test:browser -- --browsers ${{ matrix.browser }}
+

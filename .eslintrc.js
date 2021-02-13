@@ -41,7 +41,6 @@ module.exports = {
       { "selector": "typeLike", "format": ["PascalCase"], "leadingUnderscore": "allow" },
     ],
     "@typescript-eslint/restrict-plus-operands": ["warn", { "checkCompoundAssignments": true }],
-    "@typescript-eslint/no-non-null-assertion": "warn", // NOTE: pay attention to it because it may cause unexpected behavior
     "@typescript-eslint/no-throw-literal": "warn",
     "@typescript-eslint/no-extra-semi": "warn",
     "@typescript-eslint/no-extra-non-null-assertion": "warn",
@@ -53,6 +52,8 @@ module.exports = {
     "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
     "@typescript-eslint/no-invalid-void-type": "warn",
     "@typescript-eslint/no-loss-of-precision": "warn",
+    "@typescript-eslint/no-confusing-void-expression": "warn",
+    "@typescript-eslint/no-unnecessary-type-constraint": "warn",
     "@typescript-eslint/prefer-for-of": "warn",
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
@@ -68,6 +69,7 @@ module.exports = {
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/ban-ts-comment": "off",
   },
 };

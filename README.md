@@ -1,8 +1,9 @@
 # MessagePack for JavaScript/ECMA-262
 
-[![npm version](https://img.shields.io/npm/v/@msgpack/msgpack.svg)](https://www.npmjs.com/package/@msgpack/msgpack) [![Build Status](https://travis-ci.org/msgpack/msgpack-javascript.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-javascript) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graphs/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript) [![bundlephobia](https://badgen.net/bundlephobia/minzip/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack)
+[![npm version](https://img.shields.io/npm/v/@msgpack/msgpack.svg)](https://www.npmjs.com/package/@msgpack/msgpack) ![CI](https://github.com/msgpack/msgpack-javascript/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graphs/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript) [![bundlephobia](https://badgen.net/bundlephobia/minzip/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack)
 
-[![Browser Matrix powered by Sauce Labs](https://saucelabs.com/browser-matrix/gfx2019.svg)](https://saucelabs.com)
+<!--
+[![Browser Matrix powered by Sauce Labs](https://app.saucelabs.com/browser-matrix/gfx2019.svg)](https://app.saucelabs.com/u/gfx2019) -->
 
 This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient binary serilization format:
 
@@ -57,7 +58,7 @@ deepStrictEqual(decode(encoded), object);
 - [Decoding a Blob](#decoding-a-blob)
 - [MessagePack Specification](#messagepack-specification)
   - [MessagePack Mapping Table](#messagepack-mapping-table)
-- [Prerequsites](#prerequsites)
+- [Prerequisites](#prerequisites)
   - [ECMA-262](#ecma-262)
   - [NodeJS](#nodejs)
   - [TypeScript](#typescript)
@@ -70,7 +71,6 @@ deepStrictEqual(decode(encoded), object);
   - [Continuous Integration](#continuous-integration)
   - [Release Engineering](#release-engineering)
   - [Updating Dependencies](#updating-dependencies)
-- [Big Thanks](#big-thanks)
 - [License](#license)
 
 <!-- /TOC -->
@@ -125,9 +125,9 @@ context | user-defined | -
 
 ### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`
 
-It decodes `buffer` encoded in MessagePack, and returns a decoded object as `uknown`.
+It decodes `buffer` encoded in MessagePack, and returns a decoded object as `unknown`.
 
-`buffer` must be an array of bytes, which is typically `Uint8Array`, or `ArrayBuffer`.
+`buffer` must be an array of bytes, which is typically `Uint8Array` or `ArrayBuffer`, but `Array<number>` is okay.
 
 for example:
 
@@ -212,6 +212,22 @@ const stream: AsyncIterator<Uint8Array>;
 // in an async function:
 for await (const item of decodeStream(stream)) {
   console.log(item);
+}
+```
+
+If you have a multi-values MessagePack binary, you can use `decodeStream()`, but you need to convert it to a stream or an async generator like this:
+
+```typescript
+// A function that generates an AsyncGenerator
+const createStream = async function* (): AsyncGenerator<Uint8Array> {
+  yield encoded;
+};
+
+const result: Array<unknown> = [];
+
+// Decodes it with for-await
+for await (const item of decodeStream(createStream())) {
+  result.push(item);
 }
 ```
 
@@ -461,7 +477,7 @@ Date|timestamp ext family|Date (*4)
 * *3 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
 * *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
 
-## Prerequsites
+## Prerequisites
 
 This is a universal JavaScript library that supports major browsers and NodeJS.
 
@@ -519,17 +535,17 @@ Note that `Buffer.from()` for `JSON.stringify()` is necessary to emulate I/O whe
 
 The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
 
-* `dist/` is compiled into ES2015+, provided for NodeJS v10 or later
-* `dist.es5+umd/` is compiled into ES5 with UMD-style single file
-  * `dist.es5+umd/msgpack.min.js` - the default, minified file (UMD)
-  * `dist.es5+umd/msgpack.js` - an optional, non-minified file (UMD)
-* `dist.es5+esm/` is compiled into ES5 and placed as ES modules, provided for webpack-like bundlers, not NodeJS
+* `dist/` is compiled into ES2019 with CommomJS, provided for NodeJS v10
+* `dist.es5+umd/` is compiled into ES5 with UMD
+  * `dist.es5+umd/msgpack.min.js` - the minified file
+  * `dist.es5+umd/msgpack.js` - the non-minified file
+* `dist.es5+esm/` is compiled into ES5 with ES modules, provided for webpack-like bundlers and NodeJS's ESM-mode
 
 If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
 
 ### CDN / unpkg.com
 
-This library is availble via CDN:
+This library is available via CDN:
 
 ```html
 <script crossorigin src="https://unpkg.com/@msgpack/msgpack"></script>
@@ -556,7 +572,7 @@ test matrix:
 * TypeScript targets
   * `target=es2019` / `target=es5`
 * JavaScript engines
-  * NodeJS, borwsers (Chrome, Firefox, Safari, IE11, and so on)
+  * NodeJS, browsers (Chrome, Firefox, Safari, IE11, and so on)
 
 See [test:* in package.json](./package.json) and [.travis.yml](./.travis.yml) for details.
 
@@ -582,11 +598,11 @@ make publish
 npm run update-dependencies
 ```
 
-## Big Thanks
+<!-- ## Big Thanks
 
 Cross-browser Testing Platform and Open Source <3 Provided by Sauce Labs.
 
-<a href="https://saucelabs.com"><img src="./assets/SauceLabs.svg" alt="Sauce Labs" width="280"></a>
+<a href="https://saucelabs.com"><img src="./assets/SauceLabs.svg" alt="Sauce Labs" width="280"></a> -->
 
 ## License
 

@@ -63,9 +63,9 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
   public tryToEncode(object: unknown, context: ContextType): ExtData | null {
     // built-in extensions
     for (let i = 0; i < this.builtInEncoders.length; i++) {
-      const encoder = this.builtInEncoders[i];
-      if (encoder != null) {
-        const data = encoder(object, context);
+      const encodeExt = this.builtInEncoders[i];
+      if (encodeExt != null) {
+        const data = encodeExt(object, context);
         if (data != null) {
           const type = -1 - i;
           return new ExtData(type, data);
@@ -75,9 +75,9 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
 
     // custom extensions
     for (let i = 0; i < this.encoders.length; i++) {
-      const encoder = this.encoders[i];
-      if (encoder != null) {
-        const data = encoder(object, context);
+      const encodeExt = this.encoders[i];
+      if (encodeExt != null) {
+        const data = encodeExt(object, context);
         if (data != null) {
           const type = i;
           return new ExtData(type, data);
@@ -93,9 +93,9 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
   }
 
   public decode(data: Uint8Array, type: number, context: ContextType): unknown {
-    const decoder = type < 0 ? this.builtInDecoders[-1 - type] : this.decoders[type];
-    if (decoder) {
-      return decoder(data, type, context);
+    const decodeExt = type < 0 ? this.builtInDecoders[-1 - type] : this.decoders[type];
+    if (decodeExt) {
+      return decodeExt(data, type, context);
     } else {
       // decode() does not fail, returns ExtData instead.
       return new ExtData(type, data);

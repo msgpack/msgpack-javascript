@@ -33,7 +33,7 @@ export async function* asyncIterableFromStream<T>(stream: ReadableStream<T>): As
   }
 }
 
-export function ensureAsyncIterabe<T>(streamLike: ReadableStreamLike<T>): AsyncIterable<T> {
+export function ensureAsyncIterable<T>(streamLike: ReadableStreamLike<T>): AsyncIterable<T> {
   if (isAsyncIterable(streamLike)) {
     return streamLike;
   } else {

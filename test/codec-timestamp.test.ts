@@ -28,7 +28,7 @@ const SPECS = {
 describe("codec: timestamp 32/64/96", () => {
   context("encode / decode", () => {
     for (const name of Object.keys(SPECS)) {
-      const value = SPECS[name];
+      const value = SPECS[name]!;
 
       it(`encodes and decodes ${name} (${value.toISOString()})`, () => {
         const encoded = encode(value);
@@ -45,7 +45,6 @@ describe("codec: timestamp 32/64/96", () => {
 
   context("encodeDateToTimeSpec", () => {
     it("decodes timestamp-ext binary to TimeSpec", () => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const encoded = encodeTimestampExtension(new Date(42000))!;
       assert.deepStrictEqual(decodeTimestampToTimeSpec(encoded), { sec: 42, nsec: 0 });
     });

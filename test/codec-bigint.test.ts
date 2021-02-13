@@ -5,7 +5,6 @@ const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
   type: 0,
   encode: (input: unknown) => {
-    // eslint-disable-next-line valid-typeof
     if (typeof input === "bigint") {
       return encode(input.toString());
     } else {
