@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  nodejs:
     runs-on: ubuntu-20.04
 
     strategy:
@@ -23,3 +23,19 @@ jobs:
     - run: npm ci
     - run: npm run test:cover
     - run: codecov -f coverage/*.json
+
+  browser:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        browser: [ChromeHeadless, FirefoxHeadless]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+
+    - run: npm install -g npm
+    - run: npm ci
+    - run: npm run test:browser -- --browsers "${{ matrix.browser }}"
+
