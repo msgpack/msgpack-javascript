@@ -1,5 +1,15 @@
 This is the revision history of @msgpack/msgpack
 
+## v2.3.1 2021/02/13
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.3.0...v2.3.1
+
+* Fixed a lot of typos
+* Update dev environment:
+  * Migration to GitHub Actions
+  * Upgrade Webpack from v4 to v5
+  * Enable `noImplicitReturns` and `noUncheckedIndexedAccess` in tsconfig
+
 ## v2.3.0 2020/10/17
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.2.1...v2.3.0
