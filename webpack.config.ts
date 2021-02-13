@@ -1,5 +1,4 @@
 import path from "path";
-// @ts-expect-error
 import webpack from "webpack";
 import _ from "lodash";
 // @ts-expect-error
@@ -9,6 +8,7 @@ const config = {
   mode: "production",
 
   entry: "./src/index.ts",
+  target: ["web", "es5"],
   output: {
     path: path.resolve(__dirname, "dist.es5+umd"),
     library: "MessagePack",
@@ -42,7 +42,6 @@ const config = {
   ],
 
   optimization: {
-    noEmitOnErrors: true,
     minimize: undefined as boolean | undefined,
   },
 
