@@ -8,12 +8,12 @@ test-all:
 
 publish: validate-git-status
 	npm publish
-	git push origin master
-	git push origin master --tags
+	git push origin main
+	git push origin --tags
 
 validate-git-status:
-	@ if [ "`git symbolic-ref --short HEAD`" != "master" ] ; \
-		then echo "Not on the master branch!\n" ; exit 1 ; \
+	@ if [ "`git symbolic-ref --short HEAD`" != "main" ] ; \
+		then echo "Not on the main branch!\n" ; exit 1 ; \
 	fi
 	@ if ! git diff --exit-code --quiet ; \
 		then echo "Local differences!\n" ; git status ; exit 1 ; \
