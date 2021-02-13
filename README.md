@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@msgpack/msgpack.svg)](https://www.npmjs.com/package/@msgpack/msgpack) ![CI](https://github.com/msgpack/msgpack-javascript/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graphs/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript) [![bundlephobia](https://badgen.net/bundlephobia/minzip/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack)
 
-[![Browser Matrix powered by Sauce Labs](https://saucelabs.com/browser-matrix/gfx2019.svg)](https://saucelabs.com)
+[![Browser Matrix powered by Sauce Labs](https://app.saucelabs.com/browser-matrix/gfx2019.svg)](https://app.saucelabs.com/u/gfx2019)
 
 This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient binary serilization format:
 
