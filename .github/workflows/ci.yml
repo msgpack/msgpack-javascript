@@ -21,5 +21,5 @@ jobs:
     - run: npm install -g npm
     - run: npm install -g nyc codecov
     - run: npm ci
-    - run: npm test:cover
+    - run: npm run test:cover
     - run: codecov -f coverage/*.json
