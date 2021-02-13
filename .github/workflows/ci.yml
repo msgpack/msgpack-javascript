@@ -1,6 +1,10 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - main
+  pull_request:
 
 jobs:
   nodejs:
@@ -8,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
+        node-version: ['12', '14']
 
     steps:
     - uses: actions/checkout@v2
@@ -34,8 +38,10 @@ jobs:
 
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
+      with:
+        node-version: '14'
 
     - run: npm install -g npm
     - run: npm ci
-    - run: npm run test:browser -- --browsers "${{ matrix.browser }}"
+    - run: npm run test:browser -- --browsers ${{ matrix.browser }}
 
