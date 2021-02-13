@@ -60,7 +60,7 @@
     "@typescript-eslint/parser": "latest",
     "assert": "^2.0.0",
     "blob-polyfill": "latest",
-    "buffer": "^6.0.3",
+    "buffer": "latest",
     "core-js": "latest",
     "eslint": "latest",
     "eslint-config-prettier": "latest",
