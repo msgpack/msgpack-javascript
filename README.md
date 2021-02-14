@@ -45,11 +45,11 @@ deepStrictEqual(decode(encoded), object);
 - [API](#api)
   - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
     - [`EncodeOptions`](#encodeoptions)
-  - [`decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--arraybuffer-options-decodeoptions-unknown)
+  - [`decode(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--buffersource-options-decodeoptions-unknown)
     - [`DecodeOptions`](#decodeoptions)
-  - [`decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-promiseunknown)
-  - [`decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
-  - [`decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-asynciterablearraylikenumber--readablestreamarraylikenumber-options-decodeasyncoptions-asynciterableunknown)
+  - [`decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-promiseunknown)
+  - [`decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-asynciterableunknown)
+  - [`decodeStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-asynciterableunknown)
   - [Reusing Encoder and Decoder instances](#reusing-encoder-and-decoder-instances)
 - [Extension Types](#extension-types)
     - [ExtensionCodec context](#extensioncodec-context)
@@ -123,11 +123,11 @@ forceIntegerToFloat | boolean | false
 ignoreUndefined | boolean | false
 context | user-defined | -
 
-### `decode(buffer: ArrayLike<number> | ArrayBuffer, options?: DecodeOptions): unknown`
+### `decode(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): unknown`
 
 It decodes `buffer` encoded in MessagePack, and returns a decoded object as `unknown`.
 
-`buffer` must be an array of bytes, which is typically `Uint8Array` or `ArrayBuffer`, but `Array<number>` is okay.
+`buffer` must be an array of bytes, which is typically `Uint8Array` or `ArrayBuffer`. `BufferSource` is defined as `ArrayBuffer | ArrayBufferView`.
 
 for example:
 
@@ -145,7 +145,7 @@ NodeJS `Buffer` is also acceptable because it is a subclass of `Uint8Array`.
 
 Name|Type|Default
 ----|----|----
-extensionCodec | ExtensionCodec | `ExtensinCodec.defaultCodec`
+extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
 maxStrLength | number | `4_294_967_295` (UINT32_MAX)
 maxBinLength | number | `4_294_967_295` (UINT32_MAX)
 maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
@@ -155,9 +155,9 @@ context | user-defined | -
 
 You can use `max${Type}Length` to limit the length of each type decoded.
 
-### `decodeAsync(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): Promise<unknown>`
+### `decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`
 
-It decodes `stream` in an async iterable of byte arrays, and returns decoded object as `uknown` type, wrapped in `Promise`. This function works asyncronously.
+It decodes `stream`, where `ReadableStreamLike<T>` is defined as `ReadableStream<T> | AsyncIterable<T>`, in an async iterable of byte arrays, and returns decoded object as `unknown` type, wrapped in `Promise`. This function works asynchronously.
 
 `DecodeAsyncOptions` is the same as `DecodeOptions` for `decode()`.
 
@@ -176,7 +176,7 @@ if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null
 } else { /* handle errors */ }
 ```
 
-### `decodeArrayStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
 It is alike to `decodeAsync()`, but only accepts an array of items as the input `stream`, and emits the decoded item one by one.
 
@@ -196,7 +196,7 @@ for await (const item of decodeArrayStream(stream)) {
 ```
 
 
-### `decodeStream(stream: AsyncIterable<ArrayLike<number>> | ReadableStream<ArrayLike<number>>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
 It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
 
