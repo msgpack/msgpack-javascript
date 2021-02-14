@@ -85,13 +85,13 @@ export class Decoder<ContextType> {
     this.headByte = HEAD_BYTE_REQUIRED;
   }
 
-  private setBuffer(buffer: ArrayLike<number> | ArrayBuffer): void {
+  private setBuffer(buffer: ArrayLike<number> | BufferSource): void {
     this.bytes = ensureUint8Array(buffer);
     this.view = createDataView(this.bytes);
     this.pos = 0;
   }
 
-  private appendBuffer(buffer: ArrayLike<number>) {
+  private appendBuffer(buffer: ArrayLike<number> | BufferSource) {
     if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
       this.setBuffer(buffer);
     } else {
@@ -114,7 +114,7 @@ export class Decoder<ContextType> {
     return new RangeError(`Extra ${view.byteLength - pos} of ${view.byteLength} byte(s) found at buffer[${posToShow}]`);
   }
 
-  public decode(buffer: ArrayLike<number> | ArrayBuffer): unknown {
+  public decode(buffer: ArrayLike<number> | BufferSource): unknown {
     this.reinitializeState();
     this.setBuffer(buffer);
 
@@ -125,7 +125,7 @@ export class Decoder<ContextType> {
     return object;
   }
 
-  public async decodeAsync(stream: AsyncIterable<ArrayLike<number>>): Promise<unknown> {
+  public async decodeAsync(stream: AsyncIterable<ArrayLike<number> | BufferSource>): Promise<unknown> {
     let decoded = false;
     let object: unknown;
     for await (const buffer of stream) {
@@ -160,15 +160,15 @@ export class Decoder<ContextType> {
     );
   }
 
-  public decodeArrayStream(stream: AsyncIterable<ArrayLike<number>>) {
+  public decodeArrayStream(stream: AsyncIterable<ArrayLike<number> | BufferSource>) {
     return this.decodeMultiAsync(stream, true);
   }
 
-  public decodeStream(stream: AsyncIterable<ArrayLike<number>>) {
+  public decodeStream(stream: AsyncIterable<ArrayLike<number> | BufferSource>) {
     return this.decodeMultiAsync(stream, false);
   }
 
-  private async *decodeMultiAsync(stream: AsyncIterable<ArrayLike<number>>, isArray: boolean) {
+  private async *decodeMultiAsync(stream: AsyncIterable<ArrayLike<number> | BufferSource>, isArray: boolean) {
     let isArrayHeaderRequired = isArray;
     let arrayItemsLeft = -1;
 
