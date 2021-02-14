@@ -107,4 +107,17 @@ describe("decodeAsync", () => {
     };
     assert.deepStrictEqual(await decodeAsync(createStream()), object);
   });
+
+  it("decodes BufferSource", async () => {
+    // https://developer.mozilla.org/en-US/docs/Web/API/BufferSource
+    const createStream = async function* () {
+      yield [0x81] as ArrayLike<number>; // fixmap size=1
+      yield encode("foo") as BufferSource;
+      yield encode("bar") as BufferSource;
+    };
+
+    // createStream() returns AsyncGenerator<ArrayLike<number> | BufferSource, ...>
+    const object = await decodeAsync(createStream());
+    assert.deepStrictEqual(object, { "foo": "bar" });
+  });
 });
