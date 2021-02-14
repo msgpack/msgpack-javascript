@@ -125,6 +125,15 @@ export class Decoder<ContextType> {
     return object;
   }
 
+  public *decodeMulti(buffer: ArrayLike<number> | BufferSource): Generator<unknown, void, unknown> {
+    this.reinitializeState();
+    this.setBuffer(buffer);
+
+    while (this.hasRemaining()) {
+      yield this.doDecodeSync();
+    }
+  }
+
   public async decodeAsync(stream: AsyncIterable<ArrayLike<number> | BufferSource>): Promise<unknown> {
     let decoded = false;
     let object: unknown;

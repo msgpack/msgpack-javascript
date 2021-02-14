@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decodeStream } from "@msgpack/msgpack";
+import { encode, decodeMultiStream } from "@msgpack/msgpack";
 
 describe("decodeStream", () => {
   it("decodes stream", async () => {
@@ -20,14 +20,14 @@ describe("decodeStream", () => {
 
     const result: Array<unknown> = [];
 
-    for await (const item of decodeStream(createStream())) {
+    for await (const item of decodeMultiStream(createStream())) {
       result.push(item);
     }
 
     assert.deepStrictEqual(result, items);
   });
 
-  it("decodes stream with a single binary", async () => {
+  it("decodes multiple objects in a single binary stream", async () => {
     const items = [
       "foo",
       10,
@@ -51,7 +51,7 @@ describe("decodeStream", () => {
 
     const result: Array<unknown> = [];
 
-    for await (const item of decodeStream(createStream())) {
+    for await (const item of decodeMultiStream(createStream())) {
       result.push(item);
     }
 

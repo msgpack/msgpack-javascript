@@ -38,9 +38,10 @@ export type DecodeOptions<ContextType = undefined> = Readonly<
 export const defaultDecodeOptions: DecodeOptions = {};
 
 /**
- * It decodes a MessagePack-encoded buffer.
+ * It decodes a single MessagePack object in a buffer.
  *
- * This is a synchronous decoding function. See other variants for asynchronous decoding: `decodeAsync()`, `decodeStream()`, `decodeArrayStream()`.
+ * This is a synchronous decoding function.
+ * See other variants for asynchronous decoding: {@link decodeAsync()}, {@link decodeStream()}, or {@link decodeArrayStream()}.
  */
 export function decode<ContextType = undefined>(
   buffer: ArrayLike<number> | BufferSource,
@@ -56,4 +57,24 @@ export function decode<ContextType = undefined>(
     options.maxExtLength,
   );
   return decoder.decode(buffer);
+}
+
+/**
+ * It decodes multiple MessagePack objects in a buffer.
+ * This is corresponding to {@link decodeMultiStream()}.
+ */
+export function decodeMulti<ContextType = undefined>(
+  buffer: ArrayLike<number> | BufferSource,
+  options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
+): Generator<unknown, void, unknown> {
+  const decoder = new Decoder(
+    options.extensionCodec,
+    (options as typeof options & { context: any }).context,
+    options.maxStrLength,
+    options.maxBinLength,
+    options.maxArrayLength,
+    options.maxMapLength,
+    options.maxExtLength,
+  );
+  return decoder.decodeMulti(buffer);
 }
