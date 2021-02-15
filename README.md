@@ -47,9 +47,10 @@ deepStrictEqual(decode(encoded), object);
     - [`EncodeOptions`](#encodeoptions)
   - [`decode(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--buffersource-options-decodeoptions-unknown)
     - [`DecodeOptions`](#decodeoptions)
+  - [`decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): Generator<unknown, void, unknown>`](#decodemultibuffer-arraylikenumber--buffersource-options-decodeoptions-generatorunknown-void-unknown)
   - [`decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-promiseunknown)
   - [`decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-asynciterableunknown)
-  - [`decodeStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodestreamstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-asynciterableunknown)
+  - [`decodeMultiStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodemultistreamstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-asynciterableunknown)
   - [Reusing Encoder and Decoder instances](#reusing-encoder-and-decoder-instances)
 - [Extension Types](#extension-types)
     - [ExtensionCodec context](#extensioncodec-context)
@@ -155,6 +156,24 @@ context | user-defined | -
 
 You can use `max${Type}Length` to limit the length of each type decoded.
 
+### `decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): Generator<unknown, void, unknown>`
+
+It decodes `buffer` encoded in MessagePack, and returns decoded objects as a generator. That is, this is a synchronous variant for `decodeMultiStream()`.
+
+This function is not recommended to decode a MessagePack binary via I/O stream including sockets because it's synchronous. Instead, `decodeMultiStream()` decodes it asynchronously, likely spending less time and memory.
+
+for example:
+
+```typescript
+import { decode } from "@msgpack/msgpack";
+
+const encoded: Uint8Array;
+
+for (const object of decodeMulti(encoded)) {
+  console.log(object);
+}
+```
+
 ### `decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`
 
 It decodes `stream`, where `ReadableStreamLike<T>` is defined as `ReadableStream<T> | AsyncIterable<T>`, in an async iterable of byte arrays, and returns decoded object as `unknown` type, wrapped in `Promise`. This function works asynchronously.
@@ -196,11 +215,11 @@ for await (const item of decodeArrayStream(stream)) {
 ```
 
 
-### `decodeStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeMultiStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
-It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of independent MessagePack items.
+It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of multiple MessagePack items.
 
-In other words, it decodes an unlimited stream and emits an item one by one.
+In other words, it could decode an unlimited stream and emits an item one by one.
 
 for example:
 
@@ -215,7 +234,7 @@ for await (const item of decodeStream(stream)) {
 }
 ```
 
-If you have a multi-values MessagePack binary, you can use `decodeStream()`, but you need to convert it to a stream or an async generator like this:
+If you have a multi-values MessagePack binary, you can use `decodeMultiStream()`, but you need to convert it to a stream or an async generator like this:
 
 ```typescript
 // A function that generates an AsyncGenerator
@@ -226,10 +245,12 @@ const createStream = async function* (): AsyncGenerator<Uint8Array> {
 const result: Array<unknown> = [];
 
 // Decodes it with for-await
-for await (const item of decodeStream(createStream())) {
+for await (const item of decodeMultiStream(createStream())) {
   result.push(item);
 }
 ```
+
+It is available since v2.4.0; previously it was called as `decodeStream()`.
 
 ### Reusing Encoder and Decoder instances
 
