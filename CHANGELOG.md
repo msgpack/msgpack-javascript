@@ -1,4 +1,13 @@
-This is the revision history of @msgpack/msgpack
+# This is the revision history of @msgpack/msgpack
+
+## v2.4.0 2021/02/15
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.3.1...v2.4.0
+
+* Renamed `decodeStream()` to `decodeMultiStream()`
+  * `decodeStream()` is kept as a deprecated function but will be removed in a future
+* Added `decodeMulti()`, a synchronous variant for `decodeMultiStream()` (thanks to @Bilge for the request in [#152](https://github.com/msgpack/msgpack-javascript/issues/152))
+* Improved `decodeAsync()` and its family to accept `BufferSource` (thanks to @rajaybasu for the suggestion in [#152-issuecomment-778712021)](https://github.com/msgpack/msgpack-javascript/issues/152#issuecomment-778712021))
 
 ## v2.3.1 2021/02/13
 
