@@ -42,7 +42,7 @@ export function decodeArrayStream<ContextType>(
   return decoder.decodeArrayStream(stream);
 }
 
-export function decodeStream<ContextType>(
+export function decodeMultiStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number> | BufferSource>,
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
 ) {
@@ -59,4 +59,14 @@ export function decodeStream<ContextType>(
   );
 
   return decoder.decodeStream(stream);
+}
+
+/**
+ * @deprecated Use {@link decodeMultiStream()} instead.
+ */
+export function decodeStream<ContextType>(
+  streamLike: ReadableStreamLike<ArrayLike<number> | BufferSource>,
+  options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
+) {
+  return decodeMultiStream(streamLike, options);
 }

@@ -5,13 +5,13 @@ export { encode };
 import type { EncodeOptions } from "./encode";
 export type { EncodeOptions };
 
-import { decode } from "./decode";
-export { decode };
+import { decode, decodeMulti } from "./decode";
+export { decode, decodeMulti };
 import type { DecodeOptions } from "./decode";
 export { DecodeOptions };
 
-import { decodeAsync, decodeArrayStream, decodeStream } from "./decodeAsync";
-export { decodeAsync, decodeArrayStream, decodeStream };
+import { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream } from "./decodeAsync";
+export { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream };
 
 import { Decoder } from "./Decoder";
 export { Decoder };
