@@ -88,7 +88,7 @@ npm install @msgpack/msgpack
 
 ### `encode(data: unknown, options?: EncodeOptions): Uint8Array`
 
-It encodes `data` and returns a byte array as `Uint8Array`, throwing errors if `data` is, or includes, a non-serializable object such as a `function` or a `symbol`.
+It encodes `data` into a single MessagePack-encoded object, and returns a byte array as `Uint8Array`, throwing errors if `data` is, or includes, a non-serializable object such as a `function` or a `symbol`.
 
 for example:
 
@@ -99,7 +99,7 @@ const encoded: Uint8Array = encode({ foo: "bar" });
 console.log(encoded);
 ```
 
-If you'd like to convert the uint8array to a NodeJS `Buffer`, use `Buffer.from(arrayBuffer, offset, length)` in order not to copy the underlying `ArrayBuffer`, while `Buffer.from(uint8array)` copies it:
+If you'd like to convert an `uint8array` to a NodeJS `Buffer`, use `Buffer.from(arrayBuffer, offset, length)` in order not to copy the underlying `ArrayBuffer`, while `Buffer.from(uint8array)` copies it:
 
 ```typescript
 import { encode } from "@msgpack/msgpack";
@@ -115,7 +115,7 @@ console.log(buffer);
 
 Name|Type|Default
 ----|----|----
-extensionCodec | ExtensionCodec | `ExtensinCodec.defaultCodec`
+extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
 maxDepth | number | `100`
 initialBufferSize | number | `2048`
 sortKeys | boolean | false
@@ -126,9 +126,11 @@ context | user-defined | -
 
 ### `decode(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): unknown`
 
-It decodes `buffer` encoded in MessagePack, and returns a decoded object as `unknown`.
+It decodes `buffer` that includes a MessagePack-encoded object, and returns the decoded object typed `unknown`.
 
 `buffer` must be an array of bytes, which is typically `Uint8Array` or `ArrayBuffer`. `BufferSource` is defined as `ArrayBuffer | ArrayBufferView`.
+
+In addition, `buffer` can include a single encoded object. If the `buffer` includes extra bytes after an object, it will throw `RangeError`. To decode `buffer` that includes multiple encoded objects, use `decodeMulti()` or `decodeMultiStream()` (recommended) instead.
 
 for example:
 
@@ -158,9 +160,9 @@ You can use `max${Type}Length` to limit the length of each type decoded.
 
 ### `decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): Generator<unknown, void, unknown>`
 
-It decodes `buffer` encoded in MessagePack, and returns decoded objects as a generator. That is, this is a synchronous variant for `decodeMultiStream()`.
+It decodes `buffer` that includes multiple MessagePack-encoded objects, and returns decoded objects as a generator. That is, this is a synchronous variant for `decodeMultiStream()`.
 
-This function is not recommended to decode a MessagePack binary via I/O stream including sockets because it's synchronous. Instead, `decodeMultiStream()` decodes it asynchronously, likely spending less time and memory.
+This function is not recommended to decode a MessagePack binary via I/O stream including sockets because it's synchronous. Instead, `decodeMultiStream()` decodes it asynchronously, typically spending less time and memory.
 
 for example:
 
@@ -176,7 +178,7 @@ for (const object of decodeMulti(encoded)) {
 
 ### `decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`
 
-It decodes `stream`, where `ReadableStreamLike<T>` is defined as `ReadableStream<T> | AsyncIterable<T>`, in an async iterable of byte arrays, and returns decoded object as `unknown` type, wrapped in `Promise`. This function works asynchronously.
+It decodes `stream`, where `ReadableStreamLike<T>` is defined as `ReadableStream<T> | AsyncIterable<T>`, in an async iterable of byte arrays, and returns decoded object as `unknown` type, wrapped in `Promise`. This function works asynchronously. This is an async variant for `decode()`.
 
 `DecodeAsyncOptions` is the same as `DecodeOptions` for `decode()`.
 
@@ -197,9 +199,7 @@ if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null
 
 ### `decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
-It is alike to `decodeAsync()`, but only accepts an array of items as the input `stream`, and emits the decoded item one by one.
-
-It throws errors when the input is not an array-family.
+It is alike to `decodeAsync()`, but only accepts a `stream` that includes an array of items, and emits a decoded item one by one.
 
 for example:
 
@@ -214,12 +214,11 @@ for await (const item of decodeArrayStream(stream)) {
 }
 ```
 
-
 ### `decodeMultiStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
 
-It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` consists of multiple MessagePack items.
+It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` must consist of multiple MessagePack-encoded items. This is an asynchronous variant for `decodeMulti()`.
 
-In other words, it could decode an unlimited stream and emits an item one by one.
+In other words, it could decode an unlimited stream and emits a decoded item one by one.
 
 for example:
 
@@ -234,23 +233,7 @@ for await (const item of decodeStream(stream)) {
 }
 ```
 
-If you have a multi-values MessagePack binary, you can use `decodeMultiStream()`, but you need to convert it to a stream or an async generator like this:
-
-```typescript
-// A function that generates an AsyncGenerator
-const createStream = async function* (): AsyncGenerator<Uint8Array> {
-  yield encoded;
-};
-
-const result: Array<unknown> = [];
-
-// Decodes it with for-await
-for await (const item of decodeMultiStream(createStream())) {
-  result.push(item);
-}
-```
-
-It is available since v2.4.0; previously it was called as `decodeStream()`.
+This function is available since v2.4.0; previously it was called as `decodeStream()`.
 
 ### Reusing Encoder and Decoder instances
 
