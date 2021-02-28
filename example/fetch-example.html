@@ -48,11 +48,13 @@
         }
       })()
     </script>
+    <pre><code id="source"></code></pre>
     <script>
       const script = document.getElementById("script");
-      document.write("<pre><code>");
-      document.write(script.innerText.replace(/^ {6}/gms, ""));
-      document.write("</code><pre>");
+      const source = document.getElementById("source");
+      source.appendChild(
+        document.createTextNode(
+          script.innerText.replace(/^ {6}/gms, "")));
     </script>
   </main>
 </body>
