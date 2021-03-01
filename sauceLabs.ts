@@ -1,6 +1,6 @@
 // https://saucelabs.com/platforms
 
-const IS_LOCAL = !process.env.TRAVIS_BUILD_NUMBER;
+const IS_LOCAL = !process.env["TRAVIS_BUILD_NUMBER"];
 
 export type SauceLauncher = {
   base: "SauceLabs";
@@ -26,8 +26,8 @@ export const sauceLabs = {
 
   // Only master branch are logged to the SauceLabs builds, which updates the browser-matrix badge.
   build:
-    process.env.TRAVIS_BRANCH === "master" && process.env.TRAVIS_EVENT_TYPE !== "pull_request"
-      ? process.env.TRAVIS_BUILD_NUMBER
+    process.env["TRAVIS_BRANCH"] === "master" && process.env["TRAVIS_EVENT_TYPE"] !== "pull_request"
+      ? process.env["TRAVIS_BUILD_NUMBER"]
       : undefined,
 };
 
