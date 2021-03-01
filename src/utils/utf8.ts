@@ -1,6 +1,5 @@
 const TEXT_ENCODING_AVAILABLE =
-  typeof process !== "undefined" &&
-  process.env.TEXT_ENCODING !== "never" &&
+  (typeof process === "undefined" || process.env.TEXT_ENCODING !== "never") &&
   typeof TextEncoder !== "undefined" &&
   typeof TextDecoder !== "undefined";
 
