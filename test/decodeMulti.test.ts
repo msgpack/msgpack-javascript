@@ -27,4 +27,5 @@ describe("decodeMulti", () => {
     }
 
     assert.deepStrictEqual(result, items);
-  });});
+  });
+});
