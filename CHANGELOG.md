@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## v2.4.1 2021/03/01
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.4.0...v2.4.1
+
+* Fixed a performance regression that `TextEncoder` and `TextDecoder` were never used even if available ([reported as #157 by @ChALkeR](https://github.com/msgpack/msgpack-javascript/issues/157))
+
 ## v2.4.0 2021/02/15
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.3.1...v2.4.0
