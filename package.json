@@ -51,6 +51,9 @@
   "engines": {
     "node": ">= 10"
   },
+  "dependencies": {
+    "tslib": ">=2.0.0"
+  },
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",
     "@types/lodash": "latest",
