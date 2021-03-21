@@ -10,7 +10,7 @@ for (const file of files) {
   console.info(`Processing ${file} => ${fileMjs}`);
   // .js => .mjs
   const content = fs.readFileSync(file).toString("utf-8");
-  const newContent = content.replace(/\bfrom "([^"]+)";/g, 'from "$1.mjs";')
+  const newContent = content.replace(/\bfrom "(\.\.?\/[^"]+)";/g, 'from "$1.mjs";')
     .replace(/\/\/# sourceMappingURL=(.+)\.js\.map$/,
       "//# sourceMappingURL=$1.mjs.map");
   fs.writeFileSync(fileMjs, newContent);
