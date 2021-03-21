@@ -64,7 +64,7 @@ export class DecodeError extends Error {
   constructor(message: string) {
     super(message);
 
-    Object.defineProperty(this, 'name', {
+    Object.defineProperty(this, "name", {
       configurable: true,
       enumerable: false,
       value: this.constructor.name,
@@ -413,6 +413,9 @@ export class Decoder<ContextType> {
           if (!isValidMapKeyType(object)) {
             throw new DecodeError("The type of key must be string or number but " + typeof object);
           }
+          if (object === "__proto__") {
+            throw new DecodeError("The key __proto__ is not allowed");
+          }
 
           state.key = object;
           state.type = State.MAP_VALUE;
@@ -498,7 +501,9 @@ export class Decoder<ContextType> {
 
   private decodeUtf8String(byteLength: number, headerOffset: number): string {
     if (byteLength > this.maxStrLength) {
-      throw new DecodeError(`Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`);
+      throw new DecodeError(
+        `Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`,
+      );
     }
 
     if (this.bytes.byteLength < this.pos + headerOffset + byteLength) {
