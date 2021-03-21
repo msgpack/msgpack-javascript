@@ -1,5 +1,14 @@
 # This is the revision history of @msgpack/msgpack
 
+## v2.5.0 2021/03/21
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.4.1...v2.5.0
+
+* Throws `DecodeError` in decoding errors
+* Rejects `__proto__` as a map key, throwing `DecodeError`
+  * Thank you to Ninevra Leanne Walden for reporting this issue
+* Added `tslib` as a dependency
+
 ## v2.4.1 2021/03/01
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.4.0...v2.4.1
