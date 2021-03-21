@@ -13,8 +13,8 @@ export { DecodeOptions };
 import { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream } from "./decodeAsync";
 export { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream };
 
-import { Decoder } from "./Decoder";
-export { Decoder };
+import { Decoder, DecodeError } from "./Decoder";
+export { Decoder, DecodeError };
 
 import { Encoder } from "./Encoder";
 export { Encoder };

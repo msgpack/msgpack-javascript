@@ -60,6 +60,18 @@ const DEFAULT_MAX_LENGTH = 0xffff_ffff; // uint32_max
 
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
 
+export class DecodeError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    Object.defineProperty(this, 'name', {
+      configurable: true,
+      enumerable: false,
+      value: this.constructor.name,
+    });
+  }
+}
+
 export class Decoder<ContextType> {
   private totalPos = 0;
   private pos = 0;
@@ -379,7 +391,7 @@ export class Decoder<ContextType> {
         const size = this.lookU32();
         object = this.decodeExtension(size, 4);
       } else {
-        throw new Error(`Unrecognized type byte: ${prettyByte(headByte)}`);
+        throw new DecodeError(`Unrecognized type byte: ${prettyByte(headByte)}`);
       }
 
       this.complete();
@@ -399,7 +411,7 @@ export class Decoder<ContextType> {
           }
         } else if (state.type === State.MAP_KEY) {
           if (!isValidMapKeyType(object)) {
-            throw new Error("The type of key must be string or number but " + typeof object);
+            throw new DecodeError("The type of key must be string or number but " + typeof object);
           }
 
           state.key = object;
@@ -451,7 +463,7 @@ export class Decoder<ContextType> {
         if (headByte < 0xa0) {
           return headByte - 0x90;
         } else {
-          throw new Error(`Unrecognized array type byte: ${prettyByte(headByte)}`);
+          throw new DecodeError(`Unrecognized array type byte: ${prettyByte(headByte)}`);
         }
       }
     }
@@ -459,7 +471,7 @@ export class Decoder<ContextType> {
 
   private pushMapState(size: number) {
     if (size > this.maxMapLength) {
-      throw new Error(`Max length exceeded: map length (${size}) > maxMapLengthLength (${this.maxMapLength})`);
+      throw new DecodeError(`Max length exceeded: map length (${size}) > maxMapLengthLength (${this.maxMapLength})`);
     }
 
     this.stack.push({
@@ -473,7 +485,7 @@ export class Decoder<ContextType> {
 
   private pushArrayState(size: number) {
     if (size > this.maxArrayLength) {
-      throw new Error(`Max length exceeded: array length (${size}) > maxArrayLength (${this.maxArrayLength})`);
+      throw new DecodeError(`Max length exceeded: array length (${size}) > maxArrayLength (${this.maxArrayLength})`);
     }
 
     this.stack.push({
@@ -486,7 +498,7 @@ export class Decoder<ContextType> {
 
   private decodeUtf8String(byteLength: number, headerOffset: number): string {
     if (byteLength > this.maxStrLength) {
-      throw new Error(`Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`);
+      throw new DecodeError(`Max length exceeded: UTF-8 byte length (${byteLength}) > maxStrLength (${this.maxStrLength})`);
     }
 
     if (this.bytes.byteLength < this.pos + headerOffset + byteLength) {
@@ -516,7 +528,7 @@ export class Decoder<ContextType> {
 
   private decodeBinary(byteLength: number, headOffset: number): Uint8Array {
     if (byteLength > this.maxBinLength) {
-      throw new Error(`Max length exceeded: bin length (${byteLength}) > maxBinLength (${this.maxBinLength})`);
+      throw new DecodeError(`Max length exceeded: bin length (${byteLength}) > maxBinLength (${this.maxBinLength})`);
     }
 
     if (!this.hasRemaining(byteLength + headOffset)) {
@@ -531,7 +543,7 @@ export class Decoder<ContextType> {
 
   private decodeExtension(size: number, headOffset: number): unknown {
     if (size > this.maxExtLength) {
-      throw new Error(`Max length exceeded: ext length (${size}) > maxExtLength (${this.maxExtLength})`);
+      throw new DecodeError(`Max length exceeded: ext length (${size}) > maxExtLength (${this.maxExtLength})`);
     }
 
     const extType = this.view.getInt8(this.pos + headOffset);
