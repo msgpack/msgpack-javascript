@@ -1,5 +1,10 @@
 # This is the revision history of @msgpack/msgpack
 
+## v2.5.1 2021/03/21
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.5.0...v2.5.1
+
+* Fixed the ESM package's dependencies
 ## v2.5.0 2021/03/21
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.4.1...v2.5.0
