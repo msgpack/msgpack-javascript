@@ -18,7 +18,7 @@
     // "tsBuildInfoFile": "./",               /* Specify file to store incremental compilation information */
     // "removeComments": true,                /* Do not emit comments to output. */
     // "noEmit": true,                        /* Do not emit outputs. */
-    "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
+    // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
     // "downlevelIteration": true,            /* Provide full support for iterables in 'for-of', spread, and destructuring when targeting 'ES5' or 'ES3'. */
     // "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
 
@@ -41,7 +41,7 @@
     "noPropertyAccessFromIndexSignature": true,
 
     /* Module Resolution Options */
-    "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
+    // "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
     "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
     "paths": {
       "@msgpack/msgpack": ["./src"]
