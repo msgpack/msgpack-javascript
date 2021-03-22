@@ -1,6 +1,6 @@
-import { ExtensionCodecType } from "./ExtensionCodec";
 import { Decoder } from "./Decoder";
-import { ContextOf, SplitUndefined } from "./context";
+import type { ExtensionCodecType } from "./ExtensionCodec";
+import type { ContextOf, SplitUndefined } from "./context";
 
 export type DecodeOptions<ContextType = undefined> = Readonly<
   Partial<{
