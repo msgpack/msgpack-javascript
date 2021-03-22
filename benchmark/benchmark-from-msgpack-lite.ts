@@ -70,7 +70,7 @@ if (msgpack_msgpack) {
   obj = bench('obj = /* @msgpack/msgpack */ decoder.decode(buf);', (buf) => decoder.decode(buf), buf);
   runTest(obj);
 
-  if (process.env.CACHE_HIT_RATE) {
+  if (process.env["CACHE_HIT_RATE"]) {
     const {hit, miss} = decoder.keyDecoder;
     console.log(`CACHE_HIT_RATE: cache hit rate in CachedKeyDecoder: hit=${hit}, miss=${miss}, hit rate=${hit / (hit + miss)}`);
   }
