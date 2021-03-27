@@ -361,17 +361,21 @@ import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
 const BIGINT_EXT_TYPE = 0; // Any in 0-127
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
-  type: BIGINT_EXT_TYPE,
-  encode: (input: unknown) => {
-    if (typeof input === "bigint") {
-      return encode(input.toString());
-    } else {
-      return null;
-    }
-  },
-  decode: (data: Uint8Array) => {
-    return BigInt(decode(data));
-  },
+    type: BIGINT_EXT_TYPE,
+    encode: (input: unknown) => {
+        if (typeof input === "bigint") {
+            if (input <= Number.MAX_SAFE_INTEGER && input >= Number.MIN_SAFE_INTEGER) {
+                return encode(parseInt(input.toString(), 10));
+            } else {
+                return encode(input.toString());
+            }
+        } else {
+            return null;
+        }
+    },
+    decode: (data: Uint8Array) => {
+        return BigInt(decode(data));
+    },
 });
 
 const value = BigInt(Number.MAX_SAFE_INTEGER) + BigInt(1);
