@@ -1,5 +1,9 @@
 # This is the revision history of @msgpack/msgpack
 
+## NEXT
+
+* Revert use of `tslib` (added in 2.5.0) to fix [#169](https://github.com/msgpack/msgpack-javascript/issues/169)
+
 ## v2.5.1 2021/03/21
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.5.0...v2.5.1
