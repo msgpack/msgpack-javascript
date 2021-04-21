@@ -51,7 +51,6 @@
   "engines": {
     "node": ">= 10"
   },
-  "dependencies": {},
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",
     "@types/lodash": "latest",
