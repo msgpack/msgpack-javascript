@@ -1,6 +1,6 @@
 {
   "name": "@msgpack/msgpack",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "description": "MessagePack for JavaScript/ECMA-262",
   "author": "The MessagePack community",
   "license": "ISC",
@@ -51,8 +51,7 @@
   "engines": {
     "node": ">= 10"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",
     "@types/lodash": "latest",
