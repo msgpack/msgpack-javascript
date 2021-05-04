@@ -4,6 +4,7 @@ import { getInt64, getUint64 } from "./utils/int";
 import { utf8DecodeJs, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
+import { DecodeError } from "./DecodeError";
 
 const enum State {
   ARRAY,
@@ -59,22 +60,6 @@ const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 const DEFAULT_MAX_LENGTH = 0xffff_ffff; // uint32_max
 
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
-
-export class DecodeError extends Error {
-  constructor(message: string) {
-    super(message);
-
-    // fix the prototype chain in a cross-platform way
-    const proto: typeof DecodeError.prototype = Object.create(DecodeError.prototype);
-    Object.setPrototypeOf(this, proto);
-
-    Object.defineProperty(this, "name", {
-      configurable: true,
-      enumerable: false,
-      value: DecodeError.name,
-    });
-  }
-}
 
 export class Decoder<ContextType = undefined> {
   private totalPos = 0;
@@ -133,6 +118,10 @@ export class Decoder<ContextType = undefined> {
     return new RangeError(`Extra ${view.byteLength - pos} of ${view.byteLength} byte(s) found at buffer[${posToShow}]`);
   }
 
+  /**
+   * @throws {DecodeError}
+   * @throws {RangeError}
+   */
   public decode(buffer: ArrayLike<number> | BufferSource): unknown {
     this.reinitializeState();
     this.setBuffer(buffer);

@@ -1,0 +1,23 @@
+# https://gitlab.com/gitlab-org/security-products/analyzers/fuzzers/jsfuzz
+
+name: Fuzz
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+jobs:
+  fuzzing:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: "16"
+
+    - run: npm ci
+    - run: npm run test:fuzz

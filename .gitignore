@@ -11,3 +11,6 @@ isolate-*.log
 
 # flamebearer
 flamegraph.html
+
+# jsfuzz
+corpus/
