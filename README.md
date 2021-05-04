@@ -67,6 +67,7 @@ deepStrictEqual(decode(encoded), object);
 - [Distribution](#distribution)
   - [NPM / npmjs.com](#npm--npmjscom)
   - [CDN / unpkg.com](#cdn--unpkgcom)
+- [Deno Support](#deno-support)
 - [Maintenance](#maintenance)
   - [Testing](#testing)
   - [Continuous Integration](#continuous-integration)
@@ -561,6 +562,12 @@ This library is available via CDN:
 
 It loads `MessagePack` module to the global object.
 
+
+## Deno Support
+
+You can use this module on Deno.
+
+See `example/deno-*.ts` for examples.
 ## Maintenance
 
 ### Testing
