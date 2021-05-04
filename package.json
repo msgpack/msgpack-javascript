@@ -90,6 +90,7 @@
     "webpack-cli": "latest"
   },
   "files": [
+    "mod.ts",
     "src/**/*.*",
     "dist/**/*.*",
     "dist.es5+umd/**/*.*",
