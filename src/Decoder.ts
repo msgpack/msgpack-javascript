@@ -48,7 +48,7 @@ export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
     // IE11: The spec says it should throw RangeError,
     // IE11: but in IE11 it throws TypeError.
     EMPTY_VIEW.getInt8(0);
-  } catch (e) {
+  } catch (e: any) {
     return e.constructor;
   }
   throw new Error("never reached");
@@ -65,7 +65,7 @@ export class DecodeError extends Error {
     super(message);
 
     // fix the prototype chain in a cross-platform way
-    const proto = Object.create(DecodeError.prototype);
+    const proto: typeof DecodeError.prototype = Object.create(DecodeError.prototype);
     Object.setPrototypeOf(this, proto);
 
     Object.defineProperty(this, "name", {
@@ -188,11 +188,11 @@ export class Decoder<ContextType = undefined> {
     );
   }
 
-  public decodeArrayStream(stream: AsyncIterable<ArrayLike<number> | BufferSource>) {
+  public decodeArrayStream(stream: AsyncIterable<ArrayLike<number> | BufferSource>): AsyncGenerator<unknown, void, unknown> {
     return this.decodeMultiAsync(stream, true);
   }
 
-  public decodeStream(stream: AsyncIterable<ArrayLike<number> | BufferSource>) {
+  public decodeStream(stream: AsyncIterable<ArrayLike<number> | BufferSource>): AsyncGenerator<unknown, void, unknown> {
     return this.decodeMultiAsync(stream, false);
   }
 

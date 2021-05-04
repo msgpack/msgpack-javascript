@@ -1,7 +1,10 @@
 import assert from "assert";
 import { decode } from "../src";
+// ieee754 module's type declarations are too strict
+// https://github.com/feross/ieee754/pull/38
+// @ts-nocheck
+import * as ieee754 from "ieee754";
 
-const ieee754 = require("ieee754");
 
 const FLOAT32_TYPE = 0xca;
 const FLOAT64_TYPE = 0xcb;

@@ -1,4 +1,4 @@
-export function ensureUint8Array(buffer: ArrayLike<number> | Uint8Array | ArrayBufferView | ArrayBuffer) {
+export function ensureUint8Array(buffer: ArrayLike<number> | Uint8Array | ArrayBufferView | ArrayBuffer): Uint8Array {
   if (buffer instanceof Uint8Array) {
     return buffer;
   } else if (ArrayBuffer.isView(buffer)) {

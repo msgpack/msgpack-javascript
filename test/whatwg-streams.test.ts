@@ -13,10 +13,10 @@ const isReadableStreamConstructorAvailable: boolean = (() => {
   }
 })();
 
-const MyReadableStream: any = isReadableStreamConstructorAvailable ? ReadableStream : PonyReadableStream;
+const MyReadableStream = isReadableStreamConstructorAvailable ? ReadableStream : PonyReadableStream;
 
-// Downgrade stream not to implement AsycIterable<T>
-function downgradeReadableStream(stream: ReadableStream) {
+// Downgrade stream not to implement AsyncIterable<T>
+function downgradeReadableStream(stream: ReadableStream | PonyReadableStream) {
   (stream as any)[Symbol.asyncIterator] = undefined;
 }
 
@@ -25,7 +25,7 @@ describe("whatwg streams", () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
     const stream = new MyReadableStream({
-      start(controller: any) {
+      start(controller) {
         for (const byte of encoded) {
           controller.enqueue([byte]);
         }
@@ -45,7 +45,7 @@ describe("whatwg streams", () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
     const stream = new MyReadableStream({
-      start(controller: any) {
+      start(controller) {
         for (const byte of encoded) {
           controller.enqueue([byte]);
         }

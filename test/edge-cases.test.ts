@@ -1,7 +1,7 @@
 // kind of hand-written fuzzing data
 // any errors should not break Encoder/Decoder instance states
 import assert from "assert";
-import { encode, decode, decodeAsync, Encoder, Decoder } from "../src";
+import { encode, decode, Encoder, Decoder } from "../src";
 import { DataViewIndexOutOfBoundsError } from "../src/Decoder";
 
 function testEncoder(encoder: Encoder): void {

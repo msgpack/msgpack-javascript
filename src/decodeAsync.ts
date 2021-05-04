@@ -26,7 +26,7 @@ export async function decodeAsync<ContextType>(
 export function decodeArrayStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number> | BufferSource>,
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
-) {
+): AsyncGenerator<unknown, void, unknown> {
   const stream = ensureAsyncIterable(streamLike);
 
   const decoder = new Decoder(
@@ -45,7 +45,7 @@ export function decodeArrayStream<ContextType>(
 export function decodeMultiStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number> | BufferSource>,
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
-) {
+): AsyncGenerator<unknown, void, unknown> {
   const stream = ensureAsyncIterable(streamLike);
 
   const decoder = new Decoder(
@@ -67,6 +67,6 @@ export function decodeMultiStream<ContextType>(
 export function decodeStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number> | BufferSource>,
   options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
-) {
+): AsyncGenerator<unknown, void, unknown> {
   return decodeMultiStream(streamLike, options);
 }

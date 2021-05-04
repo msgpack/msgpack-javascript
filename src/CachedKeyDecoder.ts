@@ -26,7 +26,7 @@ export class CachedKeyDecoder implements KeyDecoder {
     }
   }
 
-  public canBeCached(byteLength: number) {
+  public canBeCached(byteLength: number): boolean {
     return byteLength > 0 && byteLength <= this.maxKeyLength;
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 // the util module requires process.env
 (globalThis as any).process = {
   env: {},
