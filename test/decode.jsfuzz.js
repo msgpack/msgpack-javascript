@@ -1,6 +1,6 @@
 /* eslint-disable */
 const assert = require("assert");
-const { Decoder, encode, DecodeError, DataViewIndexOutOfBoundsError } = require("../dist/index.js");
+const { Decoder, encode, DecodeError } = require("../dist/index.js");
 
 /**
  * @param {Buffer} bytes
@@ -13,7 +13,7 @@ module.exports.fuzz = function fuzz(bytes) {
   } catch (e) {
     if (e instanceof DecodeError) {
       // ok
-    } else if (e instanceof DataViewIndexOutOfBoundsError) {
+    } else if (e instanceof RangeError) {
       // ok
     } else {
       throw e;
