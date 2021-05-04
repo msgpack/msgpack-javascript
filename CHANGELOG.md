@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## 2.6.1 2021/05/04
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.6.0...v2.6.1
+
+* Recover Decoder instance states after `DecodeError` (mitigating [#160](https://github.com/msgpack/msgpack-javascript/issues/160))
+
 ## 2.6.0 2021/04/21
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.5.1...v2.6.0
