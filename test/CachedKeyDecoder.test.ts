@@ -1,15 +1,15 @@
 import assert from "assert";
-import { CachedKeyDecoder } from "../src/CachedKeyDecoder";
+import { CachedKeyDecoder, KeyDecoder } from "../src/CachedKeyDecoder";
 import { utf8EncodeJs, utf8Count } from "../src/utils/utf8";
 
-function tryDecode(decoder: CachedKeyDecoder, str: string): string {
+function tryDecode(keyDecoder: KeyDecoder, str: string): string {
   const byteLength = utf8Count(str);
   const bytes = new Uint8Array(byteLength);
   utf8EncodeJs(str, bytes, 0);
-  if (!decoder.canBeCached(byteLength)) {
+  if (!keyDecoder.canBeCached(byteLength)) {
     throw new Error("Unexpected precondition");
   }
-  return decoder.decode(bytes, 0, byteLength);
+  return keyDecoder.decode(bytes, 0, byteLength);
 }
 
 describe("CachedKeyDecoder", () => {
