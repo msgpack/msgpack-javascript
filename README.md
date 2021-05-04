@@ -568,6 +568,9 @@ It loads `MessagePack` module to the global object.
 You can use this module on Deno.
 
 See `example/deno-*.ts` for examples.
+
+`deno.land/x` is not supported yet.
+
 ## Maintenance
 
 ### Testing
