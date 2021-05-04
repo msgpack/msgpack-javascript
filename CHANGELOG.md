@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## 2.6.3 2021/05/04
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.6.2...v2.6.3
+
+* Added `mod.ts` for Deno support
+
 ## 2.6.2 2021/05/04
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.6.1...v2.6.2
