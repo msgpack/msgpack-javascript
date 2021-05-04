@@ -1,10 +1,6 @@
 import assert from "assert";
 import { decode } from "../src";
-// ieee754 module's type declarations are too strict
-// https://github.com/feross/ieee754/pull/38
-// @ts-nocheck
 import * as ieee754 from "ieee754";
-
 
 const FLOAT32_TYPE = 0xca;
 const FLOAT64_TYPE = 0xcb;
@@ -33,11 +29,9 @@ const SPECS = {
 
 describe("codec: float 32/64", () => {
   context("float 32", () => {
-    for (const name of Object.keys(SPECS)) {
-      const value = SPECS[name];
-
+    for (const [name, value] of Object.entries(SPECS)) {
       it(`decodes ${name} (${value})`, () => {
-        const buf: Array<number> = [];
+        const buf = new Uint8Array(4);
         ieee754.write(buf, value, 0, false, 23, 4);
         const expected = ieee754.read(buf, 0, false, 23, 4);
 
@@ -47,7 +41,7 @@ describe("codec: float 32/64", () => {
     }
 
     it(`decodes NaN`, () => {
-      const buf: Array<number> = [];
+      const buf = new Uint8Array(4);
       ieee754.write(buf, NaN, 0, false, 23, 4);
       const expected = ieee754.read(buf, 0, false, 23, 4);
 
@@ -56,11 +50,9 @@ describe("codec: float 32/64", () => {
   });
 
   context("float 64", () => {
-    for (const name of Object.keys(SPECS)) {
-      const value = SPECS[name];
-
+    for (const [name, value] of Object.entries(SPECS)) {
       it(`decodes ${name} (${value})`, () => {
-        const buf: Array<number> = [];
+        const buf = new Uint8Array(8);
         ieee754.write(buf, value, 0, false, 52, 8);
         const expected = ieee754.read(buf, 0, false, 52, 8);
 
@@ -70,7 +62,7 @@ describe("codec: float 32/64", () => {
     }
 
     it(`decodes NaN`, () => {
-      const buf: Array<number> = [];
+      const buf = new Uint8Array(8);
       ieee754.write(buf, NaN, 0, false, 52, 8);
       const expected = ieee754.read(buf, 0, false, 52, 8);
 
