@@ -7,7 +7,7 @@ import type { ExtData } from "./ExtData";
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
 
-export class Encoder<ContextType> {
+export class Encoder<ContextType = undefined> {
   private pos = 0;
   private view = new DataView(new ArrayBuffer(this.initialBufferSize));
   private bytes = new Uint8Array(this.view.buffer);

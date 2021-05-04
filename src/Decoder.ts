@@ -76,7 +76,7 @@ export class DecodeError extends Error {
   }
 }
 
-export class Decoder<ContextType> {
+export class Decoder<ContextType = undefined> {
   private totalPos = 0;
   private pos = 0;
 
@@ -99,6 +99,9 @@ export class Decoder<ContextType> {
   private reinitializeState() {
     this.totalPos = 0;
     this.headByte = HEAD_BYTE_REQUIRED;
+    this.stack.length = 0;
+
+    // view, bytes, and pos will be re-initialized in setBuffer()
   }
 
   private setBuffer(buffer: ArrayLike<number> | BufferSource): void {
