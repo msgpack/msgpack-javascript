@@ -96,7 +96,7 @@ export class Decoder<ContextType = undefined> {
   }
 
   private appendBuffer(buffer: ArrayLike<number> | BufferSource) {
-    if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
+    if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining(1)) {
       this.setBuffer(buffer);
     } else {
       const remainingData = this.bytes.subarray(this.pos);
@@ -110,7 +110,7 @@ export class Decoder<ContextType = undefined> {
     }
   }
 
-  private hasRemaining(size = 1) {
+  private hasRemaining(size: number) {
     return this.view.byteLength - this.pos >= size;
   }
 
@@ -128,7 +128,7 @@ export class Decoder<ContextType = undefined> {
     this.setBuffer(buffer);
 
     const object = this.doDecodeSync();
-    if (this.hasRemaining()) {
+    if (this.hasRemaining(1)) {
       throw this.createExtraByteError(this.pos);
     }
     return object;
@@ -138,7 +138,7 @@ export class Decoder<ContextType = undefined> {
     this.reinitializeState();
     this.setBuffer(buffer);
 
-    while (this.hasRemaining()) {
+    while (this.hasRemaining(1)) {
       yield this.doDecodeSync();
     }
   }
@@ -166,7 +166,7 @@ export class Decoder<ContextType = undefined> {
     }
 
     if (decoded) {
-      if (this.hasRemaining()) {
+      if (this.hasRemaining(1)) {
         throw this.createExtraByteError(this.totalPos);
       }
       return object;
