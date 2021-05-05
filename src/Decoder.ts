@@ -1,6 +1,6 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
-import { getInt64, getUint64 } from "./utils/int";
+import { getInt64, getUint64, UINT32_MAX } from "./utils/int";
 import { utf8DecodeJs, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
@@ -57,8 +57,6 @@ export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
 
 const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 
-const DEFAULT_MAX_LENGTH = 0xffff_ffff; // uint32_max
-
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
 
 export class Decoder<ContextType = undefined> {
@@ -73,11 +71,11 @@ export class Decoder<ContextType = undefined> {
   public constructor(
     private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
     private readonly context: ContextType = undefined as any,
-    private readonly maxStrLength = DEFAULT_MAX_LENGTH,
-    private readonly maxBinLength = DEFAULT_MAX_LENGTH,
-    private readonly maxArrayLength = DEFAULT_MAX_LENGTH,
-    private readonly maxMapLength = DEFAULT_MAX_LENGTH,
-    private readonly maxExtLength = DEFAULT_MAX_LENGTH,
+    private readonly maxStrLength = UINT32_MAX,
+    private readonly maxBinLength = UINT32_MAX,
+    private readonly maxArrayLength = UINT32_MAX,
+    private readonly maxMapLength = UINT32_MAX,
+    private readonly maxExtLength = UINT32_MAX,
     private readonly keyDecoder: KeyDecoder | null = sharedCachedKeyDecoder,
   ) {}
 

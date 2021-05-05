@@ -1,3 +1,7 @@
+// Integer Utility
+
+export const UINT32_MAX = 0xffff_ffff;
+
 // DataView extension to handle int64 / uint64,
 // where the actual range is 53-bits integer (a.k.a. safe integer)
 
