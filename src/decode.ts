@@ -8,27 +8,32 @@ export type DecodeOptions<ContextType = undefined> = Readonly<
 
     /**
      * Maximum string length.
-     * Default to 4_294_967_295 (UINT32_MAX).
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
      */
     maxStrLength: number;
     /**
      * Maximum binary length.
-     * Default to 4_294_967_295 (UINT32_MAX).
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
      */
     maxBinLength: number;
     /**
      * Maximum array length.
-     * Default to 4_294_967_295 (UINT32_MAX).
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
      */
     maxArrayLength: number;
     /**
      * Maximum map length.
-     * Default to 4_294_967_295 (UINT32_MAX).
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
      */
     maxMapLength: number;
     /**
      * Maximum extension length.
-     * Default to 4_294_967_295 (UINT32_MAX).
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
      */
     maxExtLength: number;
   }>

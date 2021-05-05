@@ -110,7 +110,7 @@ export class Encoder<ContextType = undefined> {
         }
       } else {
         if (object >= -0x20) {
-          // nagative fixint
+          // negative fixint
           this.writeU8(0xe0 | (object + 0x20));
         } else if (object >= -0x80) {
           // int 8
