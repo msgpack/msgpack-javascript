@@ -99,13 +99,14 @@ export class Decoder<ContextType = undefined> {
     if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining()) {
       this.setBuffer(buffer);
     } else {
-      // retried because data is insufficient
       const remainingData = this.bytes.subarray(this.pos);
       const newData = ensureUint8Array(buffer);
-      const concated = new Uint8Array(remainingData.length + newData.length);
-      concated.set(remainingData);
-      concated.set(newData, remainingData.length);
-      this.setBuffer(concated);
+
+      // concat remainingData + newData
+      const newBuffer = new Uint8Array(remainingData.length + newData.length);
+      newBuffer.set(remainingData);
+      newBuffer.set(newData, remainingData.length);
+      this.setBuffer(newBuffer);
     }
   }
 
