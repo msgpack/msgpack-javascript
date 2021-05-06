@@ -6,7 +6,7 @@ var msgpack_msgpack = require("../src");
 var msgpack_node = try_require("msgpack");
 var msgpack_lite = try_require("msgpack-lite");
 var msgpack_js = try_require("msgpack-js");
-var msgpack_js_v5 = try_require("msgpack-js-v5");
+var msgpackr = try_require("msgpackr");
 var msgpack5 = try_require("msgpack5");
 var notepack = try_require("notepack");
 
@@ -76,9 +76,9 @@ if (msgpack_msgpack) {
   }
 }
 
-if (msgpack_js_v5) {
-  buf = bench('buf = require("msgpack-js-v5").encode(obj);', msgpack_js_v5.encode, data);
-  obj = bench('obj = require("msgpack-js-v5").decode(buf);', msgpack_js_v5.decode, buf);
+if (msgpackr) {
+  buf = bench('buf = require("msgpackr").pack(obj);', msgpackr.pack, data);
+  obj = bench('obj = require("msgpackr").unpack(buf);', msgpackr.unpack, buf);
   runTest(obj);
 }
 

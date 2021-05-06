@@ -5,6 +5,7 @@
   "dependencies": {
     "benchmark": "^2.1.4",
     "msgpack-lite": "^0.1.26",
+    "msgpackr": "^1.2.10",
     "notepack.io": "^2.2.0"
   }
 }
