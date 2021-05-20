@@ -1,5 +1,14 @@
 # This is the revision history of @msgpack/msgpack
 
+
+## 2.7.0 2021/05/20
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.6.3...v2.7.0
+
+* Made sure timestamp decoder to raise DecodeError in errors
+  * This was found by fuzzing tests using [jsfuzz](https://gitlab.com/gitlab-org/security-products/analyzers/fuzzers/jsfuzz)
+* Tiny optimizations and refactoring
+
 ## 2.6.3 2021/05/04
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.6.2...v2.6.3
