@@ -229,7 +229,7 @@ import { decodeStream } from "@msgpack/msgpack";
 const stream: AsyncIterator<Uint8Array>;
 
 // in an async function:
-for await (const item of decodeStream(stream)) {
+for await (const item of decodeMultiStream(stream)) {
   console.log(item);
 }
 ```
