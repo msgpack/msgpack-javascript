@@ -39,6 +39,7 @@
     "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
     "noUncheckedIndexedAccess": true,
     "noPropertyAccessFromIndexSignature": true,
+    "noImplicitOverride": true,
     "importsNotUsedAsValues": "error",
 
     /* Module Resolution Options */
