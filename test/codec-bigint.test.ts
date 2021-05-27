@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode, ExtensionCodec } from "../src";
+import { encode, decode, ExtensionCodec, DecodeError } from "../src";
 
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
@@ -16,7 +16,11 @@ extensionCodec.register({
      }
   },
   decode: (data: Uint8Array) => {
-    return BigInt(decode(data));
+    const val = decode(data);
+    if (!(typeof val === "string" || typeof val === "number")) {
+      throw new DecodeError(`unexpected BigInt source: ${val} (${typeof val})`);
+    }
+    return BigInt(val);
   },
 });
 
