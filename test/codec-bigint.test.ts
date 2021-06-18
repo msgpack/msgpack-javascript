@@ -5,15 +5,15 @@ const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
   type: 0,
   encode: (input: unknown) => {
-     if (typeof input === "bigint") {
-        if (input <= Number.MAX_SAFE_INTEGER && input >= Number.MIN_SAFE_INTEGER) {
-            return encode(parseInt(input.toString(), 10));
-        } else {
-            return encode(input.toString());
-        }
-     } else {
-        return null;
-     }
+    if (typeof input === "bigint") {
+      if (input <= Number.MAX_SAFE_INTEGER && input >= Number.MIN_SAFE_INTEGER) {
+        return encode(parseInt(input.toString(), 10));
+      } else {
+        return encode(input.toString());
+      }
+    } else {
+      return null;
+    }
   },
   decode: (data: Uint8Array) => {
     const val = decode(data);

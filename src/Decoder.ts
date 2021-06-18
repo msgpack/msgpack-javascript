@@ -176,7 +176,9 @@ export class Decoder<ContextType = undefined> {
     );
   }
 
-  public decodeArrayStream(stream: AsyncIterable<ArrayLike<number> | BufferSource>): AsyncGenerator<unknown, void, unknown> {
+  public decodeArrayStream(
+    stream: AsyncIterable<ArrayLike<number> | BufferSource>,
+  ): AsyncGenerator<unknown, void, unknown> {
     return this.decodeMultiAsync(stream, true);
   }
 
