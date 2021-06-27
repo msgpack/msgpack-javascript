@@ -224,7 +224,7 @@ In other words, it could decode an unlimited stream and emits a decoded item one
 for example:
 
 ```typescript
-import { decodeStream } from "@msgpack/msgpack";
+import { decodeMultiStream } from "@msgpack/msgpack";
 
 const stream: AsyncIterator<Uint8Array>;
 
