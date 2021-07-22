@@ -1,4 +1,4 @@
-# MessagePack for JavaScript/ECMA-262
+# MessagePack for JavaScript/ECMA-262  <!-- omit in toc -->
 
 [![npm version](https://img.shields.io/npm/v/@msgpack/msgpack.svg)](https://www.npmjs.com/package/@msgpack/msgpack) ![CI](https://github.com/msgpack/msgpack-javascript/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graphs/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript) [![minzip](https://badgen.net/bundlephobia/minzip/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack) [![tree-shaking](https://badgen.net/bundlephobia/tree-shaking/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack)
 
@@ -37,8 +37,6 @@ deepStrictEqual(decode(encoded), object);
 
 ## Table of Contents
 
-<!-- TOC depthFrom:2 anchorMode:github.com -->
-
 - [Synopsis](#synopsis)
 - [Table of Contents](#table-of-contents)
 - [Install](#install)
@@ -74,8 +72,6 @@ deepStrictEqual(decode(encoded), object);
   - [Release Engineering](#release-engineering)
   - [Updating Dependencies](#updating-dependencies)
 - [License](#license)
-
-<!-- /TOC -->
 
 ## Install
 
