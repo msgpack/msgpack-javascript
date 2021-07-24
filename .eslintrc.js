@@ -2,14 +2,16 @@ module.exports = {
   extends: [
     // https://eslint.org/docs/rules/
     "eslint:recommended",
-    // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/src/configs/recommended.json
+    // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/src/configs/recommended.ts
     "plugin:@typescript-eslint/recommended",
-    // https://prettier.io/docs/en/eslint.html
-    "prettier",
 
     // https://github.com/benmosher/eslint-plugin-import
     "plugin:import/recommended",
     "plugin:import/typescript",
+
+    // https://prettier.io/docs/en/integrating-with-linters.html
+    // > Make sure to put it last, so it gets the chance to override other configs.
+    "prettier",
   ],
   plugins: [],
   parser: "@typescript-eslint/parser",
