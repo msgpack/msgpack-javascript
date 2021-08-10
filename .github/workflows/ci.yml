@@ -16,8 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
+        cache: npm
         node-version: ${{ matrix.node-version }}
 
     - run: npm install -g npm
@@ -35,10 +36,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup Node.js
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
+        cache: npm
         node-version: '14'
     - run: npm install -g npm
     - run: npm ci
     - run: npm run test:browser -- --browsers ${{ matrix.browser }}
-
