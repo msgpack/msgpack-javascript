@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   extends: [
     // https://eslint.org/docs/rules/
     "eslint:recommended",
@@ -13,7 +14,9 @@ module.exports = {
     // > Make sure to put it last, so it gets the chance to override other configs.
     "prettier",
   ],
-  plugins: [],
+  plugins: [
+    "@typescript-eslint",
+  ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     project: "./tsconfig.json",
