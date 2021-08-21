@@ -7,6 +7,10 @@ import type { ExtData } from "./ExtData";
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
 
+const hastoJSON = (value: unknown): value is { toJSON: unknown } => {
+  return typeof value === 'object' && value !== null && 'toJSON' in value;
+};
+
 export class Encoder<ContextType = undefined> {
   private pos = 0;
   private view = new DataView(new ArrayBuffer(this.initialBufferSize));
@@ -194,7 +198,11 @@ export class Encoder<ContextType = undefined> {
     } else if (ArrayBuffer.isView(object)) {
       this.encodeBinary(object);
     } else if (typeof object === "object") {
-      this.encodeMap(object as Record<string, unknown>, depth);
+      if (hastoJSON(object) && typeof object.toJSON === "function") {
+        this.doEncode(object.toJSON(), depth);
+      } else {
+        this.encodeMap(object as Record<string, unknown>, depth);
+      }
     } else {
       // symbol, function and other special object come here unless extensionCodec handles them.
       throw new Error(`Unrecognized object: ${Object.prototype.toString.apply(object)}`);
