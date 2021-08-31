@@ -20,6 +20,9 @@ describe("Blob", () => {
     if (!blob.stream) {
       this.skip();
     }
-    assert.deepStrictEqual(await decodeAsync(blob.stream()), "Hello!");
+
+    // use any because the type of Blob#stream() in @types/node does not make sense here.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    assert.deepStrictEqual(await decodeAsync(blob.stream() as any), "Hello!");
   });
 });
