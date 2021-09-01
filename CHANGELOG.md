@@ -1,5 +1,10 @@
 # This is the revision history of @msgpack/msgpack
+## 2.7.1 2021/09/01
 
+https://github.com/msgpack/msgpack-javascript/compare/v2.7.0...v2.7.1
+
+* No code changes
+* Build with TypeScript 4.4
 
 ## 2.7.0 2021/05/20
 
