@@ -60,7 +60,7 @@ deepStrictEqual(decode(encoded), object);
 - [Prerequisites](#prerequisites)
   - [ECMA-262](#ecma-262)
   - [NodeJS](#nodejs)
-  - [TypeScript](#typescript)
+  - [TypeScript Compiler / Type Definitions](#typescript-compiler--type-definitions)
 - [Benchmark](#benchmark)
 - [Distribution](#distribution)
   - [NPM / npmjs.com](#npm--npmjscom)
@@ -504,11 +504,11 @@ NodeJS v10 is required, but NodeJS v12 or later is recommended because it includ
 
 NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5+umd/msgpack`.
 
-### TypeScript
+### TypeScript Compiler / Type Definitions
 
-This module requires definitions of `AsyncIterator` and whatwg streams, which is specified with `"lib": ["ES2020", "DOM"]` in `tsconfig.json`.
+This module requires type definitions of `AsyncIterator`, `SourceBuffer`, whatwg streams, and so on. They are provided by `"lib": ["ES2021", "DOM"]` in `tsconfig.json`.
 
-For the TypeScript version, the latest TypeScript is tested in development, but older versions of TypeScript might be able to compile this module.
+Regarding the TypeScript compiler version, only the latest TypeScript is tested in development.
 
 ## Benchmark
 
