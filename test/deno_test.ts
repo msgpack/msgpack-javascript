@@ -1,4 +1,4 @@
-#!/usr/bin/env deno run
+#!/usr/bin/env deno test
 
 /* eslint-disable */
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
