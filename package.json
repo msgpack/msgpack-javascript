@@ -35,7 +35,7 @@
     "lint": "eslint --ext .ts src test",
     "lint:fix": "prettier --loglevel=warn --write 'src/**/*.ts' 'test/**/*.ts' && eslint --fix --ext .ts src test",
     "lint:print-config": "eslint --print-config .eslintrc.js",
-    "update-dependencies": "npx rimraf node_modules/ package-lock.json && npm install && npm audit fix --force && git checkout package.json && npm install"
+    "update-dependencies": "npx rimraf node_modules/ package-lock.json && npm install && npm audit fix --force && git restore package.json && npm install"
   },
   "homepage": "https://msgpack.org/",
   "repository": {
