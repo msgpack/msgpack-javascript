@@ -31,11 +31,10 @@
     "test:browser:chrome": "karma start --single-run --browsers ChromeHeadless",
     "test:watch:browser": "karma start --browsers ChromeHeadless,FirefoxHeadless",
     "test:watch:nodejs": "mocha -w 'test/**/*.test.ts'",
-    "test:deno": "deno test test/deno_test.ts",
     "lint": "eslint --ext .ts src test",
     "lint:fix": "prettier --loglevel=warn --write 'src/**/*.ts' 'test/**/*.ts' && eslint --fix --ext .ts src test",
     "lint:print-config": "eslint --print-config .eslintrc.js",
-    "update-dependencies": "npx rimraf node_modules/ package-lock.json && npm install && npm audit fix --force && git restore package.json && npm install"
+    "update-dependencies": "npx rimraf node_modules/ package-lock.json && npm install && npm audit fix --force && git restore package.json && npm install && git restore package.json && npm install"
   },
   "homepage": "https://msgpack.org/",
   "repository": {
@@ -74,11 +73,11 @@
     "karma-cli": "latest",
     "karma-firefox-launcher": "latest",
     "karma-mocha": "latest",
-    "karma-sauce-launcher": "latest",
+    "karma-sauce-launcher": "^4.1.4",
     "karma-sourcemap-loader": "latest",
     "karma-webpack": "latest",
     "lodash": "latest",
-    "mocha": "latest",
+    "mocha": "^8.1.3",
     "msgpack-test-js": "latest",
     "npm-run-all": "latest",
     "prettier": "latest",
