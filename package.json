@@ -34,7 +34,7 @@
     "lint": "eslint --ext .ts src test",
     "lint:fix": "prettier --loglevel=warn --write 'src/**/*.ts' 'test/**/*.ts' && eslint --fix --ext .ts src test",
     "lint:print-config": "eslint --print-config .eslintrc.js",
-    "update-dependencies": "npx rimraf node_modules/ package-lock.json && npm install && npm audit fix --force && git restore package.json && npm install && git restore package.json && npm install"
+    "update-dependencies": "npx rimraf node_modules/ package-lock.json ; npm install ; npm audit fix --force ; git restore package.json ; npm install"
   },
   "homepage": "https://msgpack.org/",
   "repository": {
@@ -60,7 +60,7 @@
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
-    "assert": "^2.0.0",
+    "assert": "latest",
     "blob-polyfill": "latest",
     "buffer": "latest",
     "core-js": "latest",
@@ -77,7 +77,7 @@
     "karma-sourcemap-loader": "latest",
     "karma-webpack": "latest",
     "lodash": "latest",
-    "mocha": "^8.1.3",
+    "mocha": "latest",
     "msgpack-test-js": "latest",
     "npm-run-all": "latest",
     "prettier": "latest",
