@@ -1,4 +1,11 @@
 # This is the revision history of @msgpack/msgpack
+
+## 2.7.2 2022/02/08
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.7.1...v2.7.2
+
+* Fix a build problem in Nuxt3 projects [#200](https://github.com/msgpack/msgpack-javascript/pull/200) reported by (reported as #199 in @masaha03)
+
 ## 2.7.1 2021/09/01
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.7.0...v2.7.1
