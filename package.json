@@ -73,7 +73,6 @@
     "karma-cli": "latest",
     "karma-firefox-launcher": "latest",
     "karma-mocha": "latest",
-    "karma-sauce-launcher": "^4.1.4",
     "karma-sourcemap-loader": "latest",
     "karma-webpack": "latest",
     "lodash": "latest",

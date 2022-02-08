@@ -1,13 +1,10 @@
-import { sauceLabs, sauceLaunchers } from "./sauceLabs";
 const path = require("path");
-const webpack = require("webpack");
+// const webpack = require("webpack");
 
 // eslint-disable-next-line import/no-default-export
 export default function configure(config: any) {
   config.set({
     customLaunchers: {
-      ...sauceLaunchers,
-
       // To debug it wih IE11,
       // Install `karma-virtualbox-ie11-launcher`,
       // and configure custom launchers like this:
@@ -17,7 +14,6 @@ export default function configure(config: any) {
       //   vmName: "IE11 - Win10",
       // },
     },
-    sauceLabs,
     browsers: ["ChromeHeadless", "FirefoxHeadless"],
 
     basePath: "",
@@ -27,7 +23,7 @@ export default function configure(config: any) {
     preprocessors: {
       "**/*.ts": ["webpack", "sourcemap"],
     },
-    reporters: ["dots", "saucelabs"],
+    reporters: ["dots"],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

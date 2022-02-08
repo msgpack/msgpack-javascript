@@ -2,9 +2,6 @@
 
 [![npm version](https://img.shields.io/npm/v/@msgpack/msgpack.svg)](https://www.npmjs.com/package/@msgpack/msgpack) ![CI](https://github.com/msgpack/msgpack-javascript/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graphs/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript) [![minzip](https://badgen.net/bundlephobia/minzip/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack) [![tree-shaking](https://badgen.net/bundlephobia/tree-shaking/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack)
 
-<!--
-[![Browser Matrix powered by Sauce Labs](https://app.saucelabs.com/browser-matrix/gfx2019.svg)](https://app.saucelabs.com/u/gfx2019) -->
-
 This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient binary serilization format:
 
 https://msgpack.org/
@@ -611,12 +608,6 @@ make publish
 ```console
 npm run update-dependencies
 ```
-
-<!-- ## Big Thanks
-
-Cross-browser Testing Platform and Open Source <3 Provided by Sauce Labs.
-
-<a href="https://saucelabs.com"><img src="./assets/SauceLabs.svg" alt="Sauce Labs" width="280"></a> -->
 
 ## License
 
