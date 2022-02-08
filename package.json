@@ -1,6 +1,6 @@
 {
   "name": "@msgpack/msgpack",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "description": "MessagePack for ECMA-262/JavaScript/TypeScript",
   "author": "The MessagePack community",
   "license": "ISC",
