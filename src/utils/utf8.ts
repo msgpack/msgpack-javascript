@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { UINT32_MAX } from "./int";
 
 const TEXT_ENCODING_AVAILABLE =
-  (typeof process === "undefined" || process.env["TEXT_ENCODING"] !== "never") &&
+  (typeof process === "undefined" || process?.env?.["TEXT_ENCODING"] !== "never") &&
   typeof TextEncoder !== "undefined" &&
   typeof TextDecoder !== "undefined";
 
@@ -91,7 +92,7 @@ export function utf8EncodeJs(str: string, output: Uint8Array, outputOffset: numb
 const sharedTextEncoder = TEXT_ENCODING_AVAILABLE ? new TextEncoder() : undefined;
 export const TEXT_ENCODER_THRESHOLD = !TEXT_ENCODING_AVAILABLE
   ? UINT32_MAX
-  : typeof process !== "undefined" && process.env["TEXT_ENCODING"] !== "force"
+  : typeof process !== "undefined" && process?.env?.["TEXT_ENCODING"] !== "force"
   ? 200
   : 0;
 
@@ -159,7 +160,7 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
 const sharedTextDecoder = TEXT_ENCODING_AVAILABLE ? new TextDecoder() : null;
 export const TEXT_DECODER_THRESHOLD = !TEXT_ENCODING_AVAILABLE
   ? UINT32_MAX
-  : typeof process !== "undefined" && process.env["TEXT_DECODER"] !== "force"
+  : typeof process !== "undefined" && process?.env?.["TEXT_DECODER"] !== "force"
   ? 200
   : 0;
 
