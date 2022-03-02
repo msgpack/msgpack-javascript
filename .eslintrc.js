@@ -64,6 +64,7 @@ module.exports = {
     "@typescript-eslint/no-invalid-void-type": "warn",
     "@typescript-eslint/no-loss-of-precision": "warn",
     "@typescript-eslint/no-confusing-void-expression": "warn",
+    "@typescript-eslint/no-redundant-type-constituents": "warn",
     "@typescript-eslint/prefer-for-of": "warn",
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
