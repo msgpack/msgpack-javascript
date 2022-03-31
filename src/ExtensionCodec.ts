@@ -11,7 +11,7 @@ export type ExtensionDecoderType<ContextType> = (
 
 export type ExtensionEncoderType<ContextType> = (input: unknown, context: ContextType) => Uint8Array | null;
 
-// immutable interfce to ExtensionCodec
+// immutable interface to ExtensionCodec
 export type ExtensionCodecType<ContextType> = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   __brand?: ContextType;
