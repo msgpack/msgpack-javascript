@@ -396,7 +396,7 @@ export class Decoder<ContextType = undefined> {
       const stack = this.stack;
       while (stack.length > 0) {
         // arrays and maps
-        const state = stack[stack.length - 1]!;
+        const state = stack.at(-1)!;
         if (state.type === State.ARRAY) {
           state.array[state.position] = object;
           state.position++;
@@ -522,7 +522,7 @@ export class Decoder<ContextType = undefined> {
 
   private stateIsMapKey(): boolean {
     if (this.stack.length > 0) {
-      const state = this.stack[this.stack.length - 1]!;
+      const state = this.stack.at(- 1)!;
       return state.type === State.MAP_KEY;
     }
     return false;

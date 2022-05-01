@@ -486,12 +486,12 @@ This is a universal JavaScript library that supports major browsers and NodeJS.
 ### ECMA-262
 
 * ES5 language features
-* ES2018 standard library, including:
+* ES2022 standard library, including:
   * Typed arrays (ES2015)
   * Async iterations (ES2018)
-  * Features added in ES2015-ES2018
+  * Functions added in ES2015-ES2022
 
-ES2018 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js).
+ES2022 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js).
 
 If you support IE11, import `core-js` in your application entrypoints, as this library does in testing for browsers.
 
