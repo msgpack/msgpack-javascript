@@ -2,10 +2,13 @@
   "name": "@msgpack/msgpack-benchmark",
   "private": true,
   "version": "0.0.0",
+  "scripts": {
+    "update-dependencies": "npx rimraf node_modules/ package-lock.json ; npm install ; npm audit fix --force ; git restore package.json ; npm install"
+  },
   "dependencies": {
-    "benchmark": "^2.1.4",
-    "msgpack-lite": "^0.1.26",
-    "msgpackr": "^1.2.10",
-    "notepack.io": "^2.2.0"
+    "benchmark": "latest",
+    "msgpack-lite": "latest",
+    "msgpackr": "latest",
+    "notepack.io": "latest"
   }
 }
