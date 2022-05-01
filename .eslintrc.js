@@ -15,7 +15,8 @@ module.exports = {
     "prettier",
   ],
   plugins: [
-    "@typescript-eslint",
+    "@typescript-eslint/eslint-plugin",
+    "eslint-plugin-tsdoc"
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -37,6 +38,8 @@ module.exports = {
     "import/no-unresolved": "off", // cannot handle `paths` in tsconfig
     "import/no-cycle": "error",
     "import/no-default-export": "warn",
+
+    "tsdoc/syntax": "warn",
 
     "@typescript-eslint/await-thenable": "warn",
     "@typescript-eslint/array-type": ["warn", { default: "generic" }],

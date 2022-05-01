@@ -67,6 +67,7 @@
     "eslint": "latest",
     "eslint-config-prettier": "latest",
     "eslint-plugin-import": "latest",
+    "eslint-plugin-tsdoc": "latest",
     "ieee754": "latest",
     "karma": "latest",
     "karma-chrome-launcher": "latest",
