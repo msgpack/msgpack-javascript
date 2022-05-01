@@ -118,8 +118,8 @@ export class Decoder<ContextType = undefined> {
   }
 
   /**
-   * @throws {DecodeError}
-   * @throws {RangeError}
+   * @throws {@link DecodeError}
+   * @throws {@link RangeError}
    */
   public decode(buffer: ArrayLike<number> | BufferSource): unknown {
     this.reinitializeState();
