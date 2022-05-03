@@ -6,7 +6,7 @@ This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient bi
 
 https://msgpack.org/
 
-This library is a universal JavaScript, meaning it is compatible with all the major browsers and NodeJS. In addition, because it is implemented in [TypeScript](https://www.typescriptlang.org/), type definition files (`d.ts`) are bundled in the distribution.
+This library is a universal JavaScript, meaning it is compatible with all the major browsers and NodeJS. In addition, because it is implemented in [TypeScript](https://www.typescriptlang.org/), type definition files (`d.ts`) are always up-to-date and bundled in the distribution.
 
 *Note that this is the second version of MessagePack for JavaScript. The first version, which was implemented in ES5 and was never released to npmjs.com, is tagged as [classic](https://github.com/msgpack/msgpack-javascript/tree/classic).*
 
@@ -82,7 +82,7 @@ npm install @msgpack/msgpack
 
 ### `encode(data: unknown, options?: EncodeOptions): Uint8Array`
 
-It encodes `data` into a single MessagePack-encoded object, and returns a byte array as `Uint8Array`, throwing errors if `data` is, or includes, a non-serializable object such as a `function` or a `symbol`.
+It encodes `data` into a single MessagePack-encoded object, and returns a byte array as `Uint8Array`. It throws errors if `data` is, or includes, a non-serializable object such as a `function` or a `symbol`.
 
 for example:
 
@@ -124,7 +124,7 @@ It decodes `buffer` that includes a MessagePack-encoded object, and returns the 
 
 `buffer` must be an array of bytes, which is typically `Uint8Array` or `ArrayBuffer`. `BufferSource` is defined as `ArrayBuffer | ArrayBufferView`.
 
-In addition, `buffer` can include a single encoded object. If the `buffer` includes extra bytes after an object, it will throw `RangeError`. To decode `buffer` that includes multiple encoded objects, use `decodeMulti()` or `decodeMultiStream()` (recommended) instead.
+The `buffer` must include a single encoded object. If the `buffer` includes extra bytes after an object or the `buffer` is empty, it throws `RangeError`. To decode `buffer` that includes multiple encoded objects, use `decodeMulti()` or `decodeMultiStream()` (recommended) instead.
 
 for example:
 
@@ -154,9 +154,9 @@ You can use `max${Type}Length` to limit the length of each type decoded.
 
 ### `decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): Generator<unknown, void, unknown>`
 
-It decodes `buffer` that includes multiple MessagePack-encoded objects, and returns decoded objects as a generator. That is, this is a synchronous variant for `decodeMultiStream()`.
+It decodes `buffer` that includes multiple MessagePack-encoded objects, and returns decoded objects as a generator. See also `decodeMultiStream()`, which is an asynchronous variant of this function.
 
-This function is not recommended to decode a MessagePack binary via I/O stream including sockets because it's synchronous. Instead, `decodeMultiStream()` decodes it asynchronously, typically spending less time and memory.
+This function is not recommended to decode a MessagePack binary via I/O stream including sockets because it's synchronous. Instead, `decodeMultiStream()` decodes a binary stream asynchronously, typically spending less CPU and memory.
 
 for example:
 
@@ -172,7 +172,9 @@ for (const object of decodeMulti(encoded)) {
 
 ### `decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`
 
-It decodes `stream`, where `ReadableStreamLike<T>` is defined as `ReadableStream<T> | AsyncIterable<T>`, in an async iterable of byte arrays, and returns decoded object as `unknown` type, wrapped in `Promise`. This function works asynchronously. This is an async variant for `decode()`.
+It decodes `stream`, where `ReadableStreamLike<T>` is defined as `ReadableStream<T> | AsyncIterable<T>`, in an async iterable of byte arrays, and returns decoded object as `unknown` type, wrapped in `Promise`.
+
+This function works asynchronously, and might CPU resources more efficiently compared with synchronous `decode()`, because it doesn't wait for the completion of downloading.
 
 `DecodeAsyncOptions` is the same as `DecodeOptions` for `decode()`.
 
@@ -231,7 +233,7 @@ This function is available since v2.4.0; previously it was called as `decodeStre
 
 ### Reusing Encoder and Decoder instances
 
-`Encoder` and `Decoder` classes is provided for better performance:
+`Encoder` and `Decoder` classes is provided to have better performance by reusing instances:
 
 ```typescript
 import { deepStrictEqual } from "assert";
@@ -253,7 +255,7 @@ and data structure.
 
 To handle [MessagePack Extension Types](https://github.com/msgpack/msgpack/blob/master/spec.md#extension-types), this library provides `ExtensionCodec` class.
 
-Here is an example to setup custom extension types that handles `Map` and `Set` classes in TypeScript:
+This is an example to setup custom extension types that handles `Map` and `Set` classes in TypeScript:
 
 ```typescript
 import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
@@ -302,7 +304,7 @@ Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128
 
 #### ExtensionCodec context
 
-When using an extension codec, it may be necessary to keep encoding/decoding state, to keep track of which objects got encoded/re-created. To do this, pass a `context` to the `EncodeOptions` and `DecodeOptions` (and if using typescript, type the `ExtensionCodec` too). Don't forget to pass the `{extensionCodec, context}` along recursive encoding/decoding:
+When you use an extension codec, it might be necessary to have encoding/decoding state to keep track of which objects got encoded/re-created. To do this, pass a `context` to the `EncodeOptions` and `DecodeOptions`:
 
 ```typescript
 import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
@@ -423,7 +425,7 @@ const decoded = decode(encoded, { extensionCodec });
 deepStrictEqual(decoded, instant);
 ```
 
-This will be default once the temporal module is standardizied, which is not a near-future, though.
+This will become default in this library with major-version increment, if the temporal module is standardized.
 
 ## Decoding a Blob
 
@@ -452,7 +454,7 @@ This library is compatible with the "August 2017" revision of MessagePack specif
 * [x] extension types, added at August 2013
 * [x] timestamp ext type, added at August 2017
 
-The livinng specification is here:
+The living specification is here:
 
 https://github.com/msgpack/msgpack
 
