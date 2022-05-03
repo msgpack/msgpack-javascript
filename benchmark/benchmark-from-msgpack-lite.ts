@@ -42,8 +42,7 @@ var buf, obj;
 
 if (JSON) {
   buf = bench('buf = Buffer.from(JSON.stringify(obj));', JSON_stringify, data);
-  buf = bench('buf = JSON.stringify(obj);', JSON.stringify, data);
-  obj = bench('obj = JSON.parse(buf);', JSON.parse, buf);
+  obj = bench('obj = JSON.parse(buf.toString("utf-8"));', JSON_parse, buf);
   runTest(obj);
 }
 
@@ -100,8 +99,12 @@ if (notepack) {
   runTest(obj);
 }
 
-function JSON_stringify(src: any) {
+function JSON_stringify(src: any): Buffer {
   return Buffer.from(JSON.stringify(src));
+}
+
+function JSON_parse(json: Buffer): any {
+  return JSON.parse(json.toString("utf-8"));
 }
 
 function bench(name: string, func: (...args: any[]) => any, src: any) {

@@ -31,7 +31,7 @@ profile-decode:
 		node --prof-process --preprocess -j isolate-*.log | npx flamebearer
 
 benchmark:
-	npx ts-node benchmark/benchmark-from-msgpack-lite.ts
+	npx node -r ts-node/register benchmark/benchmark-from-msgpack-lite.ts
 	@echo
 	node benchmark/msgpack-benchmark.js
 
