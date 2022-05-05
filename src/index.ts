@@ -9,6 +9,8 @@ import { decode, decodeMulti } from "./decode";
 export { decode, decodeMulti };
 import type { DecodeOptions } from "./decode";
 export type { DecodeOptions };
+import { IntMode } from './utils/int';
+export { IntMode };
 
 import { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream } from "./decodeAsync";
 export { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream };

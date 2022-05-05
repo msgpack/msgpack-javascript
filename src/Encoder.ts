@@ -1,9 +1,9 @@
 import { utf8Count, utf8Encode } from "./utils/utf8";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
-import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 import type { ExtData } from "./ExtData";
 import type { ContextOf } from "./context";
+import { setInt64, setUint64 } from "./utils/int";
 
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
@@ -13,14 +13,11 @@ export type EncoderOptions<ContextType = undefined> = Partial<
     extensionCodec: ExtensionCodecType<ContextType>;
 
     /**
-     * Encodes bigint as Int64 or Uint64 if it's set to true.
-     * {@link forceIntegerToFloat} does not affect bigint.
-     * Depends on ES2020's {@link DataView#setBigInt64} and
-     * {@link DataView#setBigUint64}.
+     * Encodes a `number` greater than 32-bit as Int64 or Uint64 if it's set to true, otherwise encode as float64.
      *
      * Defaults to false.
      */
-    useBigInt64: boolean;
+    useInt64: boolean;
 
     /**
      * The maximum depth in nested objects and arrays.
@@ -43,6 +40,7 @@ export type EncoderOptions<ContextType = undefined> = Partial<
      * Defaults to `false`. If enabled, it spends more time in encoding objects.
      */
     sortKeys: boolean;
+
     /**
      * If `true`, non-integer numbers are encoded in float32, not in float64 (the default).
      *
@@ -74,7 +72,7 @@ export type EncoderOptions<ContextType = undefined> = Partial<
 export class Encoder<ContextType = undefined> {
   private readonly extensionCodec: ExtensionCodecType<ContextType>;
   private readonly context: ContextType;
-  private readonly useBigInt64: boolean;
+  private readonly useInt64: boolean;
   private readonly maxDepth: number;
   private readonly initialBufferSize: number;
   private readonly sortKeys: boolean;
@@ -90,7 +88,7 @@ export class Encoder<ContextType = undefined> {
     this.extensionCodec = options?.extensionCodec ?? (ExtensionCodec.defaultCodec as ExtensionCodecType<ContextType>);
     this.context = (options as { context: ContextType } | undefined)?.context as ContextType; // needs a type assertion because EncoderOptions has no context property when ContextType is undefined
 
-    this.useBigInt64 = options?.useBigInt64 ?? false;
+    this.useInt64 = options?.useInt64 ?? false;
     this.maxDepth = options?.maxDepth ?? DEFAULT_MAX_DEPTH;
     this.initialBufferSize = options?.initialBufferSize ?? DEFAULT_INITIAL_BUFFER_SIZE;
     this.sortKeys = options?.sortKeys ?? false;
@@ -144,8 +142,6 @@ export class Encoder<ContextType = undefined> {
       }
     } else if (typeof object === "string") {
       this.encodeString(object);
-    } else if (this.useBigInt64 && typeof object === "bigint") {
-      this.encodeBigInt64(object);
     } else {
       this.encodeObject(object, depth);
     }
@@ -200,7 +196,7 @@ export class Encoder<ContextType = undefined> {
           // uint 32
           this.writeU8(0xce);
           this.writeU32(object);
-        } else if (!this.useBigInt64) {
+        } else if (this.useInt64) {
           // uint 64
           this.writeU8(0xcf);
           this.writeU64(object);
@@ -223,7 +219,7 @@ export class Encoder<ContextType = undefined> {
           // int 32
           this.writeU8(0xd2);
           this.writeI32(object);
-        } else if (!this.useBigInt64) {
+        } else if (this.useInt64) {
           // int 64
           this.writeU8(0xd3);
           this.writeI64(object);
@@ -248,15 +244,29 @@ export class Encoder<ContextType = undefined> {
     }
   }
 
-  private encodeBigInt64(object: bigint): void {
-    if (object >= BigInt(0)) {
-      // uint 64
-      this.writeU8(0xcf);
-      this.writeBigUint64(object);
+  private encodeBigInt(object: bigint) {
+    if (object >= 0) {
+      if (object < 0x100000000 || this.forceIntegerToFloat) {
+        // uint 32 or lower, or force to float
+        this.encodeNumber(Number(object))
+      } else if (object < BigInt("0x10000000000000000")) {
+        // uint 64
+        this.writeU8(0xcf);
+        this.writeBigUint64(object);
+      } else {
+        throw new Error(`Bigint is too large for uint64: ${object}`);
+      }
     } else {
-      // int 64
-      this.writeU8(0xd3);
-      this.writeBigInt64(object);
+      if (object >= -0x80000000 || this.forceIntegerToFloat) {
+        // int 32 or lower, or force to float
+        this.encodeNumber(Number(object));
+      } else if (object >= BigInt(-1) * BigInt("0x8000000000000000")) {
+        // int 64
+        this.writeU8(0xd3);
+        this.writeBigInt64(object);
+      } else {
+        throw new Error(`Bigint is too small for int64: ${object}`);
+      }
     }
   }
 
@@ -296,6 +306,10 @@ export class Encoder<ContextType = undefined> {
     const ext = this.extensionCodec.tryToEncode(object, this.context);
     if (ext != null) {
       this.encodeExtension(ext);
+    } else if (typeof object === "bigint") {
+      // this is here instead of in doEncode so that we can try encoding with an extension first,
+      // otherwise we would break existing extensions for bigints
+      this.encodeBigInt(object);
     } else if (Array.isArray(object)) {
       this.encodeArray(object, depth);
     } else if (ArrayBuffer.isView(object)) {

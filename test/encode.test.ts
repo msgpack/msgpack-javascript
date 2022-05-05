@@ -28,6 +28,10 @@ describe("encode", () => {
   context("forceFloat", () => {
     it("encodes integers as integers without forceIntegerToFloat", () => {
       assert.deepStrictEqual(encode(3), Uint8Array.from([0x3]));
+
+      if (typeof BigInt !== "undefined") {
+        assert.deepStrictEqual(encode(BigInt(3)), Uint8Array.from([0x3]));
+      }
     });
 
     it("encodes integers as floating point when forceIntegerToFloat=true", () => {
@@ -35,6 +39,13 @@ describe("encode", () => {
         encode(3, { forceIntegerToFloat: true }),
         Uint8Array.from([0xcb, 0x40, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
       );
+
+      if (typeof BigInt !== "undefined") {
+        assert.deepStrictEqual(
+          encode(BigInt(3), { forceIntegerToFloat: true }),
+          Uint8Array.from([0xcb, 0x40, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+        );
+      }
     });
 
     it("encodes integers as float32 when forceIntegerToFloat=true and forceFloat32=true", () => {
@@ -42,10 +53,21 @@ describe("encode", () => {
         encode(3, { forceIntegerToFloat: true, forceFloat32: true }),
         Uint8Array.from([0xca, 0x40, 0x40, 0x00, 0x00]),
       );
+
+      if (typeof BigInt !== "undefined") {
+        assert.deepStrictEqual(
+          encode(BigInt(3), { forceIntegerToFloat: true, forceFloat32: true }),
+          Uint8Array.from([0xca, 0x40, 0x40, 0x00, 0x00]),
+        );
+      }
     });
 
     it("encodes integers as integers when forceIntegerToFloat=false", () => {
       assert.deepStrictEqual(encode(3, { forceIntegerToFloat: false }), Uint8Array.from([0x3]));
+
+      if (typeof BigInt !== "undefined") {
+        assert.deepStrictEqual(encode(BigInt(3), { forceIntegerToFloat: false }), Uint8Array.from([0x3]));
+      }
     });
   });
 
@@ -70,5 +92,15 @@ describe("encode", () => {
     const buffer = encode([1, 2, 3]);
     const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteLength);
     assert.deepStrictEqual(decode(arrayBuffer), decode(buffer));
+  });
+
+  context("Bigint that exceeds 64 bits", () => {
+    if (typeof BigInt !== "undefined") {
+      const MAX_UINT64_PLUS_ONE = BigInt("0x10000000000000000");
+      assert.throws(() => encode(MAX_UINT64_PLUS_ONE), /Bigint is too large for uint64: 18446744073709551616$/);
+
+      const MIN_INT64_MINUS_ONE = BigInt(-1) * BigInt("0x8000000000000001");
+      assert.throws(() => encode(MIN_INT64_MINUS_ONE), /Bigint is too small for int64: -9223372036854775809$/);
+    }
   });
 });

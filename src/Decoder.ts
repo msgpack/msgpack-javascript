@@ -1,6 +1,6 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
-import { getInt64, getUint64, UINT32_MAX } from "./utils/int";
+import { IntMode, getInt64, getUint64, convertSafeIntegerToMode, UINT32_MAX } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
@@ -16,9 +16,16 @@ export type DecoderOptions<ContextType = undefined> = Readonly<
      * Depends on ES2020's {@link DataView#getBigInt64} and
      * {@link DataView#getBigUint64}.
      *
-     * Defaults to false.
+     * Defaults to false. If true, equivalent to intMode: IntMode.BIGINT.
      */
     useBigInt64: boolean;
+
+    /**
+     * Allows for more fine-grained control of BigInt handling, overrides useBigInt64.
+     *
+     * Defaults to IntMode.BIGINT if useBigInt64 is true or IntMode.UNSAFE_NUMBER otherwise.
+     */
+    intMode?: IntMode,
 
     /**
      * Maximum string length.
@@ -194,7 +201,7 @@ const sharedCachedKeyDecoder = new CachedKeyDecoder();
 export class Decoder<ContextType = undefined> {
   private readonly extensionCodec: ExtensionCodecType<ContextType>;
   private readonly context: ContextType;
-  private readonly useBigInt64: boolean;
+  private readonly intMode: IntMode;
   private readonly maxStrLength: number;
   private readonly maxBinLength: number;
   private readonly maxArrayLength: number;
@@ -214,7 +221,7 @@ export class Decoder<ContextType = undefined> {
     this.extensionCodec = options?.extensionCodec ?? (ExtensionCodec.defaultCodec as ExtensionCodecType<ContextType>);
     this.context = (options as { context: ContextType } | undefined)?.context as ContextType; // needs a type assertion because EncoderOptions has no context property when ContextType is undefined
 
-    this.useBigInt64 = options?.useBigInt64 ?? false;
+    this.intMode = options?.intMode ?? options?.useBigInt64 ? IntMode.BIGINT : IntMode.UNSAFE_NUMBER
     this.maxStrLength = options?.maxStrLength ?? UINT32_MAX;
     this.maxBinLength = options?.maxBinLength ?? UINT32_MAX;
     this.maxArrayLength = options?.maxArrayLength ?? UINT32_MAX;
@@ -371,11 +378,11 @@ export class Decoder<ContextType = undefined> {
 
       if (headByte >= 0xe0) {
         // negative fixint (111x xxxx) 0xe0 - 0xff
-        object = headByte - 0x100;
+        object = this.convertNumber(headByte - 0x100);
       } else if (headByte < 0xc0) {
         if (headByte < 0x80) {
           // positive fixint (0xxx xxxx) 0x00 - 0x7f
-          object = headByte;
+          object = this.convertNumber(headByte);
         } else if (headByte < 0x90) {
           // fixmap (1000 xxxx) 0x80 - 0x8f
           const size = headByte - 0x80;
@@ -418,36 +425,28 @@ export class Decoder<ContextType = undefined> {
         object = this.readF64();
       } else if (headByte === 0xcc) {
         // uint 8
-        object = this.readU8();
+        object = this.convertNumber(this.readU8());
       } else if (headByte === 0xcd) {
         // uint 16
-        object = this.readU16();
+        object = this.convertNumber(this.readU16());
       } else if (headByte === 0xce) {
         // uint 32
-        object = this.readU32();
+        object = this.convertNumber(this.readU32());
       } else if (headByte === 0xcf) {
         // uint 64
-        if (this.useBigInt64) {
-          object = this.readU64AsBigInt();
-        } else {
-          object = this.readU64();
-        }
+        object = this.readU64();
       } else if (headByte === 0xd0) {
         // int 8
-        object = this.readI8();
+        object = this.convertNumber(this.readI8());
       } else if (headByte === 0xd1) {
         // int 16
-        object = this.readI16();
+        object = this.convertNumber(this.readI16());
       } else if (headByte === 0xd2) {
         // int 32
-        object = this.readI32();
+        object = this.convertNumber(this.readI32());
       } else if (headByte === 0xd3) {
         // int 64
-        if (this.useBigInt64) {
-          object = this.readI64AsBigInt();
-        } else {
           object = this.readI64();
-        }
       } else if (headByte === 0xd9) {
         // str 8
         const byteLength = this.lookU8();
@@ -692,6 +691,10 @@ export class Decoder<ContextType = undefined> {
     return this.extensionCodec.decode(data, extType, this.context);
   }
 
+  private convertNumber(value: number): number | bigint {
+    return convertSafeIntegerToMode(value, this.intMode);
+  }
+
   private lookU8() {
     return this.view.getUint8(this.pos);
   }
@@ -740,26 +743,14 @@ export class Decoder<ContextType = undefined> {
     return value;
   }
 
-  private readU64(): number {
-    const value = getUint64(this.view, this.pos);
+  private readU64(): number | bigint {
+    const value = getUint64(this.view, this.pos, this.intMode);
     this.pos += 8;
     return value;
   }
 
-  private readI64(): number {
-    const value = getInt64(this.view, this.pos);
-    this.pos += 8;
-    return value;
-  }
-
-  private readU64AsBigInt(): bigint {
-    const value = this.view.getBigUint64(this.pos);
-    this.pos += 8;
-    return value;
-  }
-
-  private readI64AsBigInt(): bigint {
-    const value = this.view.getBigInt64(this.pos);
+  private readI64(): number | bigint {
+    const value = getInt64(this.view, this.pos, this.intMode);
     this.pos += 8;
     return value;
   }

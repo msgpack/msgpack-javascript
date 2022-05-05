@@ -44,6 +44,7 @@ deepStrictEqual(decode(encoded), object);
     - [`EncoderOptions`](#encoderoptions)
   - [`decode(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): unknown`](#decodebuffer-arraylikenumber--buffersource-options-decoderoptions-unknown)
     - [`DecoderOptions`](#decoderoptions)
+      - [`IntMode`](#intmode)
   - [`decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): Generator<unknown, void, unknown>`](#decodemultibuffer-arraylikenumber--buffersource-options-decoderoptions-generatorunknown-void-unknown)
   - [`decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): Promise<unknown>`](#decodeasyncstream-readablestreamlikearraylikenumber--buffersource-options-decoderoptions-promiseunknown)
   - [`decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): AsyncIterable<unknown>`](#decodearraystreamstream-readablestreamlikearraylikenumber--buffersource-options-decoderoptions-asynciterableunknown)
@@ -51,7 +52,7 @@ deepStrictEqual(decode(encoded), object);
   - [Reusing Encoder and Decoder instances](#reusing-encoder-and-decoder-instances)
 - [Extension Types](#extension-types)
     - [ExtensionCodec context](#extensioncodec-context)
-    - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
+    - [Handling BigInt](#handling-bigint)
     - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
 - [Decoding a Blob](#decoding-a-blob)
 - [MessagePack Specification](#messagepack-specification)
@@ -113,7 +114,7 @@ Name|Type|Default
 ----|----|----
 extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
 context | user-defined | -
-useBigInt64 | boolean | false
+useInt64 | boolean | false
 maxDepth | number | `100`
 initialBufferSize | number | `2048`
 sortKeys | boolean | false
@@ -148,13 +149,26 @@ Name|Type|Default
 extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
 context | user-defined | -
 useBigInt64 | boolean | false
+intMode | IntMode | IntMode.BIGINT if useBigInt64 is true or IntMode.UNSAFE_NUMBER otherwise
 maxStrLength | number | `4_294_967_295` (UINT32_MAX)
 maxBinLength | number | `4_294_967_295` (UINT32_MAX)
 maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
 maxMapLength | number | `4_294_967_295` (UINT32_MAX)
 maxExtLength | number | `4_294_967_295` (UINT32_MAX)
+intMode | `IntMode` | `IntMode.UNSAFE_NUMBER`
 
 You can use `max${Type}Length` to limit the length of each type decoded.
+
+`intMode` determines whether decoded integers should be returned as numbers or bigints. The possible values are [described below](#intmode).
+
+##### `IntMode`
+
+The `IntMode` enum defines different options for decoding integers. They are described below:
+
+- `IntMode.UNSAFE_NUMBER`: Always returns the value as a number. Be aware that there will be a loss of precision if the value is outside the range of `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER`.
+- `IntMode.SAFE_NUMBER`: Always returns the value as a number, but throws an error if the value is outside of the range of `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER`.
+- `IntMode.MIXED`: Returns all values inside the range of `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER` as numbers and all values outside that range as bigints.
+- `IntMode.BIGINT`: Always returns the value as a bigint, even if it is small enough to safely fit in a number.
 
 ### `decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): Generator<unknown, void, unknown>`
 
@@ -352,7 +366,7 @@ const encoded = = encode({myType: new MyType<any>()}, { extensionCodec, context 
 const decoded = decode(encoded, { extensionCodec, context });
 ```
 
-#### Handling BigInt with ExtensionCodec
+#### Handling BigInt
 
 This library does not handle BigInt by default, but you have two options to handle it:
 
@@ -488,28 +502,27 @@ Note that as of June 2019 there're no official "version" on the MessagePack spec
 
 The following table shows how JavaScript values are mapped to [MessagePack formats](https://github.com/msgpack/msgpack/blob/master/spec.md) and vice versa.
 
-The mapping of integers varies on the setting of `useBigInt64`.
-
-The default, `useBigInt64: false` is:
+The mapping of integers varies on the setting of `intMode`.
 
 Source Value|MessagePack Format|Value Decoded
 ----|----|----
 null, undefined|nil|null (*1)
 boolean (true, false)|bool family|boolean (true, false)
-number (53-bit int)|int family|number
-number (64-bit float)|float family|number
+number (53-bit int)|int family|number or bigint (*2)
+number (64-bit float)|float family|number (64-bit float)
+bigint|int family|number or bigint (*2)
 string|str family|string
-ArrayBufferView |bin family|Uint8Array (*2)
+ArrayBufferView |bin family|Uint8Array (*3)
 Array|array family|Array
-Object|map family|Object (*3)
-Date|timestamp ext family|Date (*4)
-bigint|N/A|N/A (*5)
+Object|map family|Object (*4)
+Date|timestamp ext family|Date (*5)
+bigint|int family|bigint
 
 * *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
-* *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
-* *3 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
-* *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
-* *5 bigint is not supported in `useBigInt64: false` mode, but you can define an extension codec for it.
+* *2 MessagePack ints are decoded as either numbers or bigints depending on the [IntMode](#intmode) used during decoding.
+* *3 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
+* *4 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
+* *5 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
 
 If you set `useBigInt64: true`, the following mapping is used:
 
@@ -519,7 +532,7 @@ null, undefined|nil|null
 boolean (true, false)|bool family|boolean (true, false)
 **number (32-bit int)**|int family|number
 **number (except for the above)**|float family|number
-**bigint**|int64 / uint64|bigint (*6)
+**bigint**|int64 / uint64|bigint (*5)
 string|str family|string
 ArrayBufferView |bin family|Uint8Array
 Array|array family|Array
@@ -527,7 +540,7 @@ Object|map family|Object
 Date|timestamp ext family|Date
 
 
-* *6 If the bigint is larger than the max value of uint64 or smaller than the min value of int64, then the behavior is undefined.
+* *5 If the bigint is larger than the max value of uint64 or smaller than the min value of int64, then the behavior is undefined.
 
 ## Prerequisites
 
