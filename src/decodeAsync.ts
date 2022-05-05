@@ -23,6 +23,7 @@ import type { SplitUndefined } from "./context";
     options.maxArrayLength,
     options.maxMapLength,
     options.maxExtLength,
+    options.intMode,
   );
   return decoder.decodeAsync(stream);
 }
@@ -45,6 +46,7 @@ import type { SplitUndefined } from "./context";
     options.maxArrayLength,
     options.maxMapLength,
     options.maxExtLength,
+    options.intMode,
   );
 
   return decoder.decodeArrayStream(stream);
@@ -68,6 +70,7 @@ export function decodeMultiStream<ContextType>(
     options.maxArrayLength,
     options.maxMapLength,
     options.maxExtLength,
+    options.intMode,
   );
 
   return decoder.decodeStream(stream);

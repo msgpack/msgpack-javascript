@@ -144,6 +144,32 @@ export class Encoder<ContextType = undefined> {
     }
   }
 
+  private encodeBigint(object: bigint) {
+    if (object >= 0) {
+      if (object < 0x100000000 || this.forceIntegerToFloat) {
+        // uint 32 or lower, or force to float
+        this.encodeNumber(Number(object))
+      } else if (object < BigInt("0x10000000000000000")) {
+        // uint 64
+        this.writeU8(0xcf);
+        this.writeUBig(object);
+      } else {
+        throw new Error(`Bigint is too large for uint64: ${object}`);
+      }
+    } else {
+      if (object >= -0x80000000 || this.forceIntegerToFloat) {
+        // int 32 or lower, or force to float
+        this.encodeNumber(Number(object));
+      } else if (object >= BigInt(-1) * BigInt("0x8000000000000000")) {
+        // int 64
+        this.writeU8(0xd3);
+        this.writeIBig(object);
+      } else {
+        throw new Error(`Bigint is too small for int64: ${object}`);
+      }
+    }
+  }
+
   private writeStringHeader(byteLength: number) {
     if (byteLength < 32) {
       // fixstr
@@ -189,6 +215,10 @@ export class Encoder<ContextType = undefined> {
     const ext = this.extensionCodec.tryToEncode(object, this.context);
     if (ext != null) {
       this.encodeExtension(ext);
+    } else if (typeof object === "bigint") {
+      // this is here instead of in doEncode so that we can try encoding with an extension first,
+      // otherwise we would break existing extensions for bigints
+      this.encodeBigint(object);
     } else if (Array.isArray(object)) {
       this.encodeArray(object, depth);
     } else if (ArrayBuffer.isView(object)) {
@@ -397,6 +427,20 @@ export class Encoder<ContextType = undefined> {
     this.ensureBufferSizeToWrite(8);
 
     setInt64(this.view, this.pos, value);
+    this.pos += 8;
+  }
+
+  private writeIBig(value: bigint) {
+    this.ensureBufferSizeToWrite(8);
+
+    this.view.setBigInt64(this.pos, value);
+    this.pos += 8;
+  }
+
+  private writeUBig(value: bigint) {
+    this.ensureBufferSizeToWrite(8);
+
+    this.view.setBigUint64(this.pos, value);
     this.pos += 8;
   }
 }

@@ -2,7 +2,8 @@ import assert from "assert";
 import util from "util";
 import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
-import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, encodeTimeSpecToTimestamp } from "@msgpack/msgpack";
+import { MsgUInt64, MsgInt64 } from "msg-int64";
+import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, encodeTimeSpecToTimestamp, IntMode } from "@msgpack/msgpack";
 
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
@@ -24,7 +25,7 @@ extensionCodec.register({
 
 const TEST_TYPES = {
   array: 1,
-  bignum: 0, // TODO
+  bignum: typeof BigInt !== "undefined",
   binary: 1,
   bool: 1,
   map: 1,
@@ -34,6 +35,22 @@ const TEST_TYPES = {
   timestamp: 1,
 };
 
+function convertValueForEncoding(value: unknown): unknown {
+  if (value instanceof MsgInt64 || value instanceof MsgUInt64) {
+    return BigInt(value.toString());
+  }
+
+  return value;
+}
+
+function convertValueForDecoding(value: unknown): unknown {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+
+  return value;
+}
+
 describe("msgpack-test-suite", () => {
   Exam.getExams(TEST_TYPES).forEach((exam) => {
     const types = exam.getTypes(TEST_TYPES);
@@ -41,7 +58,7 @@ describe("msgpack-test-suite", () => {
     const title = `${first}: ${exam.stringify(first)}`;
     it(`encodes ${title}`, () => {
       types.forEach((type) => {
-        const value = exam.getValue(type);
+        const value = convertValueForEncoding(exam.getValue(type));
         const buffer = Buffer.from(encode(value, { extensionCodec }));
 
         if (exam.matchMsgpack(buffer)) {
@@ -58,7 +75,7 @@ describe("msgpack-test-suite", () => {
     it(`decodes ${title}`, () => {
       const msgpacks = exam.getMsgpacks();
       msgpacks.forEach((encoded, idx) => {
-        const value = decode(encoded, { extensionCodec });
+        const value = convertValueForDecoding(decode(encoded, { extensionCodec, intMode: IntMode.MIXED }));
         if (exam.matchValue(value)) {
           assert(true, exam.stringify(idx));
         } else {

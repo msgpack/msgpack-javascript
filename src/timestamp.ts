@@ -1,6 +1,6 @@
 // https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type
 import { DecodeError } from "./DecodeError";
-import { getInt64, setInt64 } from "./utils/int";
+import { IntMode, getInt64, setInt64 } from "./utils/int";
 
 export const EXT_TIMESTAMP = -1;
 
@@ -87,7 +87,7 @@ export function decodeTimestampToTimeSpec(data: Uint8Array): TimeSpec {
     case 12: {
       // timestamp 96 = { nsec32 (unsigned), sec64 (signed) }
 
-      const sec = getInt64(view, 4);
+      const sec = getInt64(view, 4, IntMode.UNSAFE_NUMBER);
       const nsec = view.getUint32(0);
       return { sec, nsec };
     }

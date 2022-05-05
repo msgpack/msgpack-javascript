@@ -1,6 +1,6 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
-import { getInt64, getUint64, UINT32_MAX } from "./utils/int";
+import { IntMode, getInt64, getUint64, convertSafeIntegerToMode, UINT32_MAX } from "./utils/int";
 import { utf8DecodeJs, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
@@ -76,6 +76,7 @@ export class Decoder<ContextType = undefined> {
     private readonly maxArrayLength = UINT32_MAX,
     private readonly maxMapLength = UINT32_MAX,
     private readonly maxExtLength = UINT32_MAX,
+    private readonly intMode = IntMode.UNSAFE_NUMBER,
     private readonly keyDecoder: KeyDecoder | null = sharedCachedKeyDecoder,
   ) {}
 
@@ -274,25 +275,25 @@ export class Decoder<ContextType = undefined> {
         object = this.readF64();
       } else if (headByte === 0xcc) {
         // uint 8
-        object = this.readU8();
+        object = this.convertNumber(this.readU8());
       } else if (headByte === 0xcd) {
         // uint 16
-        object = this.readU16();
+        object = this.convertNumber(this.readU16());
       } else if (headByte === 0xce) {
         // uint 32
-        object = this.readU32();
+        object = this.convertNumber(this.readU32());
       } else if (headByte === 0xcf) {
         // uint 64
         object = this.readU64();
       } else if (headByte === 0xd0) {
         // int 8
-        object = this.readI8();
+        object = this.convertNumber(this.readI8());
       } else if (headByte === 0xd1) {
         // int 16
-        object = this.readI16();
+        object = this.convertNumber(this.readI16());
       } else if (headByte === 0xd2) {
         // int 32
-        object = this.readI32();
+        object = this.convertNumber(this.readI32());
       } else if (headByte === 0xd3) {
         // int 64
         object = this.readI64();
@@ -553,6 +554,10 @@ export class Decoder<ContextType = undefined> {
     return this.extensionCodec.decode(data, extType, this.context);
   }
 
+  private convertNumber(value: number): number | bigint {
+    return convertSafeIntegerToMode(value, this.intMode);
+  }
+
   private lookU8() {
     return this.view.getUint8(this.pos);
   }
@@ -601,14 +606,14 @@ export class Decoder<ContextType = undefined> {
     return value;
   }
 
-  private readU64(): number {
-    const value = getUint64(this.view, this.pos);
+  private readU64(): number | bigint {
+    const value = getUint64(this.view, this.pos, this.intMode);
     this.pos += 8;
     return value;
   }
 
-  private readI64(): number {
-    const value = getInt64(this.view, this.pos);
+  private readI64(): number | bigint {
+    const value = getInt64(this.view, this.pos, this.intMode);
     this.pos += 8;
     return value;
   }
