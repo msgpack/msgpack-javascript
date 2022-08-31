@@ -55,7 +55,19 @@ export type EncodeOptions<ContextType = undefined> = Partial<
 > &
   ContextOf<ContextType>;
 
+const getEncoder = (options: any) => new Encoder(
+  options.extensionCodec,
+  (options as typeof options & { context: any }).context,
+  options.maxDepth,
+  options.initialBufferSize,
+  options.sortKeys,
+  options.forceFloat32,
+  options.ignoreUndefined,
+  options.forceIntegerToFloat,
+);
+
 const defaultEncodeOptions: EncodeOptions = {};
+const defaultEncoder = getEncoder(defaultEncodeOptions);
 
 /**
  * It encodes `value` in the MessagePack format and
@@ -67,15 +79,6 @@ export function encode<ContextType = undefined>(
   value: unknown,
   options: EncodeOptions<SplitUndefined<ContextType>> = defaultEncodeOptions as any,
 ): Uint8Array {
-  const encoder = new Encoder(
-    options.extensionCodec,
-    (options as typeof options & { context: any }).context,
-    options.maxDepth,
-    options.initialBufferSize,
-    options.sortKeys,
-    options.forceFloat32,
-    options.ignoreUndefined,
-    options.forceIntegerToFloat,
-  );
+  const encoder = options === defaultEncodeOptions ? defaultEncoder : getEncoder(options);
   return encoder.encode(value);
 }
