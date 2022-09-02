@@ -19,7 +19,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         cache: npm
-        node-version: "16"
+        node-version: "18"
 
     - run: npm ci
     - run: npm run test:fuzz
