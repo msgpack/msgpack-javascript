@@ -23,18 +23,28 @@ export class Encoder<ContextType = undefined> {
     private readonly forceIntegerToFloat = false,
   ) {}
 
-  private getUint8Array(): Uint8Array {
-    return this.bytes.subarray(0, this.pos);
-  }
-
   private reinitializeState() {
     this.pos = 0;
   }
 
+  /**
+   * This is almost equivalent to {@link Encoder#encode}, but it returns an reference of the encoder's internal buffer and thus much faster than {@link Encoder#encode}.
+   *
+   * @returns Encodes the object and returns a shared reference the encoder's internal buffer.
+   */
+  public encodeSharedRef(object: unknown): Uint8Array {
+    this.reinitializeState();
+    this.doEncode(object, 1);
+    return this.bytes.subarray(0, this.pos);
+  }
+
+  /**
+   * @returns Encodes the object and returns a copy of the encoder's internal buffer.
+   */
   public encode(object: unknown): Uint8Array {
     this.reinitializeState();
     this.doEncode(object, 1);
-    return this.getUint8Array();
+    return this.bytes.slice(0, this.pos);
   }
 
   private doEncode(object: unknown, depth: number): void {

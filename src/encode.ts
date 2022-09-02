@@ -77,5 +77,5 @@ export function encode<ContextType = undefined>(
     options.ignoreUndefined,
     options.forceIntegerToFloat,
   );
-  return encoder.encode(value);
+  return encoder.encodeSharedRef(value);
 }

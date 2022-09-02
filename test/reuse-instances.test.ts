@@ -1,5 +1,5 @@
 import { deepStrictEqual } from "assert";
-import { Encoder, Decoder } from "@msgpack/msgpack";
+import { Encoder, Decoder, decode } from "@msgpack/msgpack";
 
 const createStream = async function* (...args: any) {
   for (const item of args) {
@@ -107,6 +107,48 @@ describe("shared instances", () => {
         }
         deepStrictEqual(a, [[object]], `#${i}`);
       }
+    });
+
+    context("regression #212", () => {
+      it("runs multiple times", () => {
+        const encoder = new Encoder();
+        const decoder = new Decoder();
+
+        const data1 = {
+          isCommunication: false,
+          isWarning: false,
+          alarmId: "619f65a2774abf00568b7210",
+          intervalStart: "2022-05-20T12:00:00.000Z",
+          intervalStop: "2022-05-20T13:00:00.000Z",
+          triggeredAt: "2022-05-20T13:00:00.000Z",
+          component: "someComponent",
+          _id: "6287920245a582301475627d",
+        };
+
+        const data2 = {
+          foo: "bar",
+        };
+
+        const arr = [data1, data2];
+        const enc = arr.map((x) => [x, encoder.encode(x)] as const);
+
+        enc.forEach(([orig, acc]) => {
+          const des = decoder.decode(acc);
+          deepStrictEqual(des, orig);
+        });
+      });
+    });
+
+    context("Encoder#encodeSharedRef()", () => {
+      it("returns the shared reference", () => {
+        const encoder = new Encoder();
+
+        const a = encoder.encodeSharedRef(true);
+        const b = encoder.encodeSharedRef(false);
+
+        deepStrictEqual(decode(a), decode(b)); // yes, this is the expected behavior
+        deepStrictEqual(a.buffer, b.buffer);
+      });
     });
   });
 });
