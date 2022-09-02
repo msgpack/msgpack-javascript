@@ -1,6 +1,6 @@
 # This is the revision history of @msgpack/msgpack
 
-## NEXT
+## 2.8.0 2022-09-02
 
 * Let `Encoder#encode()` return a copy of the internal buffer, instead of the reference of the buffer (fix #212).
   * Introducing `Encoder#encodeSharedRef()` to return the shared reference to the internal buffer.
