@@ -174,7 +174,7 @@ describe("edge cases", () => {
         yield [];
       };
 
-      const results = [];
+      const results: Array<unknown> = [];
       for await (const item of decodeMultiStream(createStream())) {
         results.push(item);
       }
