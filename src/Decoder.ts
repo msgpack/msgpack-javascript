@@ -6,11 +6,9 @@ import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
 import { DecodeError } from "./DecodeError";
 
-const enum State {
-  ARRAY,
-  MAP_KEY,
-  MAP_VALUE,
-}
+const STATE_ARRAY = "array";
+const STATE_MAP_KEY = "map_key";
+const STATE_MAP_VALUE = "map_value";
 
 type MapKeyType = string | number;
 
@@ -21,7 +19,7 @@ const isValidMapKeyType = (key: unknown): key is MapKeyType => {
 };
 
 type StackMapState = {
-  type: State.MAP_KEY | State.MAP_VALUE;
+  type: typeof STATE_MAP_KEY | typeof STATE_MAP_VALUE;
   size: number;
   key: MapKeyType | null;
   readCount: number;
@@ -29,7 +27,7 @@ type StackMapState = {
 };
 
 type StackArrayState = {
-  type: State.ARRAY;
+  type: typeof STATE_ARRAY;
   size: number;
   array: Array<unknown>;
   position: number;
@@ -397,7 +395,7 @@ export class Decoder<ContextType = undefined> {
       while (stack.length > 0) {
         // arrays and maps
         const state = stack[stack.length - 1]!;
-        if (state.type === State.ARRAY) {
+        if (state.type === STATE_ARRAY) {
           state.array[state.position] = object;
           state.position++;
           if (state.position === state.size) {
@@ -406,7 +404,7 @@ export class Decoder<ContextType = undefined> {
           } else {
             continue DECODE;
           }
-        } else if (state.type === State.MAP_KEY) {
+        } else if (state.type === STATE_MAP_KEY) {
           if (!isValidMapKeyType(object)) {
             throw new DecodeError("The type of key must be string or number but " + typeof object);
           }
@@ -415,7 +413,7 @@ export class Decoder<ContextType = undefined> {
           }
 
           state.key = object;
-          state.type = State.MAP_VALUE;
+          state.type = STATE_MAP_VALUE;
           continue DECODE;
         } else {
           // it must be `state.type === State.MAP_VALUE` here
@@ -428,7 +426,7 @@ export class Decoder<ContextType = undefined> {
             object = state.map;
           } else {
             state.key = null;
-            state.type = State.MAP_KEY;
+            state.type = STATE_MAP_KEY;
             continue DECODE;
           }
         }
@@ -475,7 +473,7 @@ export class Decoder<ContextType = undefined> {
     }
 
     this.stack.push({
-      type: State.MAP_KEY,
+      type: STATE_MAP_KEY,
       size,
       key: null,
       readCount: 0,
@@ -489,7 +487,7 @@ export class Decoder<ContextType = undefined> {
     }
 
     this.stack.push({
-      type: State.ARRAY,
+      type: STATE_ARRAY,
       size,
       array: new Array<unknown>(size),
       position: 0,
@@ -523,7 +521,7 @@ export class Decoder<ContextType = undefined> {
   private stateIsMapKey(): boolean {
     if (this.stack.length > 0) {
       const state = this.stack[this.stack.length - 1]!;
-      return state.type === State.MAP_KEY;
+      return state.type === STATE_MAP_KEY;
     }
     return false;
   }
