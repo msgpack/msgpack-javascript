@@ -1,7 +1,7 @@
 // kind of hand-written fuzzing data
 // any errors should not break Encoder/Decoder instance states
 import assert from "assert";
-import { encode, decodeAsync, decode, Encoder, Decoder, decodeMulti, decodeMultiStream } from "../src";
+import { encode, decodeAsync, decode, Encoder, Decoder, decodeMulti, decodeMultiStream, ExtensionCodec } from "../src";
 import { DataViewIndexOutOfBoundsError } from "../src/Decoder";
 
 function testEncoder(encoder: Encoder): void {
@@ -179,6 +179,34 @@ describe("edge cases", () => {
         results.push(item);
       }
       assert.deepStrictEqual(results, []);
+    });
+  });
+
+  context("xxx", () => {
+    it("xxx", () => {
+      function encodeStatsJson(stats: any) {
+        const extensionCodec = new ExtensionCodec();
+        const filteredFields = ['name'];
+        extensionCodec.register({
+          type: 0,
+          encode: (object: any) => {
+            console.log(object);
+            if (object instanceof Object && !(object instanceof Array)) {
+              for (const field of filteredFields) {
+                delete object[field];
+              }
+            }
+            console.log(object);
+            return null;
+          },
+          decode: () => null,
+        });
+
+        const encoded = encode(stats, { extensionCodec });
+        return encoded;
+      }
+
+      console.log(encodeStatsJson({ id: "xxx", name: 'foo', bar: 'baz', xxx: { name: 1, b: 2 } }));
     });
   });
 });
