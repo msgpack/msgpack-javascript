@@ -86,7 +86,6 @@
     "ts-node": "latest",
     "tsconfig-paths": "latest",
     "typescript": "latest",
-    "web-streams-polyfill": "latest",
     "webpack": "latest",
     "webpack-cli": "latest"
   },
