@@ -1,11 +1,11 @@
 import { deepStrictEqual } from "assert";
 import { decodeAsync, encode, decodeArrayStream } from "@msgpack/msgpack";
-import { ReadableStream as PonyReadableStream } from "web-streams-polyfill/ponyfill";
+
 const isReadableStreamConstructorAvailable: boolean = (() => {
   try {
     // Edge <= 18 has ReadableStream but its constructor is not available
     new ReadableStream({
-      start() {},
+      start(_controller) {},
     });
     return true;
   } catch {
@@ -13,18 +13,16 @@ const isReadableStreamConstructorAvailable: boolean = (() => {
   }
 })();
 
-const MyReadableStream = isReadableStreamConstructorAvailable ? ReadableStream : PonyReadableStream;
-
 // Downgrade stream not to implement AsyncIterable<T>
-function downgradeReadableStream(stream: ReadableStream | PonyReadableStream) {
+function downgradeReadableStream(stream: ReadableStream) {
   (stream as any)[Symbol.asyncIterator] = undefined;
 }
 
-describe("whatwg streams", () => {
+(isReadableStreamConstructorAvailable ? describe : describe.skip)("whatwg streams", () => {
   it("decodeArrayStream", async () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
-    const stream = new MyReadableStream({
+    const stream = new ReadableStream({
       start(controller) {
         for (const byte of encoded) {
           controller.enqueue([byte]);
@@ -44,7 +42,7 @@ describe("whatwg streams", () => {
   it("decodeAsync", async () => {
     const data = [1, 2, 3];
     const encoded = encode(data);
-    const stream = new MyReadableStream({
+    const stream = new ReadableStream({
       start(controller) {
         for (const byte of encoded) {
           controller.enqueue([byte]);
