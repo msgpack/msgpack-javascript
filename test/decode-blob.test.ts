@@ -1,7 +1,7 @@
 import assert from "assert";
 import { encode, decode, decodeAsync } from "@msgpack/msgpack";
 
-describe("Blob", () => {
+(typeof Blob !== "undefined" ? describe : describe.skip)("Blob", () => {
   it("decodes it with `decode()`", async function () {
     const blob = new Blob([encode("Hello!")]);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
