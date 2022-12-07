@@ -1,3 +1,5 @@
+// For configurations:
+// https://code.visualstudio.com/Docs/editor/debugging
 {
     "version": "0.2.0",
     "configurations": [
@@ -5,13 +7,12 @@
             "name": "Run the current Mocha test file",
             "type": "node",
             "request": "launch",
-            "runtimeArgs": [
-            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "runtimeArgs": [],
             "args": [
                 "--colors",
                 "${relativeFile}"
             ],
-            "internalConsoleOptions": "openOnSessionStart",
             "program": "${workspaceFolder}/node_modules/.bin/mocha",
             "sourceMaps": true,
             "cwd": "${workspaceRoot}"
@@ -20,6 +21,7 @@
             "name": "Run the current TypeScript file",
             "type": "node",
             "request": "launch",
+            "internalConsoleOptions": "openOnSessionStart",
             "args": [
                 "${relativeFile}"
             ],
