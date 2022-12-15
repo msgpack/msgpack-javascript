@@ -6,32 +6,30 @@
         {
             "name": "Run the current Mocha test file",
             "type": "node",
+            "sourceMaps": true,
             "request": "launch",
             "internalConsoleOptions": "openOnSessionStart",
-            "runtimeArgs": [],
+            "runtimeExecutable": "npx",
+            "program": "mocha",
             "args": [
                 "--colors",
                 "${relativeFile}"
             ],
-            "program": "${workspaceFolder}/node_modules/.bin/mocha",
-            "sourceMaps": true,
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "Run the current TypeScript file",
             "type": "node",
+            "sourceMaps": true,
             "request": "launch",
             "internalConsoleOptions": "openOnSessionStart",
             "args": [
-                "${relativeFile}"
-            ],
-            "runtimeArgs": [
                 "--nolazy",
                 "-r",
-                "ts-node/register"
+                "ts-node/register",
+                "${relativeFile}"
             ],
-            "sourceMaps": true,
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceFolder}"
         },
     ]
 }
