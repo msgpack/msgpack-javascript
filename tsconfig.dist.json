@@ -7,5 +7,5 @@
     "noEmitOnError": true,
     "incremental": false
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.mts"]
 }

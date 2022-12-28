@@ -4,6 +4,11 @@
   "description": "MessagePack for ECMA-262/JavaScript/TypeScript",
   "author": "The MessagePack community",
   "license": "ISC",
+  "type": "module",
+  "exports": {
+    "import": "./dist.es5+esm/index.mjs",
+    "require": "./dist/index.js"
+  },
   "main": "./dist/index.js",
   "module": "./dist.es5+esm/index.mjs",
   "cdn": "./dist.es5+umd/msgpack.min.js",
@@ -12,12 +17,12 @@
   "sideEffects": false,
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "npm run clean && webpack --bail && tsc --build tsconfig.dist.json tsconfig.dist.es5+esm.json && ts-node tools/esmify.ts dist.es5+esm/*.js dist.es5+esm/*/*.js",
+    "prepare": "npm run clean && webpack --bail && tsc --build tsconfig.dist.json tsconfig.dist.es5+esm.json",
     "prepublishOnly": "run-p 'test:dist:*' && npm run test:browser",
     "clean": "rimraf build dist dist.*",
-    "test": "mocha 'test/**/*.test.ts'",
-    "test:purejs": "TEXT_ENCODING=never mocha 'test/**/*.test.ts'",
-    "test:te": "TEXT_ENCODING=force mocha 'test/**/*.test.ts'",
+    "test": "mocha 'test/**/*.test.mts'",
+    "test:purejs": "TEXT_ENCODING=never mocha 'test/**/*.test.mts'",
+    "test:te": "TEXT_ENCODING=force mocha 'test/**/*.test.mts'",
     "test:dist:purejs": "TS_NODE_PROJECT=tsconfig.test-dist-es5-purejs.json npm run test:purejs -- --reporter=dot",
     "test:cover": "npm run cover:clean && npm-run-all 'test:cover:*' && npm run cover:report",
     "test:cover:purejs": "npx nyc --no-clean npm run test:purejs",
@@ -30,9 +35,9 @@
     "test:browser:firefox": "karma start --single-run --browsers FirefoxHeadless",
     "test:browser:chrome": "karma start --single-run --browsers ChromeHeadless",
     "test:watch:browser": "karma start --browsers ChromeHeadless,FirefoxHeadless",
-    "test:watch:nodejs": "mocha -w 'test/**/*.test.ts'",
-    "lint": "eslint --ext .ts src test",
-    "lint:fix": "prettier --loglevel=warn --write 'src/**/*.ts' 'test/**/*.ts' && eslint --fix --ext .ts src test",
+    "test:watch:nodejs": "mocha -w 'test/**/*.test.mts'",
+    "lint": "eslint --ext .ts --ext .mts src test",
+    "lint:fix": "prettier --loglevel=warn --write 'src/**/*.mts' 'test/**/*.mts' && eslint --fix --ext .ts --ext .mts src test",
     "lint:print-config": "eslint --print-config .eslintrc.js",
     "update-dependencies": "npx rimraf node_modules/ package-lock.json ; npm install ; npm audit fix --force ; git restore package.json ; npm install"
   },
@@ -51,7 +56,7 @@
     "universal"
   ],
   "engines": {
-    "node": ">= 10"
+    "node": ">= 14"
   },
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",

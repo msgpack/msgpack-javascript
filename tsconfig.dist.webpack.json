@@ -1,9 +1,9 @@
 {
   "extends": "./tsconfig.es5.json",
   "compilerOptions": {
-    "module": "esnext",
+    "module": "ES2022",
     "noEmitOnError": true,
     "outDir": "./build/webpack"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.mts"]
 }

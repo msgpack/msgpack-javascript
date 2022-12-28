@@ -1,8 +1,9 @@
+// import * as path from "path";
 const path = require("path");
 // const webpack = require("webpack");
 
 // eslint-disable-next-line import/no-default-export
-export default function configure(config: any) {
+module.exports =  function configure(config: any) {
   config.set({
     customLaunchers: {
       // To debug it wih IE11,
@@ -18,10 +19,10 @@ export default function configure(config: any) {
 
     basePath: "",
     frameworks: ["mocha"],
-    files: ["./test/karma-run.ts"],
+    files: ["./test/karma-run.mts"],
     exclude: [],
     preprocessors: {
-      "**/*.ts": ["webpack", "sourcemap"],
+      "**/*.mts": ["webpack", "sourcemap"],
     },
     reporters: ["dots"],
     port: 9876,
@@ -36,7 +37,7 @@ export default function configure(config: any) {
       mode: "production",
 
       resolve: {
-        extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".wasm"],
+        extensions: [".ts", ".tsx", ".mts", ".mjs", ".js", ".json", ".wasm"],
         alias: {
           "@msgpack/msgpack": path.resolve(__dirname, "src"),
         },
@@ -64,7 +65,7 @@ export default function configure(config: any) {
       devtool: "inline-source-map",
     },
     mime: {
-      "text/x-typescript": ["ts", "tsx"],
+      "text/x-typescript": ["ts", "tsx", "mts"],
     },
     client: {
       mocha: {
