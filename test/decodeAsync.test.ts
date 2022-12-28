@@ -120,4 +120,43 @@ describe("decodeAsync", () => {
     const object = await decodeAsync(createStream());
     assert.deepStrictEqual(object, { "foo": "bar" });
   });
+
+  it("decodes objects with toJSON methods", async () => {
+    const object = {
+      string: "Hello, world!",
+      nested: {
+        int: -45,
+        json: {
+          toJSON() {
+            return {
+              float: Math.PI,
+              int64: Number.MIN_SAFE_INTEGER,
+              timestamp: new Date( 0 ),
+              custom: {
+                toJSON: () => "custom"
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const createStream = async function* () {
+      for (const byte of encode(object)) {
+        yield [byte];
+      }
+    };
+    assert.deepStrictEqual(await decodeAsync(createStream()), {
+      string: "Hello, world!",
+      nested: {
+        int: -45,
+        json: {
+          float: Math.PI,
+          int64: Number.MIN_SAFE_INTEGER,
+          timestamp: new Date( 0 ),
+          custom: "custom"
+        }
+      }
+    });
+  });
 });
