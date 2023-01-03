@@ -61,7 +61,6 @@
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "assert": "latest",
-    "blob-polyfill": "latest",
     "buffer": "latest",
     "core-js": "latest",
     "eslint": "latest",
@@ -86,7 +85,6 @@
     "ts-node": "latest",
     "tsconfig-paths": "latest",
     "typescript": "latest",
-    "web-streams-polyfill": "latest",
     "webpack": "latest",
     "webpack-cli": "latest"
   },

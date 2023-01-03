@@ -3,7 +3,7 @@ import { encode, decode } from "@msgpack/msgpack";
 
 describe("encode", () => {
   context("sortKeys", () => {
-    it("canonicalizes encoded binaries", () => {
+    it("cannonicalizes encoded binaries", () => {
       assert.deepStrictEqual(encode({ a: 1, b: 2 }, { sortKeys: true }), encode({ b: 2, a: 1 }, { sortKeys: true }));
     });
   });
