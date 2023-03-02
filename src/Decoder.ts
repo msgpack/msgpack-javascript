@@ -13,9 +13,7 @@ const STATE_MAP_VALUE = "map_value";
 type MapKeyType = string | number;
 
 const isValidMapKeyType = (key: unknown): key is MapKeyType => {
-  const keyType = typeof key;
-
-  return keyType === "string" || keyType === "number";
+  return typeof key === "string" || typeof key === "number";
 };
 
 type StackMapState = {
