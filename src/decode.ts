@@ -1,4 +1,5 @@
 import { Decoder } from "./Decoder";
+import type { IntMode } from "./utils/int";
 import type { ExtensionCodecType } from "./ExtensionCodec";
 import type { ContextOf, SplitUndefined } from "./context";
 
@@ -36,6 +37,13 @@ export type DecodeOptions<ContextType = undefined> = Readonly<
      * Defaults to 4_294_967_295 (UINT32_MAX).
      */
     maxExtLength: number;
+    /**
+     * Determines whether decoded integers should be returned as numbers or bigints.
+     * 
+     * Defaults to IntMode.UNSAFE_NUMBER, which always returns the value as a number, even when it
+     * is outside the range of Number.MIN_SAFE_INTEGER to Number.MAX_SAFE_INTEGER.
+     */
+    intMode: IntMode;
   }>
 > &
   ContextOf<ContextType>;
@@ -63,6 +71,7 @@ export function decode<ContextType = undefined>(
     options.maxArrayLength,
     options.maxMapLength,
     options.maxExtLength,
+    options.intMode,
   );
   return decoder.decode(buffer);
 }
@@ -86,6 +95,7 @@ export function decodeMulti<ContextType = undefined>(
     options.maxArrayLength,
     options.maxMapLength,
     options.maxExtLength,
+    options.intMode,
   );
   return decoder.decodeMulti(buffer);
 }

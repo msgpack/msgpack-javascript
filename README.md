@@ -42,6 +42,7 @@ deepStrictEqual(decode(encoded), object);
     - [`EncodeOptions`](#encodeoptions)
   - [`decode(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--buffersource-options-decodeoptions-unknown)
     - [`DecodeOptions`](#decodeoptions)
+      - [`IntMode`](#intmode)
   - [`decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): Generator<unknown, void, unknown>`](#decodemultibuffer-arraylikenumber--buffersource-options-decodeoptions-generatorunknown-void-unknown)
   - [`decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-promiseunknown)
   - [`decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-asynciterableunknown)
@@ -49,7 +50,6 @@ deepStrictEqual(decode(encoded), object);
   - [Reusing Encoder and Decoder instances](#reusing-encoder-and-decoder-instances)
 - [Extension Types](#extension-types)
     - [ExtensionCodec context](#extensioncodec-context)
-    - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
     - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
 - [Decoding a Blob](#decoding-a-blob)
 - [MessagePack Specification](#messagepack-specification)
@@ -148,9 +148,21 @@ maxBinLength | number | `4_294_967_295` (UINT32_MAX)
 maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
 maxMapLength | number | `4_294_967_295` (UINT32_MAX)
 maxExtLength | number | `4_294_967_295` (UINT32_MAX)
+intMode | `IntMode` | `IntMode.UNSAFE_NUMBER`
 context | user-defined | -
 
 You can use `max${Type}Length` to limit the length of each type decoded.
+
+`intMode` determines whether decoded integers should be returned as numbers or bigints. The possible values are described below.
+
+##### `IntMode`
+
+The `IntMode` enum defines different options for decoding integers. They are described below:
+
+- `IntMode.UNSAFE_NUMBER`: Always returns the value as a number. Be aware that there will be a loss of precision if the value is outside the range of `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER`.
+- `IntMode.SAFE_NUMBER`: Always returns the value as a number, but throws an error if the value is outside of the range of `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER`.
+- `IntMode.MIXED`: Returns all values inside the range of `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER` as numbers and all values outside that range as bigints.
+- `IntMode.BIGINT`: Always returns the value as a bigint, even if it is small enough to safely fit in a number.
 
 ### `decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): Generator<unknown, void, unknown>`
 
@@ -346,39 +358,6 @@ const encoded = = encode({myType: new MyType<any>()}, { extensionCodec, context 
 const decoded = decode(encoded, { extensionCodec, context });
 ```
 
-#### Handling BigInt with ExtensionCodec
-
-This library does not handle BigInt by default, but you can handle it with `ExtensionCodec` like this:
-
-```typescript
-import { deepStrictEqual } from "assert";
-import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
-
-const BIGINT_EXT_TYPE = 0; // Any in 0-127
-const extensionCodec = new ExtensionCodec();
-extensionCodec.register({
-    type: BIGINT_EXT_TYPE,
-    encode: (input: unknown) => {
-        if (typeof input === "bigint") {
-            if (input <= Number.MAX_SAFE_INTEGER && input >= Number.MIN_SAFE_INTEGER) {
-                return encode(parseInt(input.toString(), 10));
-            } else {
-                return encode(input.toString());
-            }
-        } else {
-            return null;
-        }
-    },
-    decode: (data: Uint8Array) => {
-        return BigInt(decode(data));
-    },
-});
-
-const value = BigInt(Number.MAX_SAFE_INTEGER) + BigInt(1);
-const encoded: = encode(value, { extensionCodec });
-deepStrictEqual(decode(encoded, { extensionCodec }), value);
-```
-
 #### The temporal module as timestamp extensions
 
 There is a proposal for a new date/time representations in JavaScript:
@@ -468,18 +447,20 @@ Source Value|MessagePack Format|Value Decoded
 ----|----|----
 null, undefined|nil|null (*1)
 boolean (true, false)|bool family|boolean (true, false)
-number (53-bit int)|int family|number (53-bit int)
+number (53-bit int)|int family|number or bigint (*2)
 number (64-bit float)|float family|number (64-bit float)
+bigint|int family|number or bigint (*2)
 string|str family|string
-ArrayBufferView |bin family|Uint8Array (*2)
+ArrayBufferView |bin family|Uint8Array (*3)
 Array|array family|Array
-Object|map family|Object (*3)
-Date|timestamp ext family|Date (*4)
+Object|map family|Object (*4)
+Date|timestamp ext family|Date (*5)
 
 * *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
-* *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
-* *3 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
-* *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
+* *2 MessagePack ints are decoded as either numbers or bigints depending on the [IntMode](#intmode) used during decoding.
+* *3 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
+* *4 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
+* *5 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
 
 ## Prerequisites
 

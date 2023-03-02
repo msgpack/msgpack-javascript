@@ -1,5 +1,5 @@
 import assert from "assert";
-import { setInt64, getInt64, getUint64, setUint64 } from "../src/utils/int";
+import { IntMode, setInt64, getInt64, getUint64, setUint64 } from "../src/utils/int";
 
 const INT64SPECS = {
   ZERO: 0,
@@ -22,7 +22,12 @@ describe("codec: int64 / uint64", () => {
         const b = new Uint8Array(8);
         const view = new DataView(b.buffer);
         setInt64(view, 0, value);
-        assert.deepStrictEqual(getInt64(view, 0), value);
+        assert.deepStrictEqual(getInt64(view, 0, IntMode.UNSAFE_NUMBER), value);
+        assert.deepStrictEqual(getInt64(view, 0, IntMode.SAFE_NUMBER), value);
+        if (typeof BigInt !== "undefined") {
+          assert.deepStrictEqual(getInt64(view, 0, IntMode.MIXED), value);
+          assert.deepStrictEqual(getInt64(view, 0, IntMode.BIGINT), BigInt(value));
+        }
       });
     }
   });
@@ -32,14 +37,24 @@ describe("codec: int64 / uint64", () => {
       const b = new Uint8Array(8);
       const view = new DataView(b.buffer);
       setUint64(view, 0, 0);
-      assert.deepStrictEqual(getUint64(view, 0), 0);
+      assert.deepStrictEqual(getUint64(view, 0, IntMode.UNSAFE_NUMBER), 0);
+      assert.deepStrictEqual(getUint64(view, 0, IntMode.SAFE_NUMBER), 0);
+      if (typeof BigInt !== "undefined") {
+        assert.deepStrictEqual(getUint64(view, 0, IntMode.MIXED), 0);
+        assert.deepStrictEqual(getUint64(view, 0, IntMode.BIGINT), BigInt(0));
+      }
     });
 
     it(`sets and gets MAX_SAFE_INTEGER`, () => {
       const b = new Uint8Array(8);
       const view = new DataView(b.buffer);
       setUint64(view, 0, Number.MAX_SAFE_INTEGER);
-      assert.deepStrictEqual(getUint64(view, 0), Number.MAX_SAFE_INTEGER);
+      assert.deepStrictEqual(getUint64(view, 0, IntMode.UNSAFE_NUMBER), Number.MAX_SAFE_INTEGER);
+      assert.deepStrictEqual(getUint64(view, 0, IntMode.SAFE_NUMBER), Number.MAX_SAFE_INTEGER);
+      if (typeof BigInt !== "undefined") {
+        assert.deepStrictEqual(getUint64(view, 0, IntMode.MIXED), Number.MAX_SAFE_INTEGER);
+        assert.deepStrictEqual(getUint64(view, 0, IntMode.BIGINT), BigInt(Number.MAX_SAFE_INTEGER));
+      }
     });
   });
 });
