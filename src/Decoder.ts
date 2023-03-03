@@ -38,7 +38,17 @@ const HEAD_BYTE_REQUIRED = -1;
 const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
 const EMPTY_BYTES = new Uint8Array(EMPTY_VIEW.buffer);
 
+try {
+  // IE11: The spec says it should throw RangeError,
+  // IE11: but in IE11 it throws TypeError.
+  EMPTY_VIEW.getInt8(0);
+} catch (e) {
+  if (!(e instanceof RangeError)) {
+    throw new Error("This module is not supported in the current JavaScript engine because DataView does not throw RangeError on out-of-bounds access");
+  }
+}
 export const DataViewIndexOutOfBoundsError = RangeError;
+
 const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
