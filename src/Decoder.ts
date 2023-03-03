@@ -38,19 +38,7 @@ const HEAD_BYTE_REQUIRED = -1;
 const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
 const EMPTY_BYTES = new Uint8Array(EMPTY_VIEW.buffer);
 
-// IE11: Hack to support IE11.
-// IE11: Drop this hack and just use RangeError when IE11 is obsolete.
-export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
-  try {
-    // IE11: The spec says it should throw RangeError,
-    // IE11: but in IE11 it throws TypeError.
-    EMPTY_VIEW.getInt8(0);
-  } catch (e: any) {
-    return e.constructor;
-  }
-  throw new Error("never reached");
-})();
-
+export const DataViewIndexOutOfBoundsError = RangeError;
 const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
