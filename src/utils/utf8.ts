@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import { UINT32_MAX } from "./int";
 
 export function utf8Count(str: string): number {
   const strLength = str.length;
@@ -88,9 +86,14 @@ export function utf8EncodeJs(str: string, output: Uint8Array, outputOffset: numb
 // https://encoding.spec.whatwg.org/
 // and available in all the modern browsers:
 // https://caniuse.com/textencoder
+// They are available in Node.js since v12 LTS as well:
+// https://nodejs.org/api/globals.html#textencoder
 
 const sharedTextEncoder = new TextEncoder();
-const TEXT_ENCODER_THRESHOLD = 200;
+
+// This threshold should be determined by benchmarking, which might vary in engines and input data.
+// Run `npx ts-node benchmark/encode-string.ts` for details.
+const TEXT_ENCODER_THRESHOLD = 50;
 
 export function utf8EncodeTE(str: string, output: Uint8Array, outputOffset: number): void {
   sharedTextEncoder.encodeInto(str, output.subarray(outputOffset));
@@ -156,6 +159,9 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
 }
 
 const sharedTextDecoder = new TextDecoder();
+
+// This threshold should be determined by benchmarking, which might vary in engines and input data.
+// Run `npx ts-node benchmark/decode-string.ts` for details.
 const TEXT_DECODER_THRESHOLD = 200;
 
 export function utf8DecodeTD(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
