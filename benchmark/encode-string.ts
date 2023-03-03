@@ -5,7 +5,7 @@ import { utf8EncodeJs, utf8Count, utf8EncodeTE } from "../src/utils/utf8";
 import Benchmark from "benchmark";
 
 for (const baseStr of ["A", "あ", "🌏"]) {
-  const dataSet = [10, 100, 200, 1_000, 10_000, 100_000].map((n) => {
+  const dataSet = [10, 30, 50, 100].map((n) => {
     return baseStr.repeat(n);
   });
 
@@ -13,7 +13,7 @@ for (const baseStr of ["A", "あ", "🌏"]) {
     const byteLength = utf8Count(str);
     const buffer = new Uint8Array(byteLength);
 
-    console.log(`\n## string "${baseStr}" x ${str.length} (byteLength=${byteLength})\n`);
+    console.log(`\n## string "${baseStr}" (strLength=${str.length}, byteLength=${byteLength})\n`);
 
     const suite = new Benchmark.Suite();
 

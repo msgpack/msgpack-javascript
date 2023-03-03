@@ -1,7 +1,7 @@
 import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { getInt64, getUint64, UINT32_MAX } from "./utils/int";
-import { utf8DecodeJs, TEXT_DECODER_THRESHOLD, utf8DecodeTD } from "./utils/utf8";
+import { utf8Decode } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
 import { DecodeError } from "./DecodeError";
@@ -38,18 +38,16 @@ const HEAD_BYTE_REQUIRED = -1;
 const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
 const EMPTY_BYTES = new Uint8Array(EMPTY_VIEW.buffer);
 
-// IE11: Hack to support IE11.
-// IE11: Drop this hack and just use RangeError when IE11 is obsolete.
-export const DataViewIndexOutOfBoundsError: typeof Error = (() => {
-  try {
-    // IE11: The spec says it should throw RangeError,
-    // IE11: but in IE11 it throws TypeError.
-    EMPTY_VIEW.getInt8(0);
-  } catch (e: any) {
-    return e.constructor;
+try {
+  // IE11: The spec says it should throw RangeError,
+  // IE11: but in IE11 it throws TypeError.
+  EMPTY_VIEW.getInt8(0);
+} catch (e) {
+  if (!(e instanceof RangeError)) {
+    throw new Error("This module is not supported in the current JavaScript engine because DataView does not throw RangeError on out-of-bounds access");
   }
-  throw new Error("never reached");
-})();
+}
+export const DataViewIndexOutOfBoundsError = RangeError;
 
 const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 
@@ -507,10 +505,8 @@ export class Decoder<ContextType = undefined> {
     let object: string;
     if (this.stateIsMapKey() && this.keyDecoder?.canBeCached(byteLength)) {
       object = this.keyDecoder.decode(this.bytes, offset, byteLength);
-    } else if (byteLength > TEXT_DECODER_THRESHOLD) {
-      object = utf8DecodeTD(this.bytes, offset, byteLength);
     } else {
-      object = utf8DecodeJs(this.bytes, offset, byteLength);
+      object = utf8Decode(this.bytes, offset, byteLength);
     }
     this.pos += headerOffset + byteLength;
     return object;
