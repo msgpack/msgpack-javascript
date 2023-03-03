@@ -1,4 +1,4 @@
-import { utf8EncodeJs, utf8Count, TEXT_ENCODER_THRESHOLD, utf8EncodeTE } from "./utils/utf8";
+import { utf8Count, utf8Encode } from "./utils/utf8";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
@@ -177,21 +177,12 @@ export class Encoder<ContextType = undefined> {
 
   private encodeString(object: string) {
     const maxHeaderSize = 1 + 4;
-    const strLength = object.length;
 
-    if (strLength > TEXT_ENCODER_THRESHOLD) {
-      const byteLength = utf8Count(object);
-      this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
-      this.writeStringHeader(byteLength);
-      utf8EncodeTE(object, this.bytes, this.pos);
-      this.pos += byteLength;
-    } else {
-      const byteLength = utf8Count(object);
-      this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
-      this.writeStringHeader(byteLength);
-      utf8EncodeJs(object, this.bytes, this.pos);
-      this.pos += byteLength;
-    }
+    const byteLength = utf8Count(object);
+    this.ensureBufferSizeToWrite(maxHeaderSize + byteLength);
+    this.writeStringHeader(byteLength);
+    utf8Encode(object, this.bytes, this.pos);
+    this.pos += byteLength;
   }
 
   private encodeObject(object: unknown, depth: number) {

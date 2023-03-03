@@ -1,6 +1,6 @@
 {
-  "include": ["src/**/*.ts"],
-  "extension": [".ts"],
+  "include": ["src/**/*.ts", "src/**/*.mts"],
+  "extension": [".ts", ".mtx"],
   "reporter": [],
   "sourceMap": true,
   "instrument": true
