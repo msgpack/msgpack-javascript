@@ -84,18 +84,17 @@ export function utf8EncodeJs(str: string, output: Uint8Array, outputOffset: numb
   }
 }
 
+// TextEncoder and TextDecoder are standardized in whatwg encoding:
+// https://encoding.spec.whatwg.org/
+// and available in all the modern browsers:
+// https://caniuse.com/textencoder
+
 const sharedTextEncoder = new TextEncoder();
 const TEXT_ENCODER_THRESHOLD = 200;
 
-function utf8EncodeTEencode(str: string, output: Uint8Array, outputOffset: number): void {
-  output.set(sharedTextEncoder.encode(str), outputOffset);
-}
-
-function utf8EncodeTEencodeInto(str: string, output: Uint8Array, outputOffset: number): void {
+export function utf8EncodeTE(str: string, output: Uint8Array, outputOffset: number): void {
   sharedTextEncoder.encodeInto(str, output.subarray(outputOffset));
 }
-
-export const utf8EncodeTE = (sharedTextEncoder.encodeInto as unknown) ? utf8EncodeTEencodeInto : utf8EncodeTEencode;
 
 export function utf8Encode(str: string, output: Uint8Array, outputOffset: number): void {
   if (str.length > TEXT_ENCODER_THRESHOLD) {
