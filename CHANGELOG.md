@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## NEXT
+
+* Drop IE11 support ([#221](https://github.com/msgpack/msgpack-javascript/pull/221))
+  * It also fixes [feature request: option to disable TEXT_ENCODING env check #219](https://github.com/msgpack/msgpack-javascript/issues/219)
+*
+
 ## 2.8.0 2022-09-02
 
 * Let `Encoder#encode()` return a copy of the internal buffer, instead of the reference of the buffer (fix #212).
