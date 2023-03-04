@@ -7,6 +7,16 @@ export type EncodeOptions<ContextType = undefined> = Partial<
     extensionCodec: ExtensionCodecType<ContextType>;
 
     /**
+     * Encodes bigint as Int64 or Uint64 if it's set to true.
+     * {@link forceIntegerToFloat} does not affect bigint.
+     * Depends on ES2020's {@link DataView#setBigInt64} and
+     * {@link DataView#setBigUint64}.
+     *
+     * Defaults to false.
+     */
+    useBigInt64: boolean;
+
+    /**
      * The maximum depth in nested objects and arrays.
      *
      * Defaults to 100.
@@ -70,6 +80,7 @@ export function encode<ContextType = undefined>(
   const encoder = new Encoder(
     options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.useBigInt64,
     options.maxDepth,
     options.initialBufferSize,
     options.sortKeys,

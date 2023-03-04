@@ -1,6 +1,9 @@
 import assert from "assert";
 import { encode, decode, ExtensionCodec, DecodeError } from "../src";
 
+// This test is provided for backward compatibility since this library now has
+// native bigint support with `useBigInt64: true` option.
+
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
   type: 0,

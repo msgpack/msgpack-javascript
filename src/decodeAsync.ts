@@ -18,6 +18,7 @@ import type { SplitUndefined } from "./context";
   const decoder = new Decoder(
     options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.useBigInt64,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
@@ -40,6 +41,7 @@ import type { SplitUndefined } from "./context";
   const decoder = new Decoder(
     options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.useBigInt64,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
@@ -63,6 +65,7 @@ export function decodeMultiStream<ContextType>(
   const decoder = new Decoder(
     options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.useBigInt64,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,

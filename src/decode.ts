@@ -7,6 +7,15 @@ export type DecodeOptions<ContextType = undefined> = Readonly<
     extensionCodec: ExtensionCodecType<ContextType>;
 
     /**
+     * Decodes Int64 and Uint64 as bigint if it's set to true.
+     * Depends on ES2020's {@link DataView#getBigInt64} and
+     * {@link DataView#getBigUint64}.
+     *
+     * Defaults to false.
+     */
+    useBigInt64: boolean;
+
+    /**
      * Maximum string length.
      *
      * Defaults to 4_294_967_295 (UINT32_MAX).
@@ -58,6 +67,7 @@ export function decode<ContextType = undefined>(
   const decoder = new Decoder(
     options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.useBigInt64,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
@@ -81,6 +91,7 @@ export function decodeMulti<ContextType = undefined>(
   const decoder = new Decoder(
     options.extensionCodec,
     (options as typeof options & { context: any }).context,
+    options.useBigInt64,
     options.maxStrLength,
     options.maxBinLength,
     options.maxArrayLength,
