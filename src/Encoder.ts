@@ -15,6 +15,7 @@ export class Encoder<ContextType = undefined> {
   public constructor(
     private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
     private readonly context: ContextType = undefined as any,
+    private readonly useBigInt64 = false,
     private readonly maxDepth = DEFAULT_MAX_DEPTH,
     private readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
     private readonly sortKeys = false,
@@ -57,9 +58,15 @@ export class Encoder<ContextType = undefined> {
     } else if (typeof object === "boolean") {
       this.encodeBoolean(object);
     } else if (typeof object === "number") {
-      this.encodeNumber(object);
+      if (!this.forceIntegerToFloat) {
+        this.encodeNumber(object);
+      } else {
+        this.encodeNumberAsFloat(object);
+      }
     } else if (typeof object === "string") {
       this.encodeString(object);
+    } else if (this.useBigInt64 && typeof object === "bigint") {
+      this.encodeBigInt64(object);
     } else {
       this.encodeObject(object, depth);
     }
@@ -95,8 +102,9 @@ export class Encoder<ContextType = undefined> {
       this.writeU8(0xc3);
     }
   }
-  private encodeNumber(object: number) {
-    if (Number.isSafeInteger(object) && !this.forceIntegerToFloat) {
+
+  private encodeNumber(object: number): void {
+    if (!this.forceIntegerToFloat && Number.isSafeInteger(object)) {
       if (object >= 0) {
         if (object < 0x80) {
           // positive fixint
@@ -113,10 +121,12 @@ export class Encoder<ContextType = undefined> {
           // uint 32
           this.writeU8(0xce);
           this.writeU32(object);
-        } else {
+        } else if (!this.useBigInt64) {
           // uint 64
           this.writeU8(0xcf);
           this.writeU64(object);
+        } else {
+          this.encodeNumberAsFloat(object);
         }
       } else {
         if (object >= -0x20) {
@@ -134,23 +144,40 @@ export class Encoder<ContextType = undefined> {
           // int 32
           this.writeU8(0xd2);
           this.writeI32(object);
-        } else {
+        } else if (!this.useBigInt64) {
           // int 64
           this.writeU8(0xd3);
           this.writeI64(object);
+        } else {
+          this.encodeNumberAsFloat(object);
         }
       }
     } else {
-      // non-integer numbers
-      if (this.forceFloat32) {
-        // float 32
-        this.writeU8(0xca);
-        this.writeF32(object);
-      } else {
-        // float 64
-        this.writeU8(0xcb);
-        this.writeF64(object);
-      }
+      this.encodeNumberAsFloat(object);
+    }
+  }
+
+  private encodeNumberAsFloat(object: number): void {
+    if (this.forceFloat32) {
+      // float 32
+      this.writeU8(0xca);
+      this.writeF32(object);
+    } else {
+      // float 64
+      this.writeU8(0xcb);
+      this.writeF64(object);
+    }
+  }
+
+  private encodeBigInt64(object: bigint): void {
+    if (object >= BigInt(0)) {
+      // uint 64
+      this.writeU8(0xcf);
+      this.writeBigUint64(object);
+    } else {
+      // int 64
+      this.writeU8(0xd3);
+      this.writeBigInt64(object);
     }
   }
 
@@ -377,12 +404,14 @@ export class Encoder<ContextType = undefined> {
 
   private writeF32(value: number) {
     this.ensureBufferSizeToWrite(4);
+
     this.view.setFloat32(this.pos, value);
     this.pos += 4;
   }
 
   private writeF64(value: number) {
     this.ensureBufferSizeToWrite(8);
+
     this.view.setFloat64(this.pos, value);
     this.pos += 8;
   }
@@ -398,6 +427,20 @@ export class Encoder<ContextType = undefined> {
     this.ensureBufferSizeToWrite(8);
 
     setInt64(this.view, this.pos, value);
+    this.pos += 8;
+  }
+
+  private writeBigUint64(value: bigint) {
+    this.ensureBufferSizeToWrite(8);
+
+    this.view.setBigUint64(this.pos, value);
+    this.pos += 8;
+  }
+
+  private writeBigInt64(value: bigint) {
+    this.ensureBufferSizeToWrite(8);
+
+    this.view.setBigInt64(this.pos, value);
     this.pos += 8;
   }
 }

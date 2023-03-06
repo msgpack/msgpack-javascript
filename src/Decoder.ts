@@ -65,6 +65,7 @@ export class Decoder<ContextType = undefined> {
   public constructor(
     private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
     private readonly context: ContextType = undefined as any,
+    private readonly useBigInt64 = false,
     private readonly maxStrLength = UINT32_MAX,
     private readonly maxBinLength = UINT32_MAX,
     private readonly maxArrayLength = UINT32_MAX,
@@ -277,7 +278,11 @@ export class Decoder<ContextType = undefined> {
         object = this.readU32();
       } else if (headByte === 0xcf) {
         // uint 64
-        object = this.readU64();
+        if (this.useBigInt64) {
+          object = this.readU64AsBigInt();
+        } else {
+          object = this.readU64();
+        }
       } else if (headByte === 0xd0) {
         // int 8
         object = this.readI8();
@@ -289,7 +294,11 @@ export class Decoder<ContextType = undefined> {
         object = this.readI32();
       } else if (headByte === 0xd3) {
         // int 64
-        object = this.readI64();
+        if (this.useBigInt64) {
+          object = this.readI64AsBigInt();
+        } else {
+          object = this.readI64();
+        }
       } else if (headByte === 0xd9) {
         // str 8
         const byteLength = this.lookU8();
@@ -601,6 +610,18 @@ export class Decoder<ContextType = undefined> {
 
   private readI64(): number {
     const value = getInt64(this.view, this.pos);
+    this.pos += 8;
+    return value;
+  }
+
+  private readU64AsBigInt(): bigint {
+    const value = this.view.getBigUint64(this.pos);
+    this.pos += 8;
+    return value;
+  }
+
+  private readI64AsBigInt(): bigint {
+    const value = this.view.getBigInt64(this.pos);
     this.pos += 8;
     return value;
   }
