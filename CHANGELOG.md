@@ -1,6 +1,8 @@
 # This is the revision history of @msgpack/msgpack
 
-## NEXT
+## 3.0.0-beta1
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.8.0...v3.0.0-beta1
 
 * Add an option `useBigInt64` to map JavaScript's BigInt to MessagePack's int64 and uint64 ([#223](https://github.com/msgpack/msgpack-javascript/pull/223))
 * Drop IE11 support ([#221](https://github.com/msgpack/msgpack-javascript/pull/221))
@@ -8,6 +10,8 @@
 *
 
 ## 2.8.0 2022-09-02
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.7.2...v2.8.0
 
 * Let `Encoder#encode()` return a copy of the internal buffer, instead of the reference of the buffer (fix #212).
   * Introducing `Encoder#encodeSharedRef()` to return the shared reference to the internal buffer.
