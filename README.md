@@ -233,7 +233,7 @@ This function is available since v2.4.0; previously it was called as `decodeStre
 
 ### Reusing Encoder and Decoder instances
 
-`Encoder` and `Decoder` classes is provided to have better performance by reusing instances:
+`Encoder` and `Decoder` classes are provided to have better performance by reusing instances:
 
 ```typescript
 import { deepStrictEqual } from "assert";
@@ -250,6 +250,8 @@ According to our benchmark, reusing `Encoder` instance is about 20% faster
 than `encode()` function, and reusing `Decoder` instance is about 2% faster
 than `decode()` function. Note that the result should vary in environments
 and data structure.
+
+`Encoder` and `Decoder` take the same options as `encode()` and `decode()` respectively.
 
 ## Extension Types
 
