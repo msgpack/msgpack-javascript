@@ -1,71 +1,16 @@
 import { Encoder } from "./Encoder";
-import type { ExtensionCodecType } from "./ExtensionCodec";
-import type { ContextOf, SplitUndefined } from "./context";
+import type { EncoderOptions } from "./Encoder";
+import type { SplitUndefined } from "./context";
 
-export type EncodeOptions<ContextType = undefined> = Partial<
-  Readonly<{
-    extensionCodec: ExtensionCodecType<ContextType>;
+/**
+ * @deprecated Use {@link EncoderOptions} instead.
+ */
+export type EncodeOptions = never;
 
-    /**
-     * Encodes bigint as Int64 or Uint64 if it's set to true.
-     * {@link forceIntegerToFloat} does not affect bigint.
-     * Depends on ES2020's {@link DataView#setBigInt64} and
-     * {@link DataView#setBigUint64}.
-     *
-     * Defaults to false.
-     */
-    useBigInt64: boolean;
-
-    /**
-     * The maximum depth in nested objects and arrays.
-     *
-     * Defaults to 100.
-     */
-    maxDepth: number;
-
-    /**
-     * The initial size of the internal buffer.
-     *
-     * Defaults to 2048.
-     */
-    initialBufferSize: number;
-
-    /**
-     * If `true`, the keys of an object is sorted. In other words, the encoded
-     * binary is canonical and thus comparable to another encoded binary.
-     *
-     * Defaults to `false`. If enabled, it spends more time in encoding objects.
-     */
-    sortKeys: boolean;
-    /**
-     * If `true`, non-integer numbers are encoded in float32, not in float64 (the default).
-     *
-     * Only use it if precisions don't matter.
-     *
-     * Defaults to `false`.
-     */
-    forceFloat32: boolean;
-
-    /**
-     * If `true`, an object property with `undefined` value are ignored.
-     * e.g. `{ foo: undefined }` will be encoded as `{}`, as `JSON.stringify()` does.
-     *
-     * Defaults to `false`. If enabled, it spends more time in encoding objects.
-     */
-    ignoreUndefined: boolean;
-
-    /**
-     * If `true`, integer numbers are encoded as floating point numbers,
-     * with the `forceFloat32` option taken into account.
-     *
-     * Defaults to `false`.
-     */
-    forceIntegerToFloat: boolean;
-  }>
-> &
-  ContextOf<ContextType>;
-
-const defaultEncodeOptions: EncodeOptions = {};
+/**
+ * @deprecated No longer supported.
+ */
+export const defaultEncodeOptions: never = undefined as never;
 
 /**
  * It encodes `value` in the MessagePack format and
@@ -75,18 +20,8 @@ const defaultEncodeOptions: EncodeOptions = {};
  */
 export function encode<ContextType = undefined>(
   value: unknown,
-  options: EncodeOptions<SplitUndefined<ContextType>> = defaultEncodeOptions as any,
+  options?: EncoderOptions<SplitUndefined<ContextType>>,
 ): Uint8Array {
-  const encoder = new Encoder(
-    options.extensionCodec,
-    (options as typeof options & { context: any }).context,
-    options.useBigInt64,
-    options.maxDepth,
-    options.initialBufferSize,
-    options.sortKeys,
-    options.forceFloat32,
-    options.ignoreUndefined,
-    options.forceIntegerToFloat,
-  );
+  const encoder = new Encoder(options);
   return encoder.encodeSharedRef(value);
 }

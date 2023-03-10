@@ -14,13 +14,18 @@ import { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream } from 
 export { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream };
 
 import { Decoder, DataViewIndexOutOfBoundsError } from "./Decoder";
+export { Decoder, DataViewIndexOutOfBoundsError };
+import type { DecoderOptions } from "./Decoder";
+export type { DecoderOptions };
 import { DecodeError } from "./DecodeError";
-export { Decoder, DecodeError, DataViewIndexOutOfBoundsError };
+export { DecodeError };
 
 import { Encoder } from "./Encoder";
 export { Encoder };
+import type { EncoderOptions } from "./Encoder";
+export type { EncoderOptions };
 
-// Utilitiies for Extension Types:
+// Utilities for Extension Types:
 
 import { ExtensionCodec } from "./ExtensionCodec";
 export { ExtensionCodec };

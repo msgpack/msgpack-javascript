@@ -1,55 +1,16 @@
 import { Decoder } from "./Decoder";
-import type { ExtensionCodecType } from "./ExtensionCodec";
-import type { ContextOf, SplitUndefined } from "./context";
+import type { DecoderOptions } from "./Decoder";
+import type { SplitUndefined } from "./context";
 
-export type DecodeOptions<ContextType = undefined> = Readonly<
-  Partial<{
-    extensionCodec: ExtensionCodecType<ContextType>;
+/**
+ * @deprecated Use {@link DecoderOptions} instead.
+ */
+export type DecodeOptions = never;
 
-    /**
-     * Decodes Int64 and Uint64 as bigint if it's set to true.
-     * Depends on ES2020's {@link DataView#getBigInt64} and
-     * {@link DataView#getBigUint64}.
-     *
-     * Defaults to false.
-     */
-    useBigInt64: boolean;
-
-    /**
-     * Maximum string length.
-     *
-     * Defaults to 4_294_967_295 (UINT32_MAX).
-     */
-    maxStrLength: number;
-    /**
-     * Maximum binary length.
-     *
-     * Defaults to 4_294_967_295 (UINT32_MAX).
-     */
-    maxBinLength: number;
-    /**
-     * Maximum array length.
-     *
-     * Defaults to 4_294_967_295 (UINT32_MAX).
-     */
-    maxArrayLength: number;
-    /**
-     * Maximum map length.
-     *
-     * Defaults to 4_294_967_295 (UINT32_MAX).
-     */
-    maxMapLength: number;
-    /**
-     * Maximum extension length.
-     *
-     * Defaults to 4_294_967_295 (UINT32_MAX).
-     */
-    maxExtLength: number;
-  }>
-> &
-  ContextOf<ContextType>;
-
-export const defaultDecodeOptions: DecodeOptions = {};
+/**
+ * @deprecated No longer supported.
+ */
+export const defaultDecodeOptions: never = undefined as never;
 
 /**
  * It decodes a single MessagePack object in a buffer.
@@ -62,18 +23,9 @@ export const defaultDecodeOptions: DecodeOptions = {};
  */
 export function decode<ContextType = undefined>(
   buffer: ArrayLike<number> | BufferSource,
-  options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
+  options?: DecoderOptions<SplitUndefined<ContextType>>,
 ): unknown {
-  const decoder = new Decoder(
-    options.extensionCodec,
-    (options as typeof options & { context: any }).context,
-    options.useBigInt64,
-    options.maxStrLength,
-    options.maxBinLength,
-    options.maxArrayLength,
-    options.maxMapLength,
-    options.maxExtLength,
-  );
+  const decoder = new Decoder(options);
   return decoder.decode(buffer);
 }
 
@@ -86,17 +38,8 @@ export function decode<ContextType = undefined>(
  */
 export function decodeMulti<ContextType = undefined>(
   buffer: ArrayLike<number> | BufferSource,
-  options: DecodeOptions<SplitUndefined<ContextType>> = defaultDecodeOptions as any,
+  options?: DecoderOptions<SplitUndefined<ContextType>>,
 ): Generator<unknown, void, unknown> {
-  const decoder = new Decoder(
-    options.extensionCodec,
-    (options as typeof options & { context: any }).context,
-    options.useBigInt64,
-    options.maxStrLength,
-    options.maxBinLength,
-    options.maxArrayLength,
-    options.maxMapLength,
-    options.maxExtLength,
-  );
+  const decoder = new Decoder(options);
   return decoder.decodeMulti(buffer);
 }
