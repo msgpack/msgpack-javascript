@@ -46,7 +46,7 @@
     "universal"
   ],
   "engines": {
-    "node": ">= 10"
+    "node": ">= 14"
   },
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",
