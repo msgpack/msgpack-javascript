@@ -16,7 +16,7 @@
     "prepublishOnly": "npm run test:dist",
     "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
-    "test:dist": "npm run lint && npm run test && npm run test:browser && test:deno",
+    "test:dist": "npm run lint && npm run test && npm run test:browser && npm run test:deno",
     "test:cover": "npm run cover:clean && npx nyc --no-clean npm run 'test' && npm run cover:report",
     "test:deno": "deno test test/deno_test.ts",
     "test:fuzz": "npm exec --yes -- jsfuzz@git+https://gitlab.com/gitlab-org/security-products/analyzers/fuzzers/jsfuzz.git --fuzzTime 60 --no-versifier test/decode.jsfuzz.js corpus",
