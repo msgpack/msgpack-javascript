@@ -7,7 +7,9 @@ https://github.com/msgpack/msgpack-javascript/compare/v2.8.0...v3.0.0-beta1
 * Add an option `useBigInt64` to map JavaScript's BigInt to MessagePack's int64 and uint64 ([#223](https://github.com/msgpack/msgpack-javascript/pull/223))
 * Drop IE11 support ([#221](https://github.com/msgpack/msgpack-javascript/pull/221))
   * It also fixes [feature request: option to disable TEXT_ENCODING env check #219](https://github.com/msgpack/msgpack-javascript/issues/219)
-*
+* Change the interfaces of `Encoder` and `Decoder`, and describe the interfaces in README.md ([#224](https://github.com/msgpack/msgpack-javascript/pull/224)):
+  * `new Encoder(options: EncoderOptions)`: it takes the same named-options as `encode()`
+  * `new Decoder(options: DecoderOptions)`: it takes the same named-options as `decode()`
 
 ## 2.8.0 2022-09-02
 

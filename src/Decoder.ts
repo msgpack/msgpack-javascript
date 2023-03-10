@@ -5,6 +5,61 @@ import { utf8Decode } from "./utils/utf8";
 import { createDataView, ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
 import { DecodeError } from "./DecodeError";
+import type { ContextOf } from "./context";
+
+export type DecoderOptions<ContextType = undefined> = Readonly<
+  Partial<{
+    extensionCodec: ExtensionCodecType<ContextType>;
+
+    /**
+     * Decodes Int64 and Uint64 as bigint if it's set to true.
+     * Depends on ES2020's {@link DataView#getBigInt64} and
+     * {@link DataView#getBigUint64}.
+     *
+     * Defaults to false.
+     */
+    useBigInt64: boolean;
+
+    /**
+     * Maximum string length.
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
+     */
+    maxStrLength: number;
+    /**
+     * Maximum binary length.
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
+     */
+    maxBinLength: number;
+    /**
+     * Maximum array length.
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
+     */
+    maxArrayLength: number;
+    /**
+     * Maximum map length.
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
+     */
+    maxMapLength: number;
+    /**
+     * Maximum extension length.
+     *
+     * Defaults to 4_294_967_295 (UINT32_MAX).
+     */
+    maxExtLength: number;
+
+    /**
+     * An object key decoder. Defaults to the shared instance of {@link CachedKeyDecoder}.
+     * `null` is a special value to disable the use of the key decoder at all.
+     */
+    keyDecoder: KeyDecoder | null;
+  }>
+> &
+  ContextOf<ContextType>;
+
 
 const STATE_ARRAY = "array";
 const STATE_MAP_KEY = "map_key";
@@ -54,6 +109,16 @@ const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
 
 export class Decoder<ContextType = undefined> {
+  private readonly extensionCodec: ExtensionCodecType<ContextType>;
+  private readonly context: ContextType;
+  private readonly useBigInt64: boolean;
+  private readonly maxStrLength: number;
+  private readonly maxBinLength: number;
+  private readonly maxArrayLength: number;
+  private readonly maxMapLength: number;
+  private readonly maxExtLength: number;
+  private readonly keyDecoder: KeyDecoder | null;
+
   private totalPos = 0;
   private pos = 0;
 
@@ -62,17 +127,18 @@ export class Decoder<ContextType = undefined> {
   private headByte = HEAD_BYTE_REQUIRED;
   private readonly stack: Array<StackState> = [];
 
-  public constructor(
-    private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
-    private readonly context: ContextType = undefined as any,
-    private readonly useBigInt64 = false,
-    private readonly maxStrLength = UINT32_MAX,
-    private readonly maxBinLength = UINT32_MAX,
-    private readonly maxArrayLength = UINT32_MAX,
-    private readonly maxMapLength = UINT32_MAX,
-    private readonly maxExtLength = UINT32_MAX,
-    private readonly keyDecoder: KeyDecoder | null = sharedCachedKeyDecoder,
-  ) {}
+  public constructor(options?: DecoderOptions<ContextType>) {
+    this.extensionCodec = options?.extensionCodec ?? (ExtensionCodec.defaultCodec as ExtensionCodecType<ContextType>);
+    this.context = (options as { context: ContextType } | undefined)?.context as ContextType; // needs a type assertion because EncoderOptions has no context property when ContextType is undefined
+
+    this.useBigInt64 = options?.useBigInt64 ?? false;
+    this.maxStrLength = options?.maxStrLength ?? UINT32_MAX;
+    this.maxBinLength = options?.maxBinLength ?? UINT32_MAX;
+    this.maxArrayLength = options?.maxArrayLength ?? UINT32_MAX;
+    this.maxMapLength = options?.maxMapLength ?? UINT32_MAX;
+    this.maxExtLength = options?.maxExtLength ?? UINT32_MAX;
+    this.keyDecoder = (options?.keyDecoder !== undefined) ? options.keyDecoder : sharedCachedKeyDecoder;
+  }
 
   private reinitializeState() {
     this.totalPos = 0;

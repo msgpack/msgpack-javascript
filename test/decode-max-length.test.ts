@@ -1,6 +1,6 @@
 import assert from "assert";
 import { encode, decode, decodeAsync } from "../src";
-import type { DecodeOptions } from "../src/decode";
+import type { DecoderOptions } from "../src";
 
 describe("decode with max${Type}Length specified", () => {
   async function* createStream<T>(input: T) {
@@ -9,7 +9,7 @@ describe("decode with max${Type}Length specified", () => {
 
   context("maxStrLength", () => {
     const input = encode("foo");
-    const options: DecodeOptions = { maxStrLength: 1 };
+    const options = { maxStrLength: 1 } satisfies DecoderOptions;
 
     it("throws errors (synchronous)", () => {
       assert.throws(() => {
@@ -26,7 +26,7 @@ describe("decode with max${Type}Length specified", () => {
 
   context("maxBinLength", () => {
     const input = encode(Uint8Array.from([1, 2, 3]));
-    const options: DecodeOptions = { maxBinLength: 1 };
+    const options = { maxBinLength: 1 } satisfies DecoderOptions;
 
     it("throws errors (synchronous)", () => {
       assert.throws(() => {
@@ -43,7 +43,7 @@ describe("decode with max${Type}Length specified", () => {
 
   context("maxArrayLength", () => {
     const input = encode([1, 2, 3]);
-    const options: DecodeOptions = { maxArrayLength: 1 };
+    const options = { maxArrayLength: 1 } satisfies DecoderOptions;
 
     it("throws errors (synchronous)", () => {
       assert.throws(() => {
@@ -60,7 +60,7 @@ describe("decode with max${Type}Length specified", () => {
 
   context("maxMapLength", () => {
     const input = encode({ foo: 1, bar: 1, baz: 3 });
-    const options: DecodeOptions = { maxMapLength: 1 };
+    const options = { maxMapLength: 1 } satisfies DecoderOptions;
 
     it("throws errors (synchronous)", () => {
       assert.throws(() => {
@@ -78,7 +78,7 @@ describe("decode with max${Type}Length specified", () => {
   context("maxExtType", () => {
     const input = encode(new Date());
     // timextamp ext requires at least 4 bytes.
-    const options: DecodeOptions = { maxExtLength: 1 };
+    const options = { maxExtLength: 1 } satisfies DecoderOptions;
 
     it("throws errors (synchronous)", () => {
       assert.throws(() => {

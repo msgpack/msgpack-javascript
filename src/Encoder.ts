@@ -3,26 +3,105 @@ import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 import type { ExtData } from "./ExtData";
+import type { ContextOf, SplitUndefined } from "./context";
+
 
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
 
-export class Encoder<ContextType = undefined> {
-  private pos = 0;
-  private view = new DataView(new ArrayBuffer(this.initialBufferSize));
-  private bytes = new Uint8Array(this.view.buffer);
+export type EncoderOptions<ContextType = undefined> = Partial<
+  Readonly<{
+    extensionCodec: ExtensionCodecType<ContextType>;
 
-  public constructor(
-    private readonly extensionCodec: ExtensionCodecType<ContextType> = ExtensionCodec.defaultCodec as any,
-    private readonly context: ContextType = undefined as any,
-    private readonly useBigInt64 = false,
-    private readonly maxDepth = DEFAULT_MAX_DEPTH,
-    private readonly initialBufferSize = DEFAULT_INITIAL_BUFFER_SIZE,
-    private readonly sortKeys = false,
-    private readonly forceFloat32 = false,
-    private readonly ignoreUndefined = false,
-    private readonly forceIntegerToFloat = false,
-  ) {}
+    /**
+     * Encodes bigint as Int64 or Uint64 if it's set to true.
+     * {@link forceIntegerToFloat} does not affect bigint.
+     * Depends on ES2020's {@link DataView#setBigInt64} and
+     * {@link DataView#setBigUint64}.
+     *
+     * Defaults to false.
+     */
+    useBigInt64: boolean;
+
+    /**
+     * The maximum depth in nested objects and arrays.
+     *
+     * Defaults to 100.
+     */
+    maxDepth: number;
+
+    /**
+     * The initial size of the internal buffer.
+     *
+     * Defaults to 2048.
+     */
+    initialBufferSize: number;
+
+    /**
+     * If `true`, the keys of an object is sorted. In other words, the encoded
+     * binary is canonical and thus comparable to another encoded binary.
+     *
+     * Defaults to `false`. If enabled, it spends more time in encoding objects.
+     */
+    sortKeys: boolean;
+    /**
+     * If `true`, non-integer numbers are encoded in float32, not in float64 (the default).
+     *
+     * Only use it if precisions don't matter.
+     *
+     * Defaults to `false`.
+     */
+    forceFloat32: boolean;
+
+    /**
+     * If `true`, an object property with `undefined` value are ignored.
+     * e.g. `{ foo: undefined }` will be encoded as `{}`, as `JSON.stringify()` does.
+     *
+     * Defaults to `false`. If enabled, it spends more time in encoding objects.
+     */
+    ignoreUndefined: boolean;
+
+    /**
+     * If `true`, integer numbers are encoded as floating point numbers,
+     * with the `forceFloat32` option taken into account.
+     *
+     * Defaults to `false`.
+     */
+    forceIntegerToFloat: boolean;
+  }>
+> & ContextOf<ContextType>;
+
+export class Encoder<ContextType = undefined> {
+  private readonly extensionCodec: ExtensionCodecType<ContextType>;
+  private readonly context: ContextType;
+  private readonly useBigInt64: boolean;
+  private readonly maxDepth: number;
+  private readonly initialBufferSize: number;
+  private readonly sortKeys: boolean;
+  private readonly forceFloat32: boolean;
+  private readonly ignoreUndefined: boolean;
+  private readonly forceIntegerToFloat: boolean;
+
+  private pos: number;
+  private view: DataView;
+  private bytes: Uint8Array;
+
+  public constructor(options?: EncoderOptions<ContextType>) {
+    this.extensionCodec = options?.extensionCodec ?? (ExtensionCodec.defaultCodec as ExtensionCodecType<ContextType>);
+    this.context = (options as { context: ContextType } | undefined)?.context as ContextType; // needs a type assertion because EncoderOptions has no context property when ContextType is undefined
+
+    this.useBigInt64 = options?.useBigInt64 ?? false;
+    this.maxDepth = options?.maxDepth ?? DEFAULT_MAX_DEPTH;
+    this.initialBufferSize = options?.initialBufferSize ?? DEFAULT_INITIAL_BUFFER_SIZE;
+    this.sortKeys = options?.sortKeys ?? false;
+    this.forceFloat32 = options?.forceFloat32 ?? false;
+    this.ignoreUndefined = options?.ignoreUndefined ?? false;
+    this.forceIntegerToFloat = options?.forceIntegerToFloat ?? false;
+
+    this.pos = 0;
+    this.view = new DataView(new ArrayBuffer(this.initialBufferSize));
+    this.bytes = new Uint8Array(this.view.buffer);
+  }
 
   private reinitializeState() {
     this.pos = 0;

@@ -38,14 +38,14 @@ deepStrictEqual(decode(encoded), object);
 - [Table of Contents](#table-of-contents)
 - [Install](#install)
 - [API](#api)
-  - [`encode(data: unknown, options?: EncodeOptions): Uint8Array`](#encodedata-unknown-options-encodeoptions-uint8array)
-    - [`EncodeOptions`](#encodeoptions)
-  - [`decode(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): unknown`](#decodebuffer-arraylikenumber--buffersource-options-decodeoptions-unknown)
-    - [`DecodeOptions`](#decodeoptions)
-  - [`decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): Generator<unknown, void, unknown>`](#decodemultibuffer-arraylikenumber--buffersource-options-decodeoptions-generatorunknown-void-unknown)
-  - [`decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`](#decodeasyncstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-promiseunknown)
-  - [`decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodearraystreamstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-asynciterableunknown)
-  - [`decodeMultiStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`](#decodemultistreamstream-readablestreamlikearraylikenumber--buffersource-options-decodeasyncoptions-asynciterableunknown)
+  - [`encode(data: unknown, options?: EncoderOptions): Uint8Array`](#encodedata-unknown-options-encoderoptions-uint8array)
+    - [`EncoderOptions`](#encoderoptions)
+  - [`decode(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): unknown`](#decodebuffer-arraylikenumber--buffersource-options-decoderoptions-unknown)
+    - [`DecoderOptions`](#decoderoptions)
+  - [`decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): Generator<unknown, void, unknown>`](#decodemultibuffer-arraylikenumber--buffersource-options-decoderoptions-generatorunknown-void-unknown)
+  - [`decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): Promise<unknown>`](#decodeasyncstream-readablestreamlikearraylikenumber--buffersource-options-decoderoptions-promiseunknown)
+  - [`decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): AsyncIterable<unknown>`](#decodearraystreamstream-readablestreamlikearraylikenumber--buffersource-options-decoderoptions-asynciterableunknown)
+  - [`decodeMultiStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): AsyncIterable<unknown>`](#decodemultistreamstream-readablestreamlikearraylikenumber--buffersource-options-decoderoptions-asynciterableunknown)
   - [Reusing Encoder and Decoder instances](#reusing-encoder-and-decoder-instances)
 - [Extension Types](#extension-types)
     - [ExtensionCodec context](#extensioncodec-context)
@@ -80,7 +80,7 @@ npm install @msgpack/msgpack
 
 ## API
 
-### `encode(data: unknown, options?: EncodeOptions): Uint8Array`
+### `encode(data: unknown, options?: EncoderOptions): Uint8Array`
 
 It encodes `data` into a single MessagePack-encoded object, and returns a byte array as `Uint8Array`. It throws errors if `data` is, or includes, a non-serializable object such as a `function` or a `symbol`.
 
@@ -105,7 +105,7 @@ const buffer: Buffer = Buffer.from(encoded.buffer, encoded.byteOffset, encoded.b
 console.log(buffer);
 ```
 
-#### `EncodeOptions`
+#### `EncoderOptions`
 
 Name|Type|Default
 ----|----|----
@@ -118,7 +118,7 @@ forceIntegerToFloat | boolean | false
 ignoreUndefined | boolean | false
 context | user-defined | -
 
-### `decode(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): unknown`
+### `decode(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): unknown`
 
 It decodes `buffer` that includes a MessagePack-encoded object, and returns the decoded object typed `unknown`.
 
@@ -138,7 +138,7 @@ console.log(object);
 
 NodeJS `Buffer` is also acceptable because it is a subclass of `Uint8Array`.
 
-#### `DecodeOptions`
+#### `DecoderOptions`
 
 Name|Type|Default
 ----|----|----
@@ -152,7 +152,7 @@ context | user-defined | -
 
 You can use `max${Type}Length` to limit the length of each type decoded.
 
-### `decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecodeOptions): Generator<unknown, void, unknown>`
+### `decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): Generator<unknown, void, unknown>`
 
 It decodes `buffer` that includes multiple MessagePack-encoded objects, and returns decoded objects as a generator. See also `decodeMultiStream()`, which is an asynchronous variant of this function.
 
@@ -170,13 +170,11 @@ for (const object of decodeMulti(encoded)) {
 }
 ```
 
-### `decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): Promise<unknown>`
+### `decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): Promise<unknown>`
 
 It decodes `stream`, where `ReadableStreamLike<T>` is defined as `ReadableStream<T> | AsyncIterable<T>`, in an async iterable of byte arrays, and returns decoded object as `unknown` type, wrapped in `Promise`.
 
 This function works asynchronously, and might CPU resources more efficiently compared with synchronous `decode()`, because it doesn't wait for the completion of downloading.
-
-`DecodeAsyncOptions` is the same as `DecodeOptions` for `decode()`.
 
 This function is designed to work with whatwg `fetch()` like this:
 
@@ -193,7 +191,7 @@ if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null
 } else { /* handle errors */ }
 ```
 
-### `decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): AsyncIterable<unknown>`
 
 It is alike to `decodeAsync()`, but only accepts a `stream` that includes an array of items, and emits a decoded item one by one.
 
@@ -210,7 +208,7 @@ for await (const item of decodeArrayStream(stream)) {
 }
 ```
 
-### `decodeMultiStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecodeAsyncOptions): AsyncIterable<unknown>`
+### `decodeMultiStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): AsyncIterable<unknown>`
 
 It is alike to `decodeAsync()` and `decodeArrayStream()`, but the input `stream` must consist of multiple MessagePack-encoded items. This is an asynchronous variant for `decodeMulti()`.
 
@@ -233,7 +231,7 @@ This function is available since v2.4.0; previously it was called as `decodeStre
 
 ### Reusing Encoder and Decoder instances
 
-`Encoder` and `Decoder` classes is provided to have better performance by reusing instances:
+`Encoder` and `Decoder` classes are provided to have better performance by reusing instances:
 
 ```typescript
 import { deepStrictEqual } from "assert";
@@ -250,6 +248,8 @@ According to our benchmark, reusing `Encoder` instance is about 20% faster
 than `encode()` function, and reusing `Decoder` instance is about 2% faster
 than `decode()` function. Note that the result should vary in environments
 and data structure.
+
+`Encoder` and `Decoder` take the same options as `encode()` and `decode()` respectively.
 
 ## Extension Types
 
@@ -304,7 +304,7 @@ Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128
 
 #### ExtensionCodec context
 
-When you use an extension codec, it might be necessary to have encoding/decoding state to keep track of which objects got encoded/re-created. To do this, pass a `context` to the `EncodeOptions` and `DecodeOptions`:
+When you use an extension codec, it might be necessary to have encoding/decoding state to keep track of which objects got encoded/re-created. To do this, pass a `context` to the `EncoderOptions` and `DecoderOptions`:
 
 ```typescript
 import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
