@@ -3,7 +3,7 @@ import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";
 import { ensureUint8Array } from "./utils/typedArrays";
 import type { ExtData } from "./ExtData";
-import type { ContextOf, SplitUndefined } from "./context";
+import type { ContextOf } from "./context";
 
 
 export const DEFAULT_MAX_DEPTH = 100;
