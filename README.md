@@ -2,11 +2,13 @@
 
 [![npm version](https://img.shields.io/npm/v/@msgpack/msgpack.svg)](https://www.npmjs.com/package/@msgpack/msgpack) ![CI](https://github.com/msgpack/msgpack-javascript/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/msgpack/msgpack-javascript/branch/master/graphs/badge.svg)](https://codecov.io/gh/msgpack/msgpack-javascript) [![minzip](https://badgen.net/bundlephobia/minzip/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack) [![tree-shaking](https://badgen.net/bundlephobia/tree-shaking/@msgpack/msgpack)](https://bundlephobia.com/result?p=@msgpack/msgpack)
 
-This is a JavaScript/ECMA-262 implementation of **MessagePack**, an efficient binary serilization format:
+This library is an implementation of **MessagePack** for TypeScript and JavaScript, providing a compact and efficient binary serialization format. Learn more about MessagePack at:
 
 https://msgpack.org/
 
-This library is a universal JavaScript, meaning it is compatible with all the major browsers and NodeJS. In addition, because it is implemented in [TypeScript](https://www.typescriptlang.org/), type definition files (`d.ts`) are always up-to-date and bundled in the distribution.
+This library serves as a comprehensive reference implementation of MessagePack for JavaScript with a focus on accuracy, compatibility, interoperability, and performance.
+
+Additionally, this is also a universal JavaScript library. It is compatible not only with browsers, but with Node.js or other JavaScript engines that implement ES2015+ standards. As it is written in [TypeScript](https://www.typescriptlang.org/), this library bundles up-to-date type definition files (`d.ts`).
 
 *Note that this is the second version of MessagePack for JavaScript. The first version, which was implemented in ES5 and was never released to npmjs.com, is tagged as [classic](https://github.com/msgpack/msgpack-javascript/tree/classic).*
 
