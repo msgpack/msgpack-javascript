@@ -10,7 +10,7 @@ This library serves as a comprehensive reference implementation of MessagePack f
 
 Additionally, this is also a universal JavaScript library. It is compatible not only with browsers, but with Node.js or other JavaScript engines that implement ES2015+ standards. As it is written in [TypeScript](https://www.typescriptlang.org/), this library bundles up-to-date type definition files (`d.ts`).
 
-*Note that this is the second version of MessagePack for JavaScript. The first version, which was implemented in ES5 and was never released to npmjs.com, is tagged as [classic](https://github.com/msgpack/msgpack-javascript/tree/classic).*
+*Note that this is the second edition of "MessagePack for JavaScript". The first edition, which was implemented in ES5 and never released to npmjs.com, is tagged as [`classic`](https://github.com/msgpack/msgpack-javascript/tree/classic).
 
 ## Synopsis
 
@@ -466,22 +466,46 @@ Note that as of June 2019 there're no official "version" on the MessagePack spec
 
 The following table shows how JavaScript values are mapped to [MessagePack formats](https://github.com/msgpack/msgpack/blob/master/spec.md) and vice versa.
 
+The mapping of integers varies on the setting of `useBigInt64`.
+
+The default, `useBigInt64: false` is:
+
 Source Value|MessagePack Format|Value Decoded
 ----|----|----
 null, undefined|nil|null (*1)
 boolean (true, false)|bool family|boolean (true, false)
-number (53-bit int)|int family|number (53-bit int)
-number (64-bit float)|float family|number (64-bit float)
+number (53-bit int)|int family|number
+number (64-bit float)|float family|number
 string|str family|string
 ArrayBufferView |bin family|Uint8Array (*2)
 Array|array family|Array
 Object|map family|Object (*3)
 Date|timestamp ext family|Date (*4)
+bigint|N/A|N/A (*5)
 
 * *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
 * *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
 * *3 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
 * *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
+* *5 bigint is not supported in `useBigInt64: false` mode, but you can define an extension codec for it.
+
+If you set `useBigInt64: true`, the following mapping is used:
+
+Source Value|MessagePack Format|Value Decoded
+----|----|----
+null, undefined|nil|null
+boolean (true, false)|bool family|boolean (true, false)
+**number (32-bit int)**|int family|number
+**number (except for the above)**|float family|number
+**bigint**|int64 / uint64|bigint (*6)
+string|str family|string
+ArrayBufferView |bin family|Uint8Array
+Array|array family|Array
+Object|map family|Object
+Date|timestamp ext family|Date
+
+
+* *6 If the bigint is larger than the max value of uint64 or smaller than the min value of int64, then the behavior is undefined.
 
 ## Prerequisites
 
@@ -489,21 +513,19 @@ This is a universal JavaScript library that supports major browsers and NodeJS.
 
 ### ECMA-262
 
-* ES5 language features
+* ES2015 language features
 * ES2018 standard library, including:
   * Typed arrays (ES2015)
   * Async iterations (ES2018)
-  * Features added in ES2015-ES2018
+  * Features added in ES2015-ES2022
 
-ES2018 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js).
+ES2022 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js).
 
-If you support IE11, import `core-js` in your application entrypoints, as this library does in testing for browsers.
+IE11 is no longer supported. If you'd like to use this library in IE11, use v2.x versions.
 
 ### NodeJS
 
-NodeJS v10 is required, but NodeJS v12 or later is recommended because it includes the V8 feature of [Improving DataView performance in V8](https://v8.dev/blog/dataview).
-
-NodeJS before v10 will work by importing `@msgpack/msgpack/dist.es5+umd/msgpack`.
+NodeJS v14 is required.
 
 ### TypeScript Compiler / Type Definitions
 
