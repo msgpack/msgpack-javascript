@@ -112,13 +112,14 @@ console.log(buffer);
 Name|Type|Default
 ----|----|----
 extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
+context | user-defined | -
+useBigInt64 | boolean | false
 maxDepth | number | `100`
 initialBufferSize | number | `2048`
 sortKeys | boolean | false
 forceFloat32 | boolean | false
 forceIntegerToFloat | boolean | false
 ignoreUndefined | boolean | false
-context | user-defined | -
 
 ### `decode(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): unknown`
 
@@ -145,12 +146,13 @@ NodeJS `Buffer` is also acceptable because it is a subclass of `Uint8Array`.
 Name|Type|Default
 ----|----|----
 extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
+context | user-defined | -
+useBigInt64 | boolean | false
 maxStrLength | number | `4_294_967_295` (UINT32_MAX)
 maxBinLength | number | `4_294_967_295` (UINT32_MAX)
 maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
 maxMapLength | number | `4_294_967_295` (UINT32_MAX)
 maxExtLength | number | `4_294_967_295` (UINT32_MAX)
-context | user-defined | -
 
 You can use `max${Type}Length` to limit the length of each type decoded.
 
@@ -350,32 +352,48 @@ const decoded = decode(encoded, { extensionCodec, context });
 
 #### Handling BigInt with ExtensionCodec
 
-This library does not handle BigInt by default, but you can handle it with `ExtensionCodec` like this:
+This library does not handle BigInt by default, but you have two options to handle it:
+
+* Set `useBigInt64: true` to map bigint to MessagePack's int64/uint64
+* Define a custom `ExtensionCodec` to map bigint to a MessagePack's extension type
+
+`useBigInt64: true` is the simplest way to handle bigint, but it has limitations:
+
+* A bigint is encoded in 8 byte binaries even if it's a small integer
+* A bigint must be smaller than the max value of the uint64 and larger than the min value of the int64. Otherwise the behavior is undefined.
+
+So you might want to define a custom codec to handle bigint like this:
 
 ```typescript
 import { deepStrictEqual } from "assert";
 import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
 
+// to define a custom codec:
 const BIGINT_EXT_TYPE = 0; // Any in 0-127
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
-    type: BIGINT_EXT_TYPE,
-    encode: (input: unknown) => {
-        if (typeof input === "bigint") {
-            if (input <= Number.MAX_SAFE_INTEGER && input >= Number.MIN_SAFE_INTEGER) {
-                return encode(parseInt(input.toString(), 10));
-            } else {
-                return encode(input.toString());
-            }
-        } else {
-            return null;
-        }
-    },
-    decode: (data: Uint8Array) => {
-        return BigInt(decode(data));
-    },
+  type: BIGINT_EXT_TYPE,
+  encode(input: unknown): Uint8Array | null {
+    if (typeof input === "bigint") {
+      if (input <= Number.MAX_SAFE_INTEGER && input >= Number.MIN_SAFE_INTEGER) {
+        return encode(Number(input));
+      } else {
+        return encode(String(input));
+      }
+    } else {
+      return null;
+    }
+  },
+  decode(data: Uint8Array): bigint {
+    const val = decode(data);
+    if (!(typeof val === "string" || typeof val === "number")) {
+      throw new DecodeError(`unexpected BigInt source: ${val} (${typeof val})`);
+    }
+    return BigInt(val);
+  },
 });
 
+// to use it:
 const value = BigInt(Number.MAX_SAFE_INTEGER) + BigInt(1);
 const encoded: = encode(value, { extensionCodec });
 deepStrictEqual(decode(encoded, { extensionCodec }), value);
@@ -401,10 +419,11 @@ import {
   decodeTimestampToTimeSpec,
 } from "@msgpack/msgpack";
 
+// to define a custom codec
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
   type: EXT_TIMESTAMP, // override the default behavior!
-  encode: (input: any) => {
+  encode(input: unknown): Uint8Array | null {
     if (input instanceof Instant) {
       const sec = input.seconds;
       const nsec = Number(input.nanoseconds - BigInt(sec) * BigInt(1e9));
@@ -413,7 +432,7 @@ extensionCodec.register({
       return null;
     }
   },
-  decode: (data: Uint8Array) => {
+  decode(data: Uint8Array): Instant {
     const timeSpec = decodeTimestampToTimeSpec(data);
     const sec = BigInt(timeSpec.sec);
     const nsec = BigInt(timeSpec.nsec);
@@ -421,6 +440,7 @@ extensionCodec.register({
   },
 });
 
+// to use it
 const instant = Instant.fromEpochMilliseconds(Date.now());
 const encoded = encode(instant, { extensionCodec });
 const decoded = decode(encoded, { extensionCodec });
@@ -518,6 +538,7 @@ This is a universal JavaScript library that supports major browsers and NodeJS.
   * Typed arrays (ES2015)
   * Async iterations (ES2018)
   * Features added in ES2015-ES2022
+* whatwg encodings (`TextEncoder` and `TextDecoder`)
 
 ES2022 standard library used in this library can be polyfilled with [core-js](https://github.com/zloirock/core-js).
 

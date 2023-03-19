@@ -6,7 +6,9 @@
     "source.fixAll.eslint": true
   },
   "cSpell.words": [
+    "instanceof",
     "tsdoc",
+    "typeof",
     "whatwg"
   ]
 }

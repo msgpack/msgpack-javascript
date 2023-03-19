@@ -1,24 +1,26 @@
 import assert from "assert";
 import { encode, decode, ExtensionCodec, DecodeError } from "../src";
 
-// This test is provided for backward compatibility since this library now has
-// native bigint support with `useBigInt64: true` option.
+// There's a built-in `useBigInt64: true` option, but a custom codec might be
+// better if you'd like to encode bigint to reduce the size of binaries.
+
+const BIGINT_EXT_TYPE = 0; // Any in 0-127
 
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({
-  type: 0,
-  encode: (input: unknown) => {
+  type: BIGINT_EXT_TYPE,
+  encode(input: unknown): Uint8Array | null {
     if (typeof input === "bigint") {
       if (input <= Number.MAX_SAFE_INTEGER && input >= Number.MIN_SAFE_INTEGER) {
-        return encode(parseInt(input.toString(), 10));
+        return encode(Number(input));
       } else {
-        return encode(input.toString());
+        return encode(String(input));
       }
     } else {
       return null;
     }
   },
-  decode: (data: Uint8Array) => {
+  decode(data: Uint8Array): bigint {
     const val = decode(data);
     if (!(typeof val === "string" || typeof val === "number")) {
       throw new DecodeError(`unexpected BigInt source: ${val} (${typeof val})`);
@@ -28,14 +30,20 @@ extensionCodec.register({
 });
 
 describe("codec BigInt", () => {
-  before(function () {
-    if (typeof BigInt === "undefined") {
-      this.skip();
-    }
-  });
-
   it("encodes and decodes 0n", () => {
     const value = BigInt(0);
+    const encoded = encode(value, { extensionCodec });
+    assert.deepStrictEqual(decode(encoded, { extensionCodec }), value);
+  });
+
+  it("encodes and decodes 100n", () => {
+    const value = BigInt(100);
+    const encoded = encode(value, { extensionCodec });
+    assert.deepStrictEqual(decode(encoded, { extensionCodec }), value);
+  });
+
+  it("encodes and decodes -100n", () => {
+    const value = BigInt(-100);
     const encoded = encode(value, { extensionCodec });
     assert.deepStrictEqual(decode(encoded, { extensionCodec }), value);
   });
