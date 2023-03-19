@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.0.0-beta2
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta1...v3.0.0-beta2
+
+* Upgrade TypeScript compiler to v5.0
+
 ## 3.0.0-beta1
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.8.0...v3.0.0-beta1
