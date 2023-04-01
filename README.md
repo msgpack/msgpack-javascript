@@ -272,13 +272,13 @@ extensionCodec.register({
   type: SET_EXT_TYPE,
   encode: (object: unknown): Uint8Array | null => {
     if (object instanceof Set) {
-      return encode([...object]);
+      return encode([...object], { extensionCodec });
     } else {
       return null;
     }
   },
   decode: (data: Uint8Array) => {
-    const array = decode(data) as Array<unknown>;
+    const array = decode(data, { extensionCodec }) as Array<unknown>;
     return new Set(array);
   },
 });
@@ -289,13 +289,13 @@ extensionCodec.register({
   type: MAP_EXT_TYPE,
   encode: (object: unknown): Uint8Array => {
     if (object instanceof Map) {
-      return encode([...object]);
+      return encode([...object], { extensionCodec });
     } else {
       return null;
     }
   },
   decode: (data: Uint8Array) => {
-    const array = decode(data) as Array<[unknown, unknown]>;
+    const array = decode(data, { extensionCodec }) as Array<[unknown, unknown]>;
     return new Map(array);
   },
 });
@@ -304,7 +304,9 @@ const encoded = encode([new Set<any>(), new Map<any, any>()], { extensionCodec }
 const decoded = decode(encoded, { extensionCodec });
 ```
 
-Not that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
+Ensure you include your extensionCodec in any recursive encode and decode statements!
+
+Note that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
 
 #### ExtensionCodec context
 
