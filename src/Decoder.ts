@@ -86,6 +86,89 @@ type StackArrayState = {
   position: number;
 };
 
+class StackPool {
+  private readonly stack: Array<StackState> = [];
+  private stackHeadPosition = -1;
+
+  public get length(): number {
+    return this.stackHeadPosition + 1;
+  }
+
+  public top(): StackState | undefined {
+    return this.stack[this.stackHeadPosition];
+  }
+
+  public pushArrayState(size: number) {
+    const state = this.getUninitializedStateFromPool() as StackArrayState;
+
+    state.type = STATE_ARRAY;
+    state.position = 0;
+    state.size = size;
+    state.array = new Array(size);
+  }
+
+  public pushMapState(size: number) {
+    const state = this.getUninitializedStateFromPool() as StackMapState;
+
+    state.type = STATE_MAP_KEY;
+    state.readCount = 0;
+    state.size = size;
+    state.map = {};
+  }
+
+  private getUninitializedStateFromPool() {
+    this.stackHeadPosition++;
+
+    if (this.stackHeadPosition === this.stack.length) {
+
+      const partialState: Partial<StackState> = {
+        type: undefined,
+        size: 0,
+        array: undefined,
+        position: 0,
+        readCount: 0,
+        map: undefined,
+        key: null,
+      };
+
+      this.stack.push(partialState as StackState)
+    }
+
+    return this.stack[this.stackHeadPosition];
+  }
+
+  public release(state: StackState): void {
+    const topStackState = this.stack[this.stackHeadPosition];
+
+    if (topStackState !== state) {
+      throw new Error("Invalid stack state. Released state is not on top of the stack.");
+    }
+
+    if (state.type === STATE_ARRAY) {
+      const partialState = state as Partial<StackArrayState>;
+      partialState.size = 0;
+      partialState.array = undefined;
+      partialState.position = 0;
+      partialState.type = undefined;
+    }
+
+    if (state.type === STATE_MAP_KEY || state.type === STATE_MAP_VALUE) {
+      const partialState = state as Partial<StackMapState>;
+      partialState.size = 0;
+      partialState.map = undefined;
+      partialState.readCount = 0;
+      partialState.type = undefined;
+    }
+
+    this.stackHeadPosition--;
+  }
+
+  public reset(): void {
+    this.stack.length = 0;
+    this.stackHeadPosition = -1;
+  }
+}
+
 type StackState = StackArrayState | StackMapState;
 
 const HEAD_BYTE_REQUIRED = -1;
@@ -125,7 +208,7 @@ export class Decoder<ContextType = undefined> {
   private view = EMPTY_VIEW;
   private bytes = EMPTY_BYTES;
   private headByte = HEAD_BYTE_REQUIRED;
-  private readonly stack: Array<StackState> = [];
+  private readonly stack = new StackPool();
 
   public constructor(options?: DecoderOptions<ContextType>) {
     this.extensionCodec = options?.extensionCodec ?? (ExtensionCodec.defaultCodec as ExtensionCodecType<ContextType>);
@@ -143,7 +226,7 @@ export class Decoder<ContextType = undefined> {
   private reinitializeState() {
     this.totalPos = 0;
     this.headByte = HEAD_BYTE_REQUIRED;
-    this.stack.length = 0;
+    this.stack.reset();
 
     // view, bytes, and pos will be re-initialized in setBuffer()
   }
@@ -465,13 +548,13 @@ export class Decoder<ContextType = undefined> {
       const stack = this.stack;
       while (stack.length > 0) {
         // arrays and maps
-        const state = stack[stack.length - 1]!;
+        const state = stack.top()!;
         if (state.type === STATE_ARRAY) {
           state.array[state.position] = object;
           state.position++;
           if (state.position === state.size) {
-            stack.pop();
             object = state.array;
+            stack.release(state);
           } else {
             continue DECODE;
           }
@@ -493,8 +576,8 @@ export class Decoder<ContextType = undefined> {
           state.readCount++;
 
           if (state.readCount === state.size) {
-            stack.pop();
             object = state.map;
+            stack.release(state);
           } else {
             state.key = null;
             state.type = STATE_MAP_KEY;
@@ -543,13 +626,7 @@ export class Decoder<ContextType = undefined> {
       throw new DecodeError(`Max length exceeded: map length (${size}) > maxMapLengthLength (${this.maxMapLength})`);
     }
 
-    this.stack.push({
-      type: STATE_MAP_KEY,
-      size,
-      key: null,
-      readCount: 0,
-      map: {},
-    });
+    this.stack.pushMapState(size);
   }
 
   private pushArrayState(size: number) {
@@ -557,12 +634,7 @@ export class Decoder<ContextType = undefined> {
       throw new DecodeError(`Max length exceeded: array length (${size}) > maxArrayLength (${this.maxArrayLength})`);
     }
 
-    this.stack.push({
-      type: STATE_ARRAY,
-      size,
-      array: new Array<unknown>(size),
-      position: 0,
-    });
+    this.stack.pushArrayState(size);
   }
 
   private decodeUtf8String(byteLength: number, headerOffset: number): string {
@@ -589,7 +661,7 @@ export class Decoder<ContextType = undefined> {
 
   private stateIsMapKey(): boolean {
     if (this.stack.length > 0) {
-      const state = this.stack[this.stack.length - 1]!;
+      const state = this.stack.top()!;
       return state.type === STATE_MAP_KEY;
     }
     return false;
