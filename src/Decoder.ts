@@ -60,7 +60,6 @@ export type DecoderOptions<ContextType = undefined> = Readonly<
 > &
   ContextOf<ContextType>;
 
-
 const STATE_ARRAY = "array";
 const STATE_MAP_KEY = "map_key";
 const STATE_MAP_VALUE = "map_value";
@@ -120,7 +119,6 @@ class StackPool {
     this.stackHeadPosition++;
 
     if (this.stackHeadPosition === this.stack.length) {
-
       const partialState: Partial<StackState> = {
         type: undefined,
         size: 0,
@@ -131,7 +129,7 @@ class StackPool {
         key: null,
       };
 
-      this.stack.push(partialState as StackState)
+      this.stack.push(partialState as StackState);
     }
 
     return this.stack[this.stackHeadPosition];
@@ -182,7 +180,9 @@ try {
   EMPTY_VIEW.getInt8(0);
 } catch (e) {
   if (!(e instanceof RangeError)) {
-    throw new Error("This module is not supported in the current JavaScript engine because DataView does not throw RangeError on out-of-bounds access");
+    throw new Error(
+      "This module is not supported in the current JavaScript engine because DataView does not throw RangeError on out-of-bounds access",
+    );
   }
 }
 export const DataViewIndexOutOfBoundsError = RangeError;
@@ -220,7 +220,7 @@ export class Decoder<ContextType = undefined> {
     this.maxArrayLength = options?.maxArrayLength ?? UINT32_MAX;
     this.maxMapLength = options?.maxMapLength ?? UINT32_MAX;
     this.maxExtLength = options?.maxExtLength ?? UINT32_MAX;
-    this.keyDecoder = (options?.keyDecoder !== undefined) ? options.keyDecoder : sharedCachedKeyDecoder;
+    this.keyDecoder = options?.keyDecoder !== undefined ? options.keyDecoder : sharedCachedKeyDecoder;
   }
 
   private reinitializeState() {

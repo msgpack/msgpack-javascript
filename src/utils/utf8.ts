@@ -1,4 +1,3 @@
-
 export function utf8Count(str: string): number {
   const strLength = str.length;
 

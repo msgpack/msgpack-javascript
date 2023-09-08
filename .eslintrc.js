@@ -48,7 +48,7 @@ module.exports = {
       { "selector": "default", "format": ["camelCase", "UPPER_CASE", "PascalCase"], "leadingUnderscore": "allow" },
       { "selector": "typeLike", "format": ["PascalCase"], "leadingUnderscore": "allow" },
     ],
-    "@typescript-eslint/restrict-plus-operands": ["warn", { "checkCompoundAssignments": true }],
+    "@typescript-eslint/restrict-plus-operands": "warn",
     "@typescript-eslint/no-throw-literal": "warn",
     "@typescript-eslint/unbound-method": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "warn",

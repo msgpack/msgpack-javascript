@@ -8,7 +8,7 @@ import type { SplitUndefined } from "./context";
  * @throws {@link RangeError} if the buffer is incomplete, including the case where the buffer is empty.
  * @throws {@link DecodeError} if the buffer contains invalid data.
  */
- export async function decodeAsync<ContextType = undefined>(
+export async function decodeAsync<ContextType = undefined>(
   streamLike: ReadableStreamLike<ArrayLike<number> | BufferSource>,
   options?: DecoderOptions<SplitUndefined<ContextType>>,
 ): Promise<unknown> {
@@ -21,7 +21,7 @@ import type { SplitUndefined } from "./context";
  * @throws {@link RangeError} if the buffer is incomplete, including the case where the buffer is empty.
  * @throws {@link DecodeError} if the buffer contains invalid data.
  */
- export function decodeArrayStream<ContextType>(
+export function decodeArrayStream<ContextType>(
   streamLike: ReadableStreamLike<ArrayLike<number> | BufferSource>,
   options?: DecoderOptions<SplitUndefined<ContextType>>,
 ): AsyncGenerator<unknown, void, unknown> {
@@ -44,6 +44,6 @@ export function decodeMultiStream<ContextType>(
 }
 
 /**
- * @deprecated Use {@link decodeMultiStream()} instead.
+ * @deprecated Use {@link decodeMultiStream} instead.
  */
 export const decodeStream: never = undefined as never;

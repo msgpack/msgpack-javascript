@@ -5,7 +5,6 @@ import { ensureUint8Array } from "./utils/typedArrays";
 import type { ExtData } from "./ExtData";
 import type { ContextOf } from "./context";
 
-
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
 
@@ -69,7 +68,8 @@ export type EncoderOptions<ContextType = undefined> = Partial<
      */
     forceIntegerToFloat: boolean;
   }>
-> & ContextOf<ContextType>;
+> &
+  ContextOf<ContextType>;
 
 export class Encoder<ContextType = undefined> {
   private readonly extensionCodec: ExtensionCodecType<ContextType>;
