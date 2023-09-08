@@ -1,4 +1,4 @@
-import assert from "assert";
+import assert from "node:assert";
 import { encode, decode, decodeAsync } from "../src";
 import type { DecoderOptions } from "../src";
 

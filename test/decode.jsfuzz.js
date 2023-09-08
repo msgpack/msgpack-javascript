@@ -1,5 +1,5 @@
 /* eslint-disable */
-const assert = require("assert");
+const assert = require("node:assert");
 const { Decoder, encode, DecodeError } = require("../dist/index.js");
 
 /**

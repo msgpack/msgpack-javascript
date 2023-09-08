@@ -1,4 +1,4 @@
-import { deepStrictEqual } from "assert";
+import { deepStrictEqual } from "node:assert";
 import { decodeAsync, encode, decodeArrayStream } from "@msgpack/msgpack";
 
 const isReadableStreamConstructorAvailable: boolean = (() => {

@@ -1,4 +1,4 @@
-import { throws } from "assert";
+import { throws } from "node:assert";
 import { encode, decode, DecodeError } from "@msgpack/msgpack";
 
 describe("prototype pollution", () => {

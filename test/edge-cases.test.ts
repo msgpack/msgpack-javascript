@@ -1,6 +1,6 @@
 // kind of hand-written fuzzing data
 // any errors should not break Encoder/Decoder instance states
-import assert from "assert";
+import assert from "node:assert";
 import { encode, decodeAsync, decode, Encoder, Decoder, decodeMulti, decodeMultiStream } from "../src";
 import { DataViewIndexOutOfBoundsError } from "../src/Decoder";
 

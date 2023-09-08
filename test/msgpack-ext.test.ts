@@ -1,4 +1,4 @@
-import assert from "assert";
+import assert from "node:assert";
 import { encode, decode, ExtData } from "../src";
 
 function seq(n: number) {
