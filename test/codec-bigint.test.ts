@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "assert";
 import { encode, decode, ExtensionCodec, DecodeError } from "../src";
 
 // There's a built-in `useBigInt64: true` option, but a custom codec might be

@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "assert";
 import { encode, decodeArrayStream } from "../src";
 
 describe("decodeArrayStream", () => {

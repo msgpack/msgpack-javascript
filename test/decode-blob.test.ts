@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "assert";
 import { encode, decode, decodeAsync } from "@msgpack/msgpack";
 
 (typeof Blob !== "undefined" ? describe : describe.skip)("Blob", () => {

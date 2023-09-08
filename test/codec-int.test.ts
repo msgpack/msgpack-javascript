@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "assert";
 import { setInt64, getInt64, getUint64, setUint64 } from "../src/utils/int";
 
 const INT64SPECS = {
