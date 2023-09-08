@@ -13,7 +13,6 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - '14'
           - '16'
           - '18'
           - '20'
@@ -44,7 +43,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         cache: npm
-        node-version: '16'
+        node-version: '18'
     - run: npm install -g npm
     - run: npm ci
     - run: npm run test:browser -- --browsers ${{ matrix.browser }}

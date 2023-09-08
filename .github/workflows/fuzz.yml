@@ -21,5 +21,6 @@ jobs:
         cache: npm
         node-version: "18"
 
+    - run: npm install -g npm
     - run: npm ci
     - run: npm run test:fuzz
