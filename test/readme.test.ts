@@ -1,4 +1,4 @@
-import { deepStrictEqual } from "node:assert";
+import { deepStrictEqual } from "assert";
 import { encode, decode } from "@msgpack/msgpack";
 
 describe("README", () => {

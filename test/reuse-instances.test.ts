@@ -1,4 +1,4 @@
-import { deepStrictEqual } from "node:assert";
+import { deepStrictEqual } from "assert";
 import { Encoder, Decoder, decode } from "@msgpack/msgpack";
 
 const createStream = async function* (...args: any) {

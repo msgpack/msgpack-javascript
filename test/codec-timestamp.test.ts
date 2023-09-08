@@ -1,5 +1,5 @@
-import assert from "node:assert";
-import util from "node:util";
+import assert from "assert";
+import util from "util";
 import {
   encode,
   decode,

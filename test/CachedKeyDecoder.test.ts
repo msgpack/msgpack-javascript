@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "assert";
 import { CachedKeyDecoder, KeyDecoder } from "../src/CachedKeyDecoder";
 import { utf8EncodeJs, utf8Count } from "../src/utils/utf8";
 

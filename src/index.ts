@@ -8,7 +8,7 @@ export type { EncodeOptions };
 import { decode, decodeMulti } from "./decode";
 export { decode, decodeMulti };
 import type { DecodeOptions } from "./decode";
-export { DecodeOptions };
+export type { DecodeOptions };
 
 import { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream } from "./decodeAsync";
 export { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream };

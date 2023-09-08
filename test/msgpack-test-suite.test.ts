@@ -1,5 +1,5 @@
-import assert from "node:assert";
-import util from "node:util";
+import assert from "assert";
+import util from "util";
 import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
 import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, encodeTimeSpecToTimestamp } from "@msgpack/msgpack";

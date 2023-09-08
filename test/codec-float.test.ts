@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "assert";
 import { decode } from "../src";
 import * as ieee754 from "ieee754";
 
