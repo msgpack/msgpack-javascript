@@ -504,7 +504,7 @@ number (64-bit float)|float family|number
 string|str family|string (*2)
 ArrayBufferView |bin family|Uint8Array (*3)
 Array|array family|Array
-Object|map family|Object (4)
+Object|map family|Object (*4)
 Date|timestamp ext family|Date (*5)
 bigint|N/A|N/A (*6)
 
