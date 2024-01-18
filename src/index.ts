@@ -1,47 +1,26 @@
 // Main Functions:
 
-import { encode } from "./encode";
-export { encode };
-import type { EncodeOptions } from "./encode";
-export type { EncodeOptions };
+export { encode } from "./encode";
+export type { EncodeOptions } from "./encode";
 
-import { decode, decodeMulti } from "./decode";
-export { decode, decodeMulti };
-import type { DecodeOptions } from "./decode";
-export type { DecodeOptions };
+export { decode, decodeMulti } from "./decode";
+export type { DecodeOptions } from "./decode";
 
-import { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream } from "./decodeAsync";
-export { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream };
+export { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream } from "./decodeAsync";
 
-import { Decoder, DataViewIndexOutOfBoundsError } from "./Decoder";
-export { Decoder, DataViewIndexOutOfBoundsError };
-import type { DecoderOptions } from "./Decoder";
-export type { DecoderOptions };
-import { DecodeError } from "./DecodeError";
-export { DecodeError };
+export { Decoder, DataViewIndexOutOfBoundsError } from "./Decoder";
+export type { DecoderOptions } from "./Decoder";
+export { DecodeError } from "./DecodeError";
 
-import { Encoder } from "./Encoder";
-export { Encoder };
-import type { EncoderOptions } from "./Encoder";
-export type { EncoderOptions };
+export { Encoder } from "./Encoder";
+export type { EncoderOptions } from "./Encoder";
 
 // Utilities for Extension Types:
 
-import { ExtensionCodec } from "./ExtensionCodec";
-export { ExtensionCodec };
-import type { ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType } from "./ExtensionCodec";
-export type { ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType };
-import { ExtData } from "./ExtData";
-export { ExtData };
+export { ExtensionCodec } from "./ExtensionCodec";
+export type { ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType } from "./ExtensionCodec";
+export { ExtData } from "./ExtData";
 
-import {
-  EXT_TIMESTAMP,
-  encodeDateToTimeSpec,
-  encodeTimeSpecToTimestamp,
-  decodeTimestampToTimeSpec,
-  encodeTimestampExtension,
-  decodeTimestampExtension,
-} from "./timestamp";
 export {
   EXT_TIMESTAMP,
   encodeDateToTimeSpec,
@@ -49,4 +28,4 @@ export {
   decodeTimestampToTimeSpec,
   encodeTimestampExtension,
   decodeTimestampExtension,
-};
+} from "./timestamp";
