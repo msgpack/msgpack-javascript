@@ -73,6 +73,7 @@
     "karma-webpack": "latest",
     "lodash": "latest",
     "mocha": "latest",
+    "msg-timestamp": "^1.0.1",
     "msgpack-test-js": "latest",
     "prettier": "latest",
     "rimraf": "latest",
