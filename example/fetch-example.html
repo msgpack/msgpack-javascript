@@ -17,6 +17,8 @@
     <h1>Fetch API example</h1>
     <p>Open DevTool and see the console logs.</p>
     <script id="script">
+      import { decodeAsync } from "@msgpack/msgpack";
+      
       const MSGPACK_TYPE = "application/x-msgpack";
 
       const url = "http://127.0.0.1:8080/";
@@ -25,9 +27,9 @@
         // decode()
         {
           const response = await fetch(url);
-          const contentType = response.headers.get("content-type");
+          const contentType = response.headers.get("Content-Type");
           if (contentType && contentType.startsWith(MSGPACK_TYPE) && response.body != null) {
-            const object = await MessagePack.decodeAsync(response.body);
+            const object = await decodeAsync(response.body);
             console.log("decode:", object);
           } else {
             console.error("Something is wrong!");
