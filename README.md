@@ -148,11 +148,14 @@ Name|Type|Default
 extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
 context | user-defined | -
 useBigInt64 | boolean | false
+rawStrings | boolean | false
 maxStrLength | number | `4_294_967_295` (UINT32_MAX)
 maxBinLength | number | `4_294_967_295` (UINT32_MAX)
 maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
 maxMapLength | number | `4_294_967_295` (UINT32_MAX)
 maxExtLength | number | `4_294_967_295` (UINT32_MAX)
+
+To skip UTF-8 decoding of strings, `rawStrings` can be set to `true`. In this case, strings are decoded into `Uint8Array`.
 
 You can use `max${Type}Length` to limit the length of each type decoded.
 
@@ -498,18 +501,19 @@ null, undefined|nil|null (*1)
 boolean (true, false)|bool family|boolean (true, false)
 number (53-bit int)|int family|number
 number (64-bit float)|float family|number
-string|str family|string
-ArrayBufferView |bin family|Uint8Array (*2)
+string|str family|string (*2)
+ArrayBufferView |bin family|Uint8Array (*3)
 Array|array family|Array
-Object|map family|Object (*3)
-Date|timestamp ext family|Date (*4)
-bigint|N/A|N/A (*5)
+Object|map family|Object (*4)
+Date|timestamp ext family|Date (*5)
+bigint|N/A|N/A (*6)
 
 * *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
-* *2 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
-* *3 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
-* *4 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
-* *5 bigint is not supported in `useBigInt64: false` mode, but you can define an extension codec for it.
+* *2 If you'd like to skip UTF-8 decoding of strings, set `rawStrings: true`. In this case, strings are decoded into `Uint8Array`.
+* *3 Any `ArrayBufferView`s including NodeJS's `Buffer` are mapped to `bin` family, and are decoded into `Uint8Array`
+* *4 In handling `Object`, it is regarded as `Record<string, unknown>` in terms of TypeScript
+* *5 MessagePack timestamps may have nanoseconds, which will lost when it is decoded into JavaScript `Date`. This behavior can be overridden by registering `-1` for the extension codec.
+* *6 bigint is not supported in `useBigInt64: false` mode, but you can define an extension codec for it.
 
 If you set `useBigInt64: true`, the following mapping is used:
 
@@ -519,7 +523,7 @@ null, undefined|nil|null
 boolean (true, false)|bool family|boolean (true, false)
 **number (32-bit int)**|int family|number
 **number (except for the above)**|float family|number
-**bigint**|int64 / uint64|bigint (*6)
+**bigint**|int64 / uint64|bigint (*7)
 string|str family|string
 ArrayBufferView |bin family|Uint8Array
 Array|array family|Array
@@ -527,7 +531,7 @@ Object|map family|Object
 Date|timestamp ext family|Date
 
 
-* *6 If the bigint is larger than the max value of uint64 or smaller than the min value of int64, then the behavior is undefined.
+* *7 If the bigint is larger than the max value of uint64 or smaller than the min value of int64, then the behavior is undefined.
 
 ## Prerequisites
 
