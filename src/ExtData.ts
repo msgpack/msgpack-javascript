@@ -5,5 +5,6 @@ export class ExtData {
   constructor(
     readonly type: number,
     readonly data: Uint8Array,
+    readonly align: number | undefined | null = null,
   ) {}
 }

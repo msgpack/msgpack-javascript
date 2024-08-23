@@ -687,8 +687,16 @@ export class Decoder<ContextType = undefined> {
       throw new DecodeError(`Max length exceeded: ext length (${size}) > maxExtLength (${this.maxExtLength})`);
     }
 
-    const extType = this.view.getInt8(this.pos + headOffset);
-    const data = this.decodeBinary(size, headOffset + 1 /* extType */);
+    let padding = 0;
+    let extType = this.view.getInt8(this.pos + headOffset);
+
+    // 0xc1 => -63 (Int8) (noop byte)
+    while (extType === -63) {
+      padding++;
+      extType = this.view.getInt8(this.pos + headOffset + padding);
+    }
+
+    const data = this.decodeBinary(size, headOffset + padding + 1 /* extType */);
     return this.extensionCodec.decode(data, extType, this.context);
   }
 

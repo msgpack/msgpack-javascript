@@ -427,6 +427,14 @@ export class Encoder<ContextType = undefined> {
     } else {
       throw new Error(`Too large extension object: ${size}`);
     }
+    if (ext.align && Number.isInteger(ext.align)) {
+      const align = ext.align;
+      const dataPos = this.pos + 1; // + extType size
+      const padding = (align - (dataPos % align)) % align;
+      for (let i = 0; i < padding; i++) {
+        this.writeU8(0xc1); // noop byte
+      }
+    }
     this.writeI8(ext.type);
     this.writeU8a(ext.data);
   }
