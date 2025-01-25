@@ -47,13 +47,13 @@
     "universal"
   ],
   "engines": {
-    "node": ">= 14"
+    "node": ">= 18"
   },
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",
-    "@eslint/compat": "^1.2.5",
-    "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.19.0",
+    "@eslint/compat": "latest",
+    "@eslint/eslintrc": "latest",
+    "@eslint/js": "latest",
     "@types/lodash": "latest",
     "@types/mocha": "latest",
     "@types/node": "latest",
@@ -76,7 +76,7 @@
     "karma-webpack": "latest",
     "lodash": "latest",
     "mocha": "latest",
-    "msg-timestamp": "^1.0.1",
+    "msg-timestamp": "latest",
     "msgpack-test-js": "latest",
     "prettier": "latest",
     "rimraf": "latest",
