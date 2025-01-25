@@ -25,10 +25,11 @@ jobs:
         cache: npm
         node-version: ${{ matrix.node-version }}
 
-    - run: npm install -g nyc codecov
+    - run: npm install -g nyc
     - run: npm ci
     - run: npm run test:cover
-    - run: codecov -f coverage/*.json
+    - run: curl -Os https://cli.codecov.io/latest/linux/codecov && chmod +x codecov
+    - run: ./codecov -f coverage/*.json
 
   browser:
     runs-on: ubuntu-latest
