@@ -22,6 +22,7 @@ jobs:
         node-version: "18"
 
     # npm@9 may fail with https://github.com/npm/cli/issues/6723
+    # npm@10 may fail with "GitFetcher requires an Arborist constructor to pack a tarball"
     - run: npm install -g npm@8
     - run: npm ci
     - run: npm run test:fuzz
