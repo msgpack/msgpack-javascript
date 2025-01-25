@@ -18,9 +18,9 @@ jobs:
           - '22'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         cache: npm
         node-version: ${{ matrix.node-version }}
@@ -37,12 +37,12 @@ jobs:
         browser: [ChromeHeadless, FirefoxHeadless]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         cache: npm
-        node-version: '18'
+        node-version: '22'
     - run: npm install -g npm
     - run: npm ci
     - run: npm run test:browser -- --browsers ${{ matrix.browser }}
