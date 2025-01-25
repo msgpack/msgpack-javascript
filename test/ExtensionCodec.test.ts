@@ -122,7 +122,6 @@ describe("ExtensionCodec", () => {
         }
       },
       decode: (data: Uint8Array, extType, context) => {
-        extType;
         const decoded = decode(data, { extensionCodec, context }) as { magic: number };
         context.hasVisited({ decoding: decoded.magic, ctx: context.ctxVal });
         return new Magic(decoded.magic);

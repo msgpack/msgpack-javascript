@@ -27,7 +27,7 @@
     "test:browser:chrome": "karma start --single-run --browsers ChromeHeadless",
     "test:watch:browser": "karma start --browsers ChromeHeadless,FirefoxHeadless",
     "test:watch:nodejs": "mocha -w 'test/**/*.test.ts'",
-    "lint": "eslint --ext .ts src test",
+    "lint": "eslint src test",
     "lint:fix": "prettier --loglevel=warn --write 'src/**/*.ts' 'test/**/*.ts' && eslint --fix --ext .ts src test",
     "lint:print-config": "eslint --print-config .eslintrc.js",
     "update-dependencies": "npx rimraf node_modules/ package-lock.json ; npm install ; npm audit fix --force ; git restore package.json ; npm install"
@@ -51,6 +51,9 @@
   },
   "devDependencies": {
     "@bitjourney/check-es-version-webpack-plugin": "latest",
+    "@eslint/compat": "^1.2.5",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.19.0",
     "@types/lodash": "latest",
     "@types/mocha": "latest",
     "@types/node": "latest",

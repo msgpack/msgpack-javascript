@@ -10,7 +10,7 @@ const config = {
   entry: "./src/index.ts",
   target: ["web", "es5"],
   output: {
-    path: path.resolve(__dirname, "dist.es5+umd"),
+    path: path.resolve(import.meta.dirname, "dist.es5+umd"),
     library: "MessagePack",
     libraryTarget: "umd",
     globalObject: "this",
