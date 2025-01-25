@@ -4,13 +4,15 @@ import _ from "lodash";
 // @ts-expect-error
 import { CheckEsVersionPlugin } from "@bitjourney/check-es-version-webpack-plugin";
 
+const dirname = typeof __dirname === "undefined" ? import.meta.dirname : __dirname;
+
 const config = {
   mode: "production",
 
   entry: "./src/index.ts",
   target: ["web", "es5"],
   output: {
-    path: path.resolve(import.meta.dirname, "dist.es5+umd"),
+    path: path.resolve(dirname, "dist.es5+umd"),
     library: "MessagePack",
     libraryTarget: "umd",
     globalObject: "this",
