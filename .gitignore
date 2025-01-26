@@ -9,6 +9,9 @@ benchmark/sandbox.ts
 # v8 profiler logs
 isolate-*.log
 
+# deno
+deno.lock
+
 # flamebearer
 flamegraph.html
 
