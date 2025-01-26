@@ -171,8 +171,8 @@ type StackState = StackArrayState | StackMapState;
 
 const HEAD_BYTE_REQUIRED = -1;
 
-const EMPTY_VIEW = new DataView(new ArrayBuffer(0));
-const EMPTY_BYTES = new Uint8Array(EMPTY_VIEW.buffer);
+const EMPTY_VIEW = new DataView<ArrayBufferLike>(new ArrayBuffer(0));
+const EMPTY_BYTES = new Uint8Array<ArrayBufferLike>(EMPTY_VIEW.buffer);
 
 try {
   // IE11: The spec says it should throw RangeError,
@@ -231,13 +231,13 @@ export class Decoder<ContextType = undefined> {
     // view, bytes, and pos will be re-initialized in setBuffer()
   }
 
-  private setBuffer(buffer: ArrayLike<number> | BufferSource): void {
+  private setBuffer(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): void {
     this.bytes = ensureUint8Array(buffer);
     this.view = createDataView(this.bytes);
     this.pos = 0;
   }
 
-  private appendBuffer(buffer: ArrayLike<number> | BufferSource) {
+  private appendBuffer(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): void {
     if (this.headByte === HEAD_BYTE_REQUIRED && !this.hasRemaining(1)) {
       this.setBuffer(buffer);
     } else {
@@ -265,7 +265,7 @@ export class Decoder<ContextType = undefined> {
    * @throws {@link DecodeError}
    * @throws {@link RangeError}
    */
-  public decode(buffer: ArrayLike<number> | BufferSource): unknown {
+  public decode(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): unknown {
     this.reinitializeState();
     this.setBuffer(buffer);
 
