@@ -28,8 +28,11 @@ jobs:
     - run: npm install -g nyc
     - run: npm ci
     - run: npm run test:cover
-    - run: curl -Os https://cli.codecov.io/latest/linux/codecov && chmod +x codecov
-    - run: ./codecov --verbose upload-process -f coverage/coverage-final.json
+
+    - uses: codecov/codecov-action@v5
+      with:
+        files: coverage/coverage-final.json
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   browser:
     runs-on: ubuntu-latest
