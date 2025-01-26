@@ -34,6 +34,7 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
   // custom extensions
   private readonly encoders: Array<ExtensionEncoderType<ContextType> | undefined | null> = [];
   private readonly decoders: Array<ExtensionDecoderType<ContextType> | undefined | null> = [];
+  private readonly aligns: Array<number | undefined | null> = [];
 
   public constructor() {
     this.register(timestampExtension);
@@ -41,10 +42,12 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
 
   public register({
     type,
+    align,
     encode,
     decode,
   }: {
     type: number;
+    align?: number;
     encode: ExtensionEncoderType<ContextType>;
     decode: ExtensionDecoderType<ContextType>;
   }): void {
@@ -52,6 +55,7 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
       // custom extensions
       this.encoders[type] = encode;
       this.decoders[type] = decode;
+      this.aligns[type] = align;
     } else {
       // built-in extensions
       const index = 1 + type;
@@ -80,7 +84,8 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
         const data = encodeExt(object, context);
         if (data != null) {
           const type = i;
-          return new ExtData(type, data);
+          const align = this.aligns[type];
+          return new ExtData(type, data, align);
         }
       }
     }
