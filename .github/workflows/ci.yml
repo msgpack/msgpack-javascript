@@ -29,7 +29,7 @@ jobs:
     - run: npm ci
     - run: npm run test:cover
     - run: curl -Os https://cli.codecov.io/latest/linux/codecov && chmod +x codecov
-    - run: ./codecov -f coverage/*.json
+    - run: ./codecov --verbose upload-process -f coverage/coverage-final.json
 
   browser:
     runs-on: ubuntu-latest
