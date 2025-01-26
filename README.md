@@ -614,7 +614,7 @@ You can use this module on Deno.
 
 See `example/deno-*.ts` for examples.
 
-`deno.land/x` is not supported yet.
+`deno.land/x` is not supported.
 
 ## Maintenance
 
@@ -632,12 +632,12 @@ This library uses Travis CI.
 
 test matrix:
 
+* Node.js versions:
+  * v18 / v20 / v22
 * TypeScript targets
   * `target=es2019` / `target=es5`
 * JavaScript engines
-  * NodeJS, browsers (Chrome, Firefox, Safari, IE11, and so on)
-
-See [test:* in package.json](./package.json) and [.travis.yml](./.travis.yml) for details.
+  * NodeJS, browsers (Chrome, Firefox)
 
 ### Release Engineering
 
