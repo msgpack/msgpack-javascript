@@ -1,5 +1,14 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.0.0-beta3 2025-01-26
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta2...v3.0.0-beta3
+
+* Added an option `rawStrings: boolean` to decoders ([#235](https://github.com/msgpack/msgpack-javascript/pull/235), thanks to @jasonpaulos)
+* Optimized GC load by reusing stack states (["228](https://github.com/msgpack/msgpack-javascript/pull/228), thanks to @sergeyzenchenko)
+* Drop support for Node.js v16
+* Type compatibility with ES2024 / SharedArrayBuffer
+
 ## 3.0.0-beta2
 
 https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta1...v3.0.0-beta2
@@ -10,7 +19,7 @@ https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta1...v3.0.0-beta
 
 https://github.com/msgpack/msgpack-javascript/compare/v2.8.0...v3.0.0-beta1
 
-* Add an option `useBigInt64` to map JavaScript's BigInt to MessagePack's int64 and uint64 ([#223](https://github.com/msgpack/msgpack-javascript/pull/223))
+* Added an option `useBigInt64` to map JavaScript's BigInt to MessagePack's int64 and uint64 ([#223](https://github.com/msgpack/msgpack-javascript/pull/223))
 * Drop IE11 support ([#221](https://github.com/msgpack/msgpack-javascript/pull/221))
   * It also fixes [feature request: option to disable TEXT_ENCODING env check #219](https://github.com/msgpack/msgpack-javascript/issues/219)
 * Change the interfaces of `Encoder` and `Decoder`, and describe the interfaces in README.md ([#224](https://github.com/msgpack/msgpack-javascript/pull/224)):
