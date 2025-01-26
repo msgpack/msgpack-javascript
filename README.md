@@ -566,20 +566,20 @@ Run-time performance is not the only reason to use MessagePack, but it's importa
 
 V8's built-in JSON has been improved for years, esp. `JSON.parse()` is [significantly improved in V8/7.6](https://v8.dev/blog/v8-release-76), it is the fastest deserializer as of 2019, as the benchmark result bellow suggests.
 
-However, MessagePack can handles binary data effectively, actual performance depends on situations. You'd better take benchmark on your own use-case if performance matters.
+However, MessagePack can handles binary data effectively, actual performance depends on situations. Esp. streaming-decoding may be significantly faster than non-streaming decoding if it's effective.  You'd better take benchmark on your own use-case if performance matters.
 
-Benchmark on NodeJS/v18.1.0 (V8/10.1)
+Benchmark on NodeJS/v22.13.1 (V8/12.4)
 
 operation                                                         |   op   |   ms  |  op/s
 ----------------------------------------------------------------- | ------: | ----: | ------:
-buf = Buffer.from(JSON.stringify(obj));                           |  902100 |  5000 |  180420
-obj = JSON.parse(buf.toString("utf-8"));                          |  898700 |  5000 |  179740
-buf = require("msgpack-lite").encode(obj);                        |  411000 |  5000 |   82200
-obj = require("msgpack-lite").decode(buf);                        |  246200 |  5001 |   49230
-buf = require("@msgpack/msgpack").encode(obj);                    |  843300 |  5000 |  168660
-obj = require("@msgpack/msgpack").decode(buf);                    |  489300 |  5000 |   97860
-buf = /* @msgpack/msgpack */ encoder.encode(obj);                 | 1154200 |  5000 |  230840
-obj = /* @msgpack/msgpack */ decoder.decode(buf);                 |  448900 |  5000 |   89780
+buf = Buffer.from(JSON.stringify(obj));                           | 1348700 |  5000 |  269740
+obj = JSON.parse(buf.toString("utf-8"));                          | 1700300 |  5000 |  340060
+buf = require("msgpack-lite").encode(obj);                        |  591300 |  5000 |  118260
+obj = require("msgpack-lite").decode(buf);                        |  539500 |  5000 |  107900
+buf = require("@msgpack/msgpack").encode(obj);                    | 1238700 |  5000 |  247740
+obj = require("@msgpack/msgpack").decode(buf);                    | 1402000 |  5000 |  280400
+buf = /* @msgpack/msgpack */ encoder.encode(obj);                 | 1379800 |  5000 |  275960
+obj = /* @msgpack/msgpack */ decoder.decode(buf);                 | 1406100 |  5000 |  281220
 
 Note that `JSON` cases use `Buffer` to emulate I/O where a JavaScript string must be converted into a byte array encoded in UTF-8, whereas MessagePack modules deal with byte arrays.
 
