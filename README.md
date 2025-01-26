@@ -540,7 +540,7 @@ This is a universal JavaScript library that supports major browsers and NodeJS.
 ### ECMA-262
 
 * ES2015 language features
-* ES2018 standard library, including:
+* ES2024 standard library, including:
   * Typed arrays (ES2015)
   * Async iterations (ES2018)
   * Features added in ES2015-ES2022
@@ -552,11 +552,11 @@ IE11 is no longer supported. If you'd like to use this library in IE11, use v2.x
 
 ### NodeJS
 
-NodeJS v14 is required.
+NodeJS v18 is required.
 
 ### TypeScript Compiler / Type Definitions
 
-This module requires type definitions of `AsyncIterator`, `SourceBuffer`, whatwg streams, and so on. They are provided by `"lib": ["ES2021", "DOM"]` in `tsconfig.json`.
+This module requires type definitions of `AsyncIterator`, `ArrayBufferLike`, whatwg streams, and so on. They are provided by `"lib": ["ES2024", "DOM"]` in `tsconfig.json`.
 
 Regarding the TypeScript compiler version, only the latest TypeScript is tested in development.
 
