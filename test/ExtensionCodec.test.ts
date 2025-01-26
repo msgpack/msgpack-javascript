@@ -98,8 +98,11 @@ describe("ExtensionCodec", () => {
 
   context("custom extensions with custom context", () => {
     class Context {
+      public ctxVal: number;
       public expectations: Array<any> = [];
-      constructor(public ctxVal: number) {}
+      constructor(ctxVal: number) {
+        this.ctxVal = ctxVal;
+      }
       public hasVisited(val: any) {
         this.expectations.push(val);
       }
@@ -107,7 +110,10 @@ describe("ExtensionCodec", () => {
     const extensionCodec = new ExtensionCodec<Context>();
 
     class Magic<T> {
-      constructor(public val: T) {}
+      public val: T;
+      constructor(val: T) {
+        this.val = val;
+      }
     }
 
     // Magic
@@ -122,7 +128,6 @@ describe("ExtensionCodec", () => {
         }
       },
       decode: (data: Uint8Array, extType, context) => {
-        extType;
         const decoded = decode(data, { extensionCodec, context }) as { magic: number };
         context.hasVisited({ decoding: decoded.magic, ctx: context.ctxVal });
         return new Magic(decoded.magic);
