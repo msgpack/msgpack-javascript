@@ -22,7 +22,7 @@ export const defaultDecodeOptions: never = undefined as never;
  * @throws {@link DecodeError} if the buffer contains invalid data.
  */
 export function decode<ContextType = undefined>(
-  buffer: ArrayLike<number> | BufferSource,
+  buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike,
   options?: DecoderOptions<SplitUndefined<ContextType>>,
 ): unknown {
   const decoder = new Decoder(options);

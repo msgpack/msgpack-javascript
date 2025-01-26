@@ -13,22 +13,26 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - '16'
           - '18'
           - '20'
+          - '22'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         cache: npm
         node-version: ${{ matrix.node-version }}
 
-    - run: npm install -g nyc codecov
+    - run: npm install -g nyc
     - run: npm ci
     - run: npm run test:cover
-    - run: codecov -f coverage/*.json
+
+    - uses: codecov/codecov-action@v5
+      with:
+        files: coverage/coverage-final.json
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   browser:
     runs-on: ubuntu-latest
@@ -37,12 +41,12 @@ jobs:
         browser: [ChromeHeadless, FirefoxHeadless]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         cache: npm
-        node-version: '18'
+        node-version: '22'
     - run: npm install -g npm
     - run: npm ci
     - run: npm run test:browser -- --browsers ${{ matrix.browser }}
