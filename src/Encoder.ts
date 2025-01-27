@@ -396,6 +396,21 @@ export class Encoder<ContextType = undefined> {
   }
 
   private encodeExtension(ext: ExtData) {
+    if (typeof ext.data === "function") {
+      const data = ext.data(this.pos + 6);
+      const size = data.length;
+
+      if (size >= 0x100000000) {
+        throw new Error(`Too large extension object: ${size}`);
+      }
+
+      this.writeU8(0xc9);
+      this.writeU32(size);
+      this.writeI8(ext.type);
+      this.writeU8a(data);
+      return;
+    }
+
     const size = ext.data.length;
     if (size === 1) {
       // fixext 1
