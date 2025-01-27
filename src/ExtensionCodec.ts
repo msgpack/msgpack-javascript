@@ -9,7 +9,10 @@ export type ExtensionDecoderType<ContextType> = (
   context: ContextType,
 ) => unknown;
 
-export type ExtensionEncoderType<ContextType> = (input: unknown, context: ContextType) => Uint8Array | null;
+export type ExtensionEncoderType<ContextType> = (
+  input: unknown,
+  context: ContextType,
+) => Uint8Array | ((dataPos: number) => Uint8Array) | null;
 
 // immutable interface to ExtensionCodec
 export type ExtensionCodecType<ContextType> = {

@@ -196,4 +196,42 @@ describe("ExtensionCodec", () => {
       ]);
     });
   });
+
+  context("custom extensions with alignment", () => {
+    const extensionCodec = new ExtensionCodec();
+
+    extensionCodec.register({
+      type: 0x01,
+      encode: (object: unknown) => {
+        if (object instanceof Float32Array) {
+          return (pos: number) => {
+            const align = 4;
+            const padding = 1 + ((align - ((pos + 1) % align)) % align);
+            const data = new Uint8Array(object.buffer);
+            const result = new Uint8Array(padding + data.length);
+            result[0] = padding;
+            result.set(data, padding);
+            return result;
+          };
+        }
+        return null;
+      },
+      decode: (data: Uint8Array) => {
+        const padding = data[0]!;
+        const offset = data.byteOffset + padding;
+        const length = data.byteLength - padding;
+        return new Float32Array(data.buffer, offset, length / Float32Array.BYTES_PER_ELEMENT);
+      },
+    });
+
+    it("encodes and decodes Float32Array type with zero-copy", () => {
+      const data = {
+        position: new Float32Array([1.1, 2.2, 3.3, 4.4, 5.5]),
+      };
+      const encoded = encode(data, { extensionCodec });
+      const decoded = decode(encoded, { extensionCodec });
+      assert.deepStrictEqual(decoded, data);
+      assert.strictEqual(decoded.position.buffer, encoded.buffer);
+    });
+  });
 });
