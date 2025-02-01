@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decodeArrayStream } from "../src";
+import { encode, decodeArrayStream } from "../src/index";
 
 describe("decodeArrayStream", () => {
   const generateSampleObject = () => {
