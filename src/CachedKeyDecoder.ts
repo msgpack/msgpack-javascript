@@ -16,11 +16,16 @@ export class CachedKeyDecoder implements KeyDecoder {
   hit = 0;
   miss = 0;
   private readonly caches: Array<Array<KeyCacheRecord>>;
+  private readonly maxKeyLength: number;
+  private readonly maxLengthPerKey: number;
 
   constructor(
-    readonly maxKeyLength = DEFAULT_MAX_KEY_LENGTH,
-    readonly maxLengthPerKey = DEFAULT_MAX_LENGTH_PER_KEY,
+    maxKeyLength = DEFAULT_MAX_KEY_LENGTH,
+    maxLengthPerKey = DEFAULT_MAX_LENGTH_PER_KEY,
   ) {
+    this.maxKeyLength = maxKeyLength;
+    this.maxLengthPerKey = maxLengthPerKey;
+
     // avoid `new Array(N)`, which makes a sparse array,
     // because a sparse array is typically slower than a non-sparse array.
     this.caches = [];

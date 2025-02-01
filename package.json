@@ -83,7 +83,7 @@
     "ts-loader": "latest",
     "ts-node": "latest",
     "tsconfig-paths": "latest",
-    "typescript": "latest",
+    "typescript": "^5.8.0-beta",
     "webpack": "latest",
     "webpack-cli": "latest"
   },
