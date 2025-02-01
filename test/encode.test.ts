@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode } from "@msgpack/msgpack";
+import { encode, decode } from "../src/index";
 
 describe("encode", () => {
   context("sortKeys", () => {

@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode } from "../src";
+import { encode, decode } from "../src/index";
 
 describe("useBigInt64: true", () => {
   before(function () {

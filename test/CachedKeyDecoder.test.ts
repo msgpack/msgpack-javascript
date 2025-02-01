@@ -1,6 +1,7 @@
 import assert from "assert";
-import { CachedKeyDecoder, KeyDecoder } from "../src/CachedKeyDecoder";
+import { CachedKeyDecoder } from "../src/CachedKeyDecoder";
 import { utf8EncodeJs, utf8Count } from "../src/utils/utf8";
+import type { KeyDecoder } from "../src/CachedKeyDecoder";
 
 function tryDecode(keyDecoder: KeyDecoder, str: string): string {
   const byteLength = utf8Count(str);

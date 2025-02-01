@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode, ExtensionCodec, DecodeError } from "../src";
+import { encode, decode, ExtensionCodec, DecodeError } from "../src/index";
 
 // There's a built-in `useBigInt64: true` option, but a custom codec might be
 // better if you'd like to encode bigint to reduce the size of binaries.
