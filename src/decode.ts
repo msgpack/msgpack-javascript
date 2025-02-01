@@ -3,16 +3,6 @@ import type { DecoderOptions } from "./Decoder";
 import type { SplitUndefined } from "./context";
 
 /**
- * @deprecated Use {@link DecoderOptions} instead.
- */
-export type DecodeOptions = never;
-
-/**
- * @deprecated No longer supported.
- */
-export const defaultDecodeOptions: never = undefined as never;
-
-/**
  * It decodes a single MessagePack object in a buffer.
  *
  * This is a synchronous decoding function.

@@ -3,16 +3,6 @@ import type { EncoderOptions } from "./Encoder";
 import type { SplitUndefined } from "./context";
 
 /**
- * @deprecated Use {@link EncoderOptions} instead.
- */
-export type EncodeOptions = never;
-
-/**
- * @deprecated No longer supported.
- */
-export const defaultEncodeOptions: never = undefined as never;
-
-/**
  * It encodes `value` in the MessagePack format and
  * returns a byte buffer.
  *
