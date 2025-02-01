@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decodeMultiStream } from "@msgpack/msgpack";
+import { encode, decodeMultiStream } from "../src/index";
 
 describe("decodeStream", () => {
   it("decodes stream", async () => {

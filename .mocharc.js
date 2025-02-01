@@ -1,7 +1,6 @@
 'use strict';
 
 require("ts-node/register");
-require("tsconfig-paths/register");
 
 module.exports = {
   diff: true,

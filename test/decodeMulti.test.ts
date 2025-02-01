@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decodeMulti } from "@msgpack/msgpack";
+import { encode, decodeMulti } from "../src/index";
 
 describe("decodeMulti", () => {
   it("decodes multiple objects in a single binary", () => {

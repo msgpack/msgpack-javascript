@@ -82,7 +82,6 @@
     "rimraf": "latest",
     "ts-loader": "latest",
     "ts-node": "latest",
-    "tsconfig-paths": "latest",
     "typescript": "latest",
     "webpack": "latest",
     "webpack-cli": "latest"

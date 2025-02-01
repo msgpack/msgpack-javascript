@@ -1,5 +1,5 @@
 import { deepStrictEqual } from "assert";
-import { encode, decode } from "@msgpack/msgpack";
+import { encode, decode } from "../src/index";
 
 describe("README", () => {
   context("## Synopsis", () => {

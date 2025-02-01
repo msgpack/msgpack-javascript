@@ -1,5 +1,5 @@
 import { throws } from "assert";
-import { encode, decode, DecodeError } from "@msgpack/msgpack";
+import { encode, decode, DecodeError } from "../src/index";
 
 describe("prototype pollution", () => {
   context("__proto__ exists as a map key", () => {
