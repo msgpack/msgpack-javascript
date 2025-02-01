@@ -10,5 +10,6 @@
     "tsdoc",
     "typeof",
     "whatwg"
-  ]
+  ],
+  "makefile.configureOnOpen": false
 }
