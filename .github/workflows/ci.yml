@@ -64,3 +64,13 @@ jobs:
     - run: npm ci
     - run: deno test test/deno_test.ts
 
+  bun:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+    - run: bun install
+    - run: bun test test/bun.spec.ts
+
