@@ -1,4 +1,3 @@
-const path = require("path");
 // const webpack = require("webpack");
 
 // eslint-disable-next-line import/no-default-export
@@ -37,9 +36,6 @@ export default function configure(config: any) {
 
       resolve: {
         extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".wasm"],
-        alias: {
-          "@msgpack/msgpack": path.resolve(__dirname, "src"),
-        },
       },
       module: {
         rules: [
