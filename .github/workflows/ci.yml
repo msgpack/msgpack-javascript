@@ -50,3 +50,17 @@ jobs:
     - run: npm install -g npm
     - run: npm ci
     - run: npm run test:browser -- --browsers ${{ matrix.browser }}
+
+
+  deno:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Deno
+      uses: denoland/setup-deno@v2
+      with:
+        deno-version: "v2.x"
+    - run: npm ci
+    - run: deno test test/deno_test.ts
+

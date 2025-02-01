@@ -1,11 +1,12 @@
 #!/usr/bin/env deno test
 
 /* eslint-disable */
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { deepStrictEqual } from "node:assert";
+import { test } from "node:test";
 import * as msgpack from "../mod.ts";
 
-Deno.test("Hello, world!", () => {
+test("Hello, world!", () => {
   const encoded = msgpack.encode("Hello, world!");
   const decoded = msgpack.decode(encoded);
-  assertEquals(decoded, "Hello, world!");
+  deepStrictEqual(decoded, "Hello, world!");
 });
