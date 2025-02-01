@@ -2,16 +2,12 @@
 
 import { encode } from "./encode";
 export { encode };
-import type { EncodeOptions } from "./encode";
-export type { EncodeOptions };
 
 import { decode, decodeMulti } from "./decode";
 export { decode, decodeMulti };
-import type { DecodeOptions } from "./decode";
-export type { DecodeOptions };
 
-import { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream } from "./decodeAsync";
-export { decodeAsync, decodeArrayStream, decodeMultiStream, decodeStream };
+import { decodeAsync, decodeArrayStream, decodeMultiStream } from "./decodeAsync";
+export { decodeAsync, decodeArrayStream, decodeMultiStream };
 
 import { Decoder, DataViewIndexOutOfBoundsError } from "./Decoder";
 export { Decoder, DataViewIndexOutOfBoundsError };

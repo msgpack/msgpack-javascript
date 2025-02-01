@@ -42,8 +42,3 @@ export function decodeMultiStream<ContextType>(
   const decoder = new Decoder(options);
   return decoder.decodeStream(stream);
 }
-
-/**
- * @deprecated Use {@link decodeMultiStream} instead.
- */
-export const decodeStream: never = undefined as never;
