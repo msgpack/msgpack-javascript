@@ -3,12 +3,9 @@
  */
 export class ExtData {
   readonly type: number;
-  readonly data: Uint8Array;
+  readonly data: Uint8Array | ((pos: number) => Uint8Array);
 
-  constructor(
-    type: number,
-    data: Uint8Array,
-  ) {
+  constructor(type: number, data: Uint8Array | ((pos: number) => Uint8Array)) {
     this.type = type;
     this.data = data;
   }
