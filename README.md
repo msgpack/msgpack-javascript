@@ -456,7 +456,7 @@ This will become default in this library with major-version increment, if the te
 
 ## Decoding a Blob
 
-[`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) is a binary data container provided by browsers. To read its contents, you can use `Blob#arrayBuffer()` or `Blob#stream()`. `Blob#stream()`
+[`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) is a binary data container provided by browsers. To read its contents when it contains a MessagePack binary, you can use `Blob#arrayBuffer()` or `Blob#stream()`. `Blob#stream()`
 is recommended if your target platform support it. This is because streaming
 decode should be faster for large objects. In both ways, you need to use
 asynchronous API.
