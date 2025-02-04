@@ -19,10 +19,7 @@ export class CachedKeyDecoder implements KeyDecoder {
   private readonly maxKeyLength: number;
   private readonly maxLengthPerKey: number;
 
-  constructor(
-    maxKeyLength = DEFAULT_MAX_KEY_LENGTH,
-    maxLengthPerKey = DEFAULT_MAX_LENGTH_PER_KEY,
-  ) {
+  constructor(maxKeyLength = DEFAULT_MAX_KEY_LENGTH, maxLengthPerKey = DEFAULT_MAX_LENGTH_PER_KEY) {
     this.maxKeyLength = maxKeyLength;
     this.maxLengthPerKey = maxLengthPerKey;
 

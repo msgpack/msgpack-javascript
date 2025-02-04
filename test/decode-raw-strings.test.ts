@@ -12,8 +12,14 @@ describe("decode with rawStrings specified", () => {
   });
 
   it("decodes invalid UTF-8 string as binary", () => {
-    const invalidUtf8String = Uint8Array.from([61, 180, 118, 220, 39, 166, 43, 68, 219, 116, 105, 84, 121, 46, 122, 136, 233, 221, 15, 174, 247, 19, 50, 176, 184, 221, 66, 188, 171, 36, 135, 121]);
-    const encoded = Uint8Array.from([196, 32, 61, 180, 118, 220, 39, 166, 43, 68, 219, 116, 105, 84, 121, 46, 122, 136, 233, 221, 15, 174, 247, 19, 50, 176, 184, 221, 66, 188, 171, 36, 135, 121]);
+    const invalidUtf8String = Uint8Array.from([
+      61, 180, 118, 220, 39, 166, 43, 68, 219, 116, 105, 84, 121, 46, 122, 136, 233, 221, 15, 174, 247, 19, 50, 176,
+      184, 221, 66, 188, 171, 36, 135, 121,
+    ]);
+    const encoded = Uint8Array.from([
+      196, 32, 61, 180, 118, 220, 39, 166, 43, 68, 219, 116, 105, 84, 121, 46, 122, 136, 233, 221, 15, 174, 247, 19, 50,
+      176, 184, 221, 66, 188, 171, 36, 135, 121,
+    ]);
 
     const actual = decode(encoded, options);
     assert.deepStrictEqual(actual, invalidUtf8String);
