@@ -9,8 +9,8 @@ export { decode, decodeMulti };
 import { decodeAsync, decodeArrayStream, decodeMultiStream } from "./decodeAsync";
 export { decodeAsync, decodeArrayStream, decodeMultiStream };
 
-import { Decoder, DataViewIndexOutOfBoundsError } from "./Decoder";
-export { Decoder, DataViewIndexOutOfBoundsError };
+import { Decoder } from "./Decoder";
+export { Decoder };
 import type { DecoderOptions } from "./Decoder";
 export type { DecoderOptions };
 import { DecodeError } from "./DecodeError";

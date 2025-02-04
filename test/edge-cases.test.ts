@@ -2,7 +2,6 @@
 // any errors should not break Encoder/Decoder instance states
 import assert from "assert";
 import { encode, decodeAsync, decode, Encoder, Decoder, decodeMulti, decodeMultiStream } from "../src/index";
-import { DataViewIndexOutOfBoundsError } from "../src/Decoder";
 
 function testEncoder(encoder: Encoder): void {
   const object = {
@@ -91,8 +90,7 @@ describe("edge cases", () => {
           0x92, // fixarray size=2
           0xc0, // nil
         ]);
-        // [IE11] A raw error thrown by DataView
-      }, DataViewIndexOutOfBoundsError);
+      }, RangeError);
       testDecoder(decoder);
     });
 

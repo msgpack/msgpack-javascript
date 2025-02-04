@@ -23,9 +23,9 @@ export type DecoderOptions<ContextType = undefined> = Readonly<
     /**
      * By default, string values will be decoded as UTF-8 strings. However, if this option is true,
      * string values will be returned as Uint8Arrays without additional decoding.
-     * 
+     *
      * This is useful if the strings may contain invalid UTF-8 sequences.
-     * 
+     *
      * Note that this option only applies to string values, not map keys. Additionally, when
      * enabled, raw string length is limited by the maxBinLength option.
      */
@@ -196,9 +196,8 @@ try {
     );
   }
 }
-export const DataViewIndexOutOfBoundsError = RangeError;
 
-const MORE_DATA = new DataViewIndexOutOfBoundsError("Insufficient data");
+const MORE_DATA = new RangeError("Insufficient data");
 
 const sharedCachedKeyDecoder = new CachedKeyDecoder();
 
@@ -312,7 +311,7 @@ export class Decoder<ContextType = undefined> {
         object = this.doDecodeSync();
         decoded = true;
       } catch (e) {
-        if (!(e instanceof DataViewIndexOutOfBoundsError)) {
+        if (!(e instanceof RangeError)) {
           throw e; // rethrow
         }
         // fallthrough
@@ -368,7 +367,7 @@ export class Decoder<ContextType = undefined> {
           }
         }
       } catch (e) {
-        if (!(e instanceof DataViewIndexOutOfBoundsError)) {
+        if (!(e instanceof RangeError)) {
           throw e; // rethrow
         }
         // fallthrough
@@ -657,6 +656,9 @@ export class Decoder<ContextType = undefined> {
     return this.decodeBinary(byteLength, headerOffset);
   }
 
+  /**
+   * @throws {@link RangeError}
+   */
   private decodeUtf8String(byteLength: number, headerOffset: number): string {
     if (byteLength > this.maxStrLength) {
       throw new DecodeError(
@@ -687,6 +689,9 @@ export class Decoder<ContextType = undefined> {
     return false;
   }
 
+  /**
+   * @throws {@link RangeError}
+   */
   private decodeBinary(byteLength: number, headOffset: number): Uint8Array {
     if (byteLength > this.maxBinLength) {
       throw new DecodeError(`Max length exceeded: bin length (${byteLength}) > maxBinLength (${this.maxBinLength})`);
