@@ -1,11 +1,19 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.0.0-beta4 2025-02-04
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta3...HEAD
+
+* Added Deno test to CI
+* Added Bun tests to CI
+* Allowed the data alignment to support zero-copy decoding ([#248](https://github.com/msgpack/msgpack-javascript/pull/248), thanks to @EddiG)
+
 ## 3.0.0-beta3 2025-01-26
 
 https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta2...v3.0.0-beta3
 
 * Added an option `rawStrings: boolean` to decoders ([#235](https://github.com/msgpack/msgpack-javascript/pull/235), thanks to @jasonpaulos)
-* Optimized GC load by reusing stack states (["228](https://github.com/msgpack/msgpack-javascript/pull/228), thanks to @sergeyzenchenko)
+* Optimized GC load by reusing stack states ([#228](https://github.com/msgpack/msgpack-javascript/pull/228), thanks to @sergeyzenchenko)
 * Drop support for Node.js v16
 * Type compatibility with ES2024 / SharedArrayBuffer
 
