@@ -50,9 +50,9 @@ deepStrictEqual(decode(encoded), object);
   - [`decodeMultiStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): AsyncIterable<unknown>`](#decodemultistreamstream-readablestreamlikearraylikenumber--buffersource-options-decoderoptions-asynciterableunknown)
   - [Reusing Encoder and Decoder instances](#reusing-encoder-and-decoder-instances)
 - [Extension Types](#extension-types)
-    - [ExtensionCodec context](#extensioncodec-context)
-    - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
-    - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
+  - [ExtensionCodec context](#extensioncodec-context)
+  - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
+  - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
 - [Decoding a Blob](#decoding-a-blob)
 - [MessagePack Specification](#messagepack-specification)
   - [MessagePack Mapping Table](#messagepack-mapping-table)
@@ -286,7 +286,7 @@ extensionCodec.register({
   },
 });
 
-// Map<T>
+// Map<K, V>
 const MAP_EXT_TYPE = 1; // Any in 0-127
 extensionCodec.register({
   type: MAP_EXT_TYPE,
@@ -311,7 +311,7 @@ Ensure you include your extensionCodec in any recursive encode and decode statem
 
 Note that extension types for custom objects must be `[0, 127]`, while `[-1, -128]` is reserved for MessagePack itself.
 
-#### ExtensionCodec context
+### ExtensionCodec context
 
 When you use an extension codec, it might be necessary to have encoding/decoding state to keep track of which objects got encoded/re-created. To do this, pass a `context` to the `EncoderOptions` and `DecoderOptions`:
 
@@ -355,7 +355,7 @@ const encoded = = encode({myType: new MyType<any>()}, { extensionCodec, context 
 const decoded = decode(encoded, { extensionCodec, context });
 ```
 
-#### Handling BigInt with ExtensionCodec
+### Handling BigInt with ExtensionCodec
 
 This library does not handle BigInt by default, but you have two options to handle it:
 
@@ -404,7 +404,7 @@ const encoded: = encode(value, { extensionCodec });
 deepStrictEqual(decode(encoded, { extensionCodec }), value);
 ```
 
-#### The temporal module as timestamp extensions
+### The temporal module as timestamp extensions
 
 There is a proposal for a new date/time representations in JavaScript:
 
