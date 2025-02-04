@@ -53,6 +53,7 @@ deepStrictEqual(decode(encoded), object);
   - [ExtensionCodec context](#extensioncodec-context)
   - [Handling BigInt with ExtensionCodec](#handling-bigint-with-extensioncodec)
   - [The temporal module as timestamp extensions](#the-temporal-module-as-timestamp-extensions)
+- [Faster way to decode a large array of floating point numbers](#faster-way-to-decode-a-large-array-of-floating-point-numbers)
 - [Decoding a Blob](#decoding-a-blob)
 - [MessagePack Specification](#messagepack-specification)
   - [MessagePack Mapping Table](#messagepack-mapping-table)
@@ -109,17 +110,17 @@ console.log(buffer);
 
 #### `EncoderOptions`
 
-Name|Type|Default
-----|----|----
-extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
-context | user-defined | -
-useBigInt64 | boolean | false
-maxDepth | number | `100`
-initialBufferSize | number | `2048`
-sortKeys | boolean | false
-forceFloat32 | boolean | false
-forceIntegerToFloat | boolean | false
-ignoreUndefined | boolean | false
+| Name                | Type           | Default                       |
+| ------------------- | -------------- | ----------------------------- |
+| extensionCodec      | ExtensionCodec | `ExtensionCodec.defaultCodec` |
+| context             | user-defined   | -                             |
+| useBigInt64         | boolean        | false                         |
+| maxDepth            | number         | `100`                         |
+| initialBufferSize   | number         | `2048`                        |
+| sortKeys            | boolean        | false                         |
+| forceFloat32        | boolean        | false                         |
+| forceIntegerToFloat | boolean        | false                         |
+| ignoreUndefined     | boolean        | false                         |
 
 ### `decode(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): unknown`
 
@@ -143,17 +144,17 @@ NodeJS `Buffer` is also acceptable because it is a subclass of `Uint8Array`.
 
 #### `DecoderOptions`
 
-Name|Type|Default
-----|----|----
-extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec`
-context | user-defined | -
-useBigInt64 | boolean | false
-rawStrings | boolean | false
-maxStrLength | number | `4_294_967_295` (UINT32_MAX)
-maxBinLength | number | `4_294_967_295` (UINT32_MAX)
-maxArrayLength | number | `4_294_967_295` (UINT32_MAX)
-maxMapLength | number | `4_294_967_295` (UINT32_MAX)
-maxExtLength | number | `4_294_967_295` (UINT32_MAX)
+| Name           | Type           | Default                       |
+| -------------- | -------------- | ----------------------------- |
+| extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec` |
+| context        | user-defined   | -                             |
+| useBigInt64    | boolean        | false                         |
+| rawStrings     | boolean        | false                         |
+| maxStrLength   | number         | `4_294_967_295` (UINT32_MAX)  |
+| maxBinLength   | number         | `4_294_967_295` (UINT32_MAX)  |
+| maxArrayLength | number         | `4_294_967_295` (UINT32_MAX)  |
+| maxMapLength   | number         | `4_294_967_295` (UINT32_MAX)  |
+| maxExtLength   | number         | `4_294_967_295` (UINT32_MAX)  |
 
 To skip UTF-8 decoding of strings, `rawStrings` can be set to `true`. In this case, strings are decoded into `Uint8Array`.
 
@@ -454,6 +455,48 @@ deepStrictEqual(decoded, instant);
 
 This will become default in this library with major-version increment, if the temporal module is standardized.
 
+## Faster way to decode a large array of floating point numbers
+
+If there are large arrays of floating point numbers in your payload, there
+is a way to decode it faster: define a custom extension type for `Float#Array`
+with alignment.
+
+An extension type's `encode` method can return a function that takes a parameter
+`pos: number`. This parameter can be used to make alignment of the buffer,
+resulting decoding it much more performant.
+
+See an example implementation for `Float32Array`:
+
+```typescript
+const extensionCodec = new ExtensionCodec();
+
+const EXT_TYPE_FLOAT32ARRAY = 0; // Any in 0-127
+extensionCodec.register({
+  type: EXT_TYPE_FLOAT32ARRAY,
+  encode: (object: unknown) => {
+    if (object instanceof Float32Array) {
+      return (pos: number) => {
+        const bpe = Float32Array.BYTES_PER_ELEMENT;
+        const padding = 1 + ((bpe - ((pos + 1) % bpe)) % bpe);
+        const data = new Uint8Array(object.buffer);
+        const result = new Uint8Array(padding + data.length);
+        result[0] = padding;
+        result.set(data, padding);
+        return result;
+      };
+    }
+    return null;
+  },
+  decode: (data: Uint8Array) => {
+    const padding = data[0]!;
+    const bpe = Float32Array.BYTES_PER_ELEMENT;
+    const offset = data.byteOffset + padding;
+    const length = data.byteLength - padding;
+    return new Float32Array(data.buffer, offset, length / bpe);
+  },
+});
+```
+
 ## Decoding a Blob
 
 [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) is a binary data container provided by browsers. To read its contents when it contains a MessagePack binary, you can use `Blob#arrayBuffer()` or `Blob#stream()`. `Blob#stream()`
@@ -495,18 +538,18 @@ The mapping of integers varies on the setting of `useBigInt64`.
 
 The default, `useBigInt64: false` is:
 
-Source Value|MessagePack Format|Value Decoded
-----|----|----
-null, undefined|nil|null (*1)
-boolean (true, false)|bool family|boolean (true, false)
-number (53-bit int)|int family|number
-number (64-bit float)|float family|number
-string|str family|string (*2)
-ArrayBufferView |bin family|Uint8Array (*3)
-Array|array family|Array
-Object|map family|Object (*4)
-Date|timestamp ext family|Date (*5)
-bigint|N/A|N/A (*6)
+| Source Value          | MessagePack Format   | Value Decoded         |
+| --------------------- | -------------------- | --------------------- |
+| null, undefined       | nil                  | null (*1)             |
+| boolean (true, false) | bool family          | boolean (true, false) |
+| number (53-bit int)   | int family           | number                |
+| number (64-bit float) | float family         | number                |
+| string                | str family           | string (*2)           |
+| ArrayBufferView       | bin family           | Uint8Array (*3)       |
+| Array                 | array family         | Array                 |
+| Object                | map family           | Object (*4)           |
+| Date                  | timestamp ext family | Date (*5)             |
+| bigint                | N/A                  | N/A (*6)              |
 
 * *1 Both `null` and `undefined` are mapped to `nil` (`0xC0`) type, and are decoded into `null`
 * *2 If you'd like to skip UTF-8 decoding of strings, set `rawStrings: true`. In this case, strings are decoded into `Uint8Array`.
@@ -517,18 +560,18 @@ bigint|N/A|N/A (*6)
 
 If you set `useBigInt64: true`, the following mapping is used:
 
-Source Value|MessagePack Format|Value Decoded
-----|----|----
-null, undefined|nil|null
-boolean (true, false)|bool family|boolean (true, false)
-**number (32-bit int)**|int family|number
-**number (except for the above)**|float family|number
-**bigint**|int64 / uint64|bigint (*7)
-string|str family|string
-ArrayBufferView |bin family|Uint8Array
-Array|array family|Array
-Object|map family|Object
-Date|timestamp ext family|Date
+| Source Value                      | MessagePack Format   | Value Decoded         |
+| --------------------------------- | -------------------- | --------------------- |
+| null, undefined                   | nil                  | null                  |
+| boolean (true, false)             | bool family          | boolean (true, false) |
+| **number (32-bit int)**           | int family           | number                |
+| **number (except for the above)** | float family         | number                |
+| **bigint**                        | int64 / uint64       | bigint (*7)           |
+| string                            | str family           | string                |
+| ArrayBufferView                   | bin family           | Uint8Array            |
+| Array                             | array family         | Array                 |
+| Object                            | map family           | Object                |
+| Date                              | timestamp ext family | Date                  |
 
 
 * *7 If the bigint is larger than the max value of uint64 or smaller than the min value of int64, then the behavior is undefined.
@@ -570,16 +613,16 @@ However, MessagePack can handles binary data effectively, actual performance dep
 
 Benchmark on NodeJS/v22.13.1 (V8/12.4)
 
-operation                                                         |   op   |   ms  |  op/s
------------------------------------------------------------------ | ------: | ----: | ------:
-buf = Buffer.from(JSON.stringify(obj));                           | 1348700 |  5000 |  269740
-obj = JSON.parse(buf.toString("utf-8"));                          | 1700300 |  5000 |  340060
-buf = require("msgpack-lite").encode(obj);                        |  591300 |  5000 |  118260
-obj = require("msgpack-lite").decode(buf);                        |  539500 |  5000 |  107900
-buf = require("@msgpack/msgpack").encode(obj);                    | 1238700 |  5000 |  247740
-obj = require("@msgpack/msgpack").decode(buf);                    | 1402000 |  5000 |  280400
-buf = /* @msgpack/msgpack */ encoder.encode(obj);                 | 1379800 |  5000 |  275960
-obj = /* @msgpack/msgpack */ decoder.decode(buf);                 | 1406100 |  5000 |  281220
+| operation                                         |      op |   ms |   op/s |
+| ------------------------------------------------- | ------: | ---: | -----: |
+| buf = Buffer.from(JSON.stringify(obj));           | 1348700 | 5000 | 269740 |
+| obj = JSON.parse(buf.toString("utf-8"));          | 1700300 | 5000 | 340060 |
+| buf = require("msgpack-lite").encode(obj);        |  591300 | 5000 | 118260 |
+| obj = require("msgpack-lite").decode(buf);        |  539500 | 5000 | 107900 |
+| buf = require("@msgpack/msgpack").encode(obj);    | 1238700 | 5000 | 247740 |
+| obj = require("@msgpack/msgpack").decode(buf);    | 1402000 | 5000 | 280400 |
+| buf = /* @msgpack/msgpack */ encoder.encode(obj); | 1379800 | 5000 | 275960 |
+| obj = /* @msgpack/msgpack */ decoder.decode(buf); | 1406100 | 5000 | 281220 |
 
 Note that `JSON` cases use `Buffer` to emulate I/O where a JavaScript string must be converted into a byte array encoded in UTF-8, whereas MessagePack modules deal with byte arrays.
 
