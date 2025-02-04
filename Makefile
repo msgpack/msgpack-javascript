@@ -4,10 +4,10 @@ test:
 
 test-all:
 	npm ci
-	npm publish --dry-run
+	npm publish --dry-run --tag "$(shell node --experimental-strip-types tools/get-release-tag.mjs)"
 
 publish: validate-git-status
-	npm publish
+	npm publish --tag "$(shell node --experimental-strip-types tools/get-release-tag.mjs)"
 	git push origin main
 	git push origin --tags
 
