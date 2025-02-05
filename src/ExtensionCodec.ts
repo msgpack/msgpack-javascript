@@ -57,7 +57,7 @@ export class ExtensionCodec<ContextType = undefined> implements ExtensionCodecTy
       this.decoders[type] = decode;
     } else {
       // built-in extensions
-      const index = 1 + type;
+      const index = -1 - type;
       this.builtInEncoders[index] = encode;
       this.builtInDecoders[index] = decode;
     }
