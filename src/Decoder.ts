@@ -2,7 +2,7 @@ import { prettyByte } from "./utils/prettyByte";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { getInt64, getUint64, UINT32_MAX } from "./utils/int";
 import { utf8Decode } from "./utils/utf8";
-import { createDataView, ensureUint8Array } from "./utils/typedArrays";
+import { ensureUint8Array } from "./utils/typedArrays";
 import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
 import { DecodeError } from "./DecodeError";
 import type { ContextOf } from "./context";
@@ -244,8 +244,9 @@ export class Decoder<ContextType = undefined> {
   }
 
   private setBuffer(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): void {
-    this.bytes = ensureUint8Array(buffer);
-    this.view = createDataView(this.bytes);
+    const bytes = ensureUint8Array(buffer);
+    this.bytes = bytes;
+    this.view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     this.pos = 0;
   }
 
