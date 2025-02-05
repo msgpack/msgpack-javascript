@@ -289,7 +289,7 @@ export class Decoder<ContextType = undefined> {
     return object;
   }
 
-  public *decodeMulti(buffer: ArrayLike<number> | BufferSource): Generator<unknown, void, unknown> {
+  public *decodeMulti(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): Generator<unknown, void, unknown> {
     this.reinitializeState();
     this.setBuffer(buffer);
 
@@ -298,7 +298,7 @@ export class Decoder<ContextType = undefined> {
     }
   }
 
-  public async decodeAsync(stream: AsyncIterable<ArrayLike<number> | BufferSource>): Promise<unknown> {
+  public async decodeAsync(stream: AsyncIterable<ArrayLike<number> | ArrayBufferView | ArrayBufferLike>): Promise<unknown> {
     let decoded = false;
     let object: unknown;
     for await (const buffer of stream) {
@@ -334,16 +334,16 @@ export class Decoder<ContextType = undefined> {
   }
 
   public decodeArrayStream(
-    stream: AsyncIterable<ArrayLike<number> | BufferSource>,
+    stream: AsyncIterable<ArrayLike<number> | ArrayBufferView | ArrayBufferLike>,
   ): AsyncGenerator<unknown, void, unknown> {
     return this.decodeMultiAsync(stream, true);
   }
 
-  public decodeStream(stream: AsyncIterable<ArrayLike<number> | BufferSource>): AsyncGenerator<unknown, void, unknown> {
+  public decodeStream(stream: AsyncIterable<ArrayLike<number> | ArrayBufferView | ArrayBufferLike>): AsyncGenerator<unknown, void, unknown> {
     return this.decodeMultiAsync(stream, false);
   }
 
-  private async *decodeMultiAsync(stream: AsyncIterable<ArrayLike<number> | BufferSource>, isArray: boolean) {
+  private async *decodeMultiAsync(stream: AsyncIterable<ArrayLike<number> | ArrayBufferView | ArrayBufferLike>, isArray: boolean) {
     let isArrayHeaderRequired = isArray;
     let arrayItemsLeft = -1;
 
