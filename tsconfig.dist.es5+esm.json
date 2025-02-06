@@ -3,6 +3,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "es2015",
+    "downlevelIteration": true,
     "outDir": "./dist.es5+esm",
     "declaration": false,
     "noEmitOnError": true,

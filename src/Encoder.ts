@@ -86,6 +86,8 @@ export class Encoder<ContextType = undefined> {
   private view: DataView;
   private bytes: Uint8Array;
 
+  private entered = false;
+
   public constructor(options?: EncoderOptions<ContextType>) {
     this.extensionCodec = options?.extensionCodec ?? (ExtensionCodec.defaultCodec as ExtensionCodecType<ContextType>);
     this.context = (options as { context: ContextType } | undefined)?.context as ContextType; // needs a type assertion because EncoderOptions has no context property when ContextType is undefined
@@ -103,8 +105,34 @@ export class Encoder<ContextType = undefined> {
     this.bytes = new Uint8Array(this.view.buffer);
   }
 
+  private clone() {
+    // Because of slightly special argument `context`,
+    // type assertion is needed.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return new Encoder<ContextType>({
+      extensionCodec: this.extensionCodec,
+      context: this.context,
+      useBigInt64: this.useBigInt64,
+      maxDepth: this.maxDepth,
+      initialBufferSize: this.initialBufferSize,
+      sortKeys: this.sortKeys,
+      forceFloat32: this.forceFloat32,
+      ignoreUndefined: this.ignoreUndefined,
+      forceIntegerToFloat: this.forceIntegerToFloat,
+    } as any);
+  }
+
   private reinitializeState() {
     this.pos = 0;
+  }
+
+  private enteringGuard(): Disposable {
+    this.entered = true;
+    return {
+      [Symbol.dispose]: () => {
+        this.entered = false;
+      },
+    };
   }
 
   /**
@@ -113,6 +141,13 @@ export class Encoder<ContextType = undefined> {
    * @returns Encodes the object and returns a shared reference the encoder's internal buffer.
    */
   public encodeSharedRef(object: unknown): Uint8Array {
+    if (this.entered) {
+      const instance = this.clone();
+      return instance.encodeSharedRef(object);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    using _guard = this.enteringGuard();
+
     this.reinitializeState();
     this.doEncode(object, 1);
     return this.bytes.subarray(0, this.pos);
@@ -122,6 +157,13 @@ export class Encoder<ContextType = undefined> {
    * @returns Encodes the object and returns a copy of the encoder's internal buffer.
    */
   public encode(object: unknown): Uint8Array {
+    if (this.entered) {
+      const instance = this.clone();
+      return instance.encode(object);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    using _guard = this.enteringGuard();
+
     this.reinitializeState();
     this.doEncode(object, 1);
     return this.bytes.slice(0, this.pos);
