@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.0.0-beta5 2025-02-06
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta4...v3.0.0-beta5
+
+* Fixed a bug that `encode()` and `decode()` were not re-entrant in reusing instances ([#257](https://github.com/msgpack/msgpack-javascript/pull/257))
+
 ## 3.0.0-beta4 2025-02-04
 
 https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta3...v3.0.0-beta4
