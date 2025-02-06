@@ -221,6 +221,8 @@ export class Decoder<ContextType = undefined> {
   private headByte = HEAD_BYTE_REQUIRED;
   private readonly stack = new StackPool();
 
+  private entered = false;
+
   public constructor(options?: DecoderOptions<ContextType>) {
     this.extensionCodec = options?.extensionCodec ?? (ExtensionCodec.defaultCodec as ExtensionCodecType<ContextType>);
     this.context = (options as { context: ContextType } | undefined)?.context as ContextType; // needs a type assertion because EncoderOptions has no context property when ContextType is undefined
@@ -233,6 +235,22 @@ export class Decoder<ContextType = undefined> {
     this.maxMapLength = options?.maxMapLength ?? UINT32_MAX;
     this.maxExtLength = options?.maxExtLength ?? UINT32_MAX;
     this.keyDecoder = options?.keyDecoder !== undefined ? options.keyDecoder : sharedCachedKeyDecoder;
+  }
+
+  private clone(): Decoder<ContextType> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return new Decoder({
+      extensionCodec: this.extensionCodec,
+      context: this.context,
+      useBigInt64: this.useBigInt64,
+      rawStrings: this.rawStrings,
+      maxStrLength: this.maxStrLength,
+      maxBinLength: this.maxBinLength,
+      maxArrayLength: this.maxArrayLength,
+      maxMapLength: this.maxMapLength,
+      maxExtLength: this.maxExtLength,
+      keyDecoder: this.keyDecoder,
+    } as any);
   }
 
   private reinitializeState() {
@@ -274,11 +292,27 @@ export class Decoder<ContextType = undefined> {
     return new RangeError(`Extra ${view.byteLength - pos} of ${view.byteLength} byte(s) found at buffer[${posToShow}]`);
   }
 
+  private enteringGuard(): Disposable {
+    this.entered = true;
+    return {
+      [Symbol.dispose]: () => {
+        this.entered = false;
+      },
+    };
+  }
+
   /**
    * @throws {@link DecodeError}
    * @throws {@link RangeError}
    */
   public decode(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): unknown {
+    if (this.entered) {
+      const instance = this.clone();
+      return instance.decode(buffer);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    using _guard = this.enteringGuard();
+
     this.reinitializeState();
     this.setBuffer(buffer);
 
@@ -290,6 +324,14 @@ export class Decoder<ContextType = undefined> {
   }
 
   public *decodeMulti(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): Generator<unknown, void, unknown> {
+    if (this.entered) {
+      const instance = this.clone();
+      yield* instance.decodeMulti(buffer);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    using _guard = this.enteringGuard();
+
     this.reinitializeState();
     this.setBuffer(buffer);
 
@@ -299,10 +341,18 @@ export class Decoder<ContextType = undefined> {
   }
 
   public async decodeAsync(stream: AsyncIterable<ArrayLike<number> | ArrayBufferView | ArrayBufferLike>): Promise<unknown> {
+    if (this.entered) {
+      const instance = this.clone();
+      return instance.decodeAsync(stream);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    using _guard = this.enteringGuard();
+
     let decoded = false;
     let object: unknown;
     for await (const buffer of stream) {
       if (decoded) {
+        this.entered = false;
         throw this.createExtraByteError(this.totalPos);
       }
 
@@ -343,7 +393,15 @@ export class Decoder<ContextType = undefined> {
     return this.decodeMultiAsync(stream, false);
   }
 
-  private async *decodeMultiAsync(stream: AsyncIterable<ArrayLike<number> | ArrayBufferView | ArrayBufferLike>, isArray: boolean) {
+  private async *decodeMultiAsync(stream: AsyncIterable<ArrayLike<number> | ArrayBufferView | ArrayBufferLike>, isArray: boolean): AsyncGenerator<unknown, void, unknown> {
+    if (this.entered) {
+      const instance = this.clone();
+      yield* instance.decodeMultiAsync(stream, isArray);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    using _guard = this.enteringGuard();
+
     let isArrayHeaderRequired = isArray;
     let arrayItemsLeft = -1;
 

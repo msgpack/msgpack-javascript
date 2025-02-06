@@ -21,8 +21,8 @@ class MsgPackContext {
   readonly extensionCodec = new ExtensionCodec<MsgPackContext>();
 
   constructor() {
-    const encoder = new Encoder<MsgPackContext>({ extensionCodec: this.extensionCodec, context: this });
-    const decoder = new Decoder<MsgPackContext>({ extensionCodec: this.extensionCodec, context: this });
+    const encoder = new Encoder({ extensionCodec: this.extensionCodec, context: this });
+    const decoder = new Decoder({ extensionCodec: this.extensionCodec, context: this });
 
     this.encode = encoder.encode.bind(encoder);
     this.decode = decoder.decode.bind(decoder);
@@ -37,5 +37,12 @@ describe("reuse instances with extensions", () => {
     const buf = context.encode(BigInt(42));
     const data = context.decode(buf);
     deepStrictEqual(data, BigInt(42));
+  });
+
+  it("should encode and decode bigints", () => {
+    const context = new MsgPackContext();
+    const buf = context.encode([BigInt(1), BigInt(2), BigInt(3)]);
+    const data = context.decode(buf);
+    deepStrictEqual(data, [BigInt(1), BigInt(2), BigInt(3)]);
   });
 });
