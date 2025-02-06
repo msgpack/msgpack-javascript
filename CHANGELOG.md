@@ -2,7 +2,7 @@
 
 ## 3.0.0-beta4 2025-02-04
 
-https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta3...HEAD
+https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta3...v3.0.0-beta4
 
 * Added Deno test to CI
 * Added Bun tests to CI
