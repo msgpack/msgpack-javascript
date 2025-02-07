@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.0.0-beta6 2025-02-07
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta5...v3.0.0-beta6
+
+* Set the compile target to ES2020, dropping support for the dists with the ES5 target
+
 ## 3.0.0-beta5 2025-02-06
 
 https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta4...v3.0.0-beta5
