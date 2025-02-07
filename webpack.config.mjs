@@ -2,8 +2,6 @@ import path from "node:path";
 import url from "node:url";
 import webpack from "webpack";
 import _ from "lodash";
-// @ts-expect-error
-import { CheckEsVersionPlugin } from "@bitjourney/check-es-version-webpack-plugin";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
@@ -11,9 +9,9 @@ const config = {
   mode: "production",
 
   entry: "./src/index.ts",
-  target: ["web", "es5"],
+  target: ["web", "es2020"],
   output: {
-    path: path.resolve(dirname, "dist.es5+umd"),
+    path: path.resolve(dirname, "dist.umd"),
     library: "MessagePack",
     libraryTarget: "umd",
     globalObject: "this",
@@ -35,9 +33,6 @@ const config = {
   },
 
   plugins: [
-    new CheckEsVersionPlugin({
-      esVersion: 5, // for IE11 support
-    }),
     new webpack.DefinePlugin({
       "process.env.TEXT_ENCODING": "undefined",
       "process.env.TEXT_DECODER": "undefined",
@@ -55,7 +50,7 @@ const config = {
   devtool: "source-map",
 };
 
-// eslint-disable-next-line import/no-default-export
+
 export default [
   ((config) => {
     config.output.filename = "msgpack.min.js";

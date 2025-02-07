@@ -9,6 +9,9 @@ benchmark/sandbox.ts
 # v8 profiler logs
 isolate-*.log
 
+# tsimp
+.tsimp/
+
 # deno
 deno.lock
 
