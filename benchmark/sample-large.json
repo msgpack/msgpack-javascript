@@ -16,7 +16,9 @@
       "published":true,
       "title":"The Ruby Rogues",
       "updated_at":"2015-11-15T22:50:06.565Z",
-      "url":"http://feeds.feedwrench.com/RubyRogues.rss"
+      "url":"http://feeds.feedwrench.com/RubyRogues.rss",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"56490d6ad9275a00030000eb",
@@ -35,7 +37,9 @@
       "published":true,
       "title":"Grok Podcast",
       "updated_at":"2015-11-15T22:55:47.498Z",
-      "url":"http://www.grokpodcast.com/atom.xml"
+      "url":"http://www.grokpodcast.com/atom.xml",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a1c30b1191d0003000000",
@@ -53,7 +57,9 @@
       "published":true,
       "title":"The Web Platform Podcast",
       "updated_at":"2015-11-16T18:11:02.022Z",
-      "url":"http://thewebplatform.libsyn.com//rss"
+      "url":"http://thewebplatform.libsyn.com//rss",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a1de3b1191d0003000047",
@@ -72,7 +78,9 @@
       "published":true,
       "title":"Developer Tea",
       "updated_at":"2015-11-16T23:00:23.224Z",
-      "url":"http://feeds.feedburner.com/developertea"
+      "url":"http://feeds.feedburner.com/developertea",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a3163e51cc0000300004c",
@@ -88,7 +96,9 @@
       "published":true,
       "title":"Remote Conferences - Audio",
       "updated_at":"2015-11-16T19:41:24.367Z",
-      "url":"http://feeds.feedwrench.com/remoteconfs-audio.rss"
+      "url":"http://feeds.feedwrench.com/remoteconfs-audio.rss",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a315de51cc00003000000",
@@ -108,7 +118,9 @@
       "published":true,
       "title":"The Freelancers' Show",
       "updated_at":"2015-11-16T19:41:27.459Z",
-      "url":"http://feeds.feedwrench.com/TheFreelancersShow.rss"
+      "url":"http://feeds.feedwrench.com/TheFreelancersShow.rss",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a3169e51cc000030000cd",
@@ -124,7 +136,9 @@
       "published":true,
       "title":"React Native Radio",
       "updated_at":"2015-11-16T19:41:29.999Z",
-      "url":"http://feeds.feedwrench.com/react-native-radio.rss"
+      "url":"http://feeds.feedwrench.com/react-native-radio.rss",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a316fe51cc000030000d4",
@@ -142,7 +156,9 @@
       "published":true,
       "title":"The iPhreaks Show",
       "updated_at":"2015-11-16T19:41:43.700Z",
-      "url":"http://feeds.feedwrench.com/iPhreaks.rss"
+      "url":"http://feeds.feedwrench.com/iPhreaks.rss",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a3184e51cc00003000156",
@@ -161,7 +177,9 @@
       "published":true,
       "title":"JavaScript Jabber",
       "updated_at":"2015-11-16T19:42:24.692Z",
-      "url":"http://feeds.feedwrench.com/JavaScriptJabber.rss"
+      "url":"http://feeds.feedwrench.com/JavaScriptJabber.rss",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a31dee51cc00003000210",
@@ -177,7 +195,9 @@
       "published":true,
       "title":"Web Security Warriors",
       "updated_at":"2015-11-16T19:43:28.133Z",
-      "url":"http://feeds.feedwrench.com/websecwarriors.rss"
+      "url":"http://feeds.feedwrench.com/websecwarriors.rss",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564a3ddbe51cc00003000217",
@@ -194,7 +214,9 @@
       "published":true,
       "title":"Podcast NowLoading",
       "updated_at":"2015-11-16T23:00:23.963Z",
-      "url":"http://feeds.feedburner.com/podcastnowloading"
+      "url":"http://feeds.feedburner.com/podcastnowloading",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564b9cfe08602e00030000fa",
@@ -210,7 +232,9 @@
       "published":true,
       "title":"Being Boss // A Podcast for Creative Entrepreneurs",
       "updated_at":"2015-11-17T21:32:50.672Z",
-      "url":"http://www.lovebeingboss.com/RSSRetrieve.aspx?ID=18365\u0026Type=RSS20"
+      "url":"http://www.lovebeingboss.com/RSSRetrieve.aspx?ID=18365\u0026Type=RSS20",
+      "score1": 100,
+      "score2": 0.1
    },
    {
       "_id":"564c5c8008602e0003000128",
@@ -226,6 +250,8 @@
       "published":true,
       "title":"Nerdcast",
       "updated_at":"2015-11-18T11:11:20.034Z",
-      "url":"http://jovemnerd.com.br/categoria/nerdcast/feed/"
+      "url":"http://jovemnerd.com.br/categoria/nerdcast/feed/",
+      "score1": 100,
+      "score2": 0.1
    }
 ]
