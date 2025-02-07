@@ -73,7 +73,7 @@ export class CachedKeyDecoder implements KeyDecoder {
     this.miss++;
 
     const str = utf8DecodeJs(bytes, inputOffset, byteLength);
-    // Ensure to copy a slice of bytes because the byte may be NodeJS Buffer and Buffer#slice() returns a reference to its internal ArrayBuffer.
+    // Ensure to copy a slice of bytes because the bytes may be a NodeJS Buffer and Buffer#slice() returns a reference to its internal ArrayBuffer.
     const slicedCopyOfBytes = Uint8Array.prototype.slice.call(bytes, inputOffset, inputOffset + byteLength);
     this.store(slicedCopyOfBytes, str);
     return str;
