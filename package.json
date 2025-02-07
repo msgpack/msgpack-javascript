@@ -50,7 +50,6 @@
     "node": ">= 18"
   },
   "devDependencies": {
-    "@bitjourney/check-es-version-webpack-plugin": "latest",
     "@eslint/compat": "latest",
     "@eslint/eslintrc": "latest",
     "@eslint/js": "latest",
