@@ -5,14 +5,14 @@
   "author": "The MessagePack community",
   "license": "ISC",
   "main": "./dist/index.js",
-  "module": "./dist.es5+esm/index.mjs",
-  "cdn": "./dist.es5+umd/msgpack.min.js",
-  "unpkg": "./dist.es5+umd/msgpack.min.js",
+  "module": "./dist.esm/index.mjs",
+  "cdn": "./dist.umd/msgpack.min.js",
+  "unpkg": "./dist.umd/msgpack.min.js",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
     "build": "npm publish --dry-run",
-    "prepare": "npm run clean && webpack --bail && tsc --build tsconfig.dist.json tsconfig.dist.es5+esm.json && ts-node tools/esmify.ts dist.es5+esm/*.js dist.es5+esm/*/*.js",
+    "prepare": "npm run clean && webpack --bail && tsc --build tsconfig.dist.json tsconfig.dist.esm.json && ts-node tools/esmify.ts dist.esm/*.js dist.esm/*/*.js",
     "prepublishOnly": "npm run test:dist",
     "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
@@ -50,7 +50,6 @@
     "node": ">= 18"
   },
   "devDependencies": {
-    "@bitjourney/check-es-version-webpack-plugin": "latest",
     "@eslint/compat": "latest",
     "@eslint/eslintrc": "latest",
     "@eslint/js": "latest",
@@ -90,7 +89,7 @@
     "mod.ts",
     "src/**/*.*",
     "dist/**/*.*",
-    "dist.es5+umd/**/*.*",
-    "dist.es5+esm/**/*.*"
+    "dist.umd/**/*.*",
+    "dist.esm/**/*.*"
   ]
 }
