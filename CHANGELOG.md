@@ -1,5 +1,21 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.0.0 2025-02-07
+
+https://github.com/msgpack/msgpack-javascript/compare/v2.8.0...v3.0.0
+
+* Set the compile target to ES2020, dropping support for the dists with the ES5 target
+* Fixed a bug that `encode()` and `decode()` were not re-entrant in reusing instances ([#257](https://github.com/msgpack/msgpack-javascript/pull/257))
+* Allowed the data alignment to support zero-copy decoding ([#248](https://github.com/msgpack/msgpack-javascript/pull/248), thanks to @EddiG)
+* Added an option `rawStrings: boolean` to decoders ([#235](https://github.com/msgpack/msgpack-javascript/pull/235), thanks to @jasonpaulos)
+* Optimized GC load by reusing stack states ([#228](https://github.com/msgpack/msgpack-javascript/pull/228), thanks to @sergeyzenchenko)
+* Added an option `useBigInt64` to map JavaScript's BigInt to MessagePack's int64 and uint64 ([#223](https://github.com/msgpack/msgpack-javascript/pull/223))
+* Drop IE11 support ([#221](https://github.com/msgpack/msgpack-javascript/pull/221))
+  * It also fixes [feature request: option to disable TEXT_ENCODING env check #219](https://github.com/msgpack/msgpack-javascript/issues/219)
+* Change the interfaces of `Encoder` and `Decoder`, and describe the interfaces in README.md ([#224](https://github.com/msgpack/msgpack-javascript/pull/224)):
+  * `new Encoder(options: EncoderOptions)`: it takes the same named-options as `encode()`
+  * `new Decoder(options: DecoderOptions)`: it takes the same named-options as `decode()`
+
 ## 3.0.0-beta6 2025-02-07
 
 https://github.com/msgpack/msgpack-javascript/compare/v3.0.0-beta5...v3.0.0-beta6
