@@ -1,6 +1,6 @@
 import assert from "assert";
-import { encode, decode } from "../src/index";
-import type { DecoderOptions } from "../src/index";
+import { encode, decode } from "../src/index.ts";
+import type { DecoderOptions } from "../src/index.ts";
 
 describe("decode with rawStrings specified", () => {
   const options = { rawStrings: true } satisfies DecoderOptions;

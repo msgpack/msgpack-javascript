@@ -1,5 +1,5 @@
 import { deepStrictEqual } from "assert";
-import { decodeAsync, encode, decodeArrayStream } from "../src/index";
+import { decodeAsync, encode, decodeArrayStream } from "../src/index.ts";
 
 const isReadableStreamConstructorAvailable: boolean = (() => {
   try {

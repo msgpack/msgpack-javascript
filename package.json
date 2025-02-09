@@ -81,6 +81,7 @@
     "rimraf": "latest",
     "ts-loader": "latest",
     "ts-node": "latest",
+    "tsimp": "^2.0.12",
     "typescript": "latest",
     "webpack": "latest",
     "webpack-cli": "latest"

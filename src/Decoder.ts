@@ -1,11 +1,11 @@
-import { prettyByte } from "./utils/prettyByte";
-import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
-import { getInt64, getUint64, UINT32_MAX } from "./utils/int";
-import { utf8Decode } from "./utils/utf8";
-import { ensureUint8Array } from "./utils/typedArrays";
-import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder";
-import { DecodeError } from "./DecodeError";
-import type { ContextOf } from "./context";
+import { prettyByte } from "./utils/prettyByte.ts";
+import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec.ts";
+import { getInt64, getUint64, UINT32_MAX } from "./utils/int.ts";
+import { utf8Decode } from "./utils/utf8.ts";
+import { ensureUint8Array } from "./utils/typedArrays.ts";
+import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder.ts";
+import { DecodeError } from "./DecodeError.ts";
+import type { ContextOf } from "./context.ts";
 
 export type DecoderOptions<ContextType = undefined> = Readonly<
   Partial<{

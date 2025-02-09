@@ -26,6 +26,7 @@ const config = {
         test: /\.tsx?$/,
         loader: "ts-loader",
         options: {
+          transpileOnly: true,
           configFile: "tsconfig.dist.webpack.json",
         },
       },

@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode } from "../src/index";
+import { encode, decode } from "../src/index.ts";
 
 describe("encode", () => {
   context("sortKeys", () => {

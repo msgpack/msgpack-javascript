@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decodeMultiStream } from "../src/index";
+import { encode, decodeMultiStream } from "../src/index.ts";
 
 describe("decodeStream", () => {
   it("decodes stream", async () => {

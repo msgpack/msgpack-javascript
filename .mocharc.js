@@ -1,10 +1,9 @@
-'use strict';
-
-require("ts-node/register");
+"use strict";
 
 module.exports = {
   diff: true,
-  extension: ['ts'],
-  package: '../package.json',
+  extension: ["ts"],
+  package: "../package.json",
   timeout: 10000,
+  require: ["tsimp"],
 };

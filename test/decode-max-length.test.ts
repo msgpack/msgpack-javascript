@@ -1,6 +1,6 @@
 import assert from "assert";
-import { encode, decode, decodeAsync } from "../src/index";
-import type { DecoderOptions } from "../src/index";
+import { encode, decode, decodeAsync } from "../src/index.ts";
+import type { DecoderOptions } from "../src/index.ts";
 
 describe("decode with max${Type}Length specified", () => {
   async function* createStream<T>(input: T) {
