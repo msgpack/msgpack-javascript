@@ -1,7 +1,7 @@
 #!ts-node
 /* eslint-disable no-console */
 
-import fs from "fs";
+import fs from "node:fs";
 
 const mode = process.argv[2]; // --cjs or --mjs
 const files = process.argv.slice(3);
