@@ -1,3 +1,4 @@
+import "./utils/symbol.dispose";
 import { utf8Count, utf8Encode } from "./utils/utf8";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec";
 import { setInt64, setUint64 } from "./utils/int";

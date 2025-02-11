@@ -11,6 +11,7 @@ for (const file of files) {
   // .js => .mjs
   const content = fs.readFileSync(file).toString("utf-8");
   const newContent = content.replace(/\bfrom "(\.\.?\/[^"]+)";/g, 'from "$1.mjs";')
+    .replace(/\bimport "(\.\.?\/[^"]+)";/g, 'import "$1.mjs";')
     .replace(/\/\/# sourceMappingURL=(.+)\.js\.map$/,
       "//# sourceMappingURL=$1.mjs.map");
   fs.writeFileSync(fileMjs, newContent);
