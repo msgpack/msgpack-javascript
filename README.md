@@ -66,6 +66,7 @@ deepStrictEqual(decode(encoded), object);
   - [NPM / npmjs.com](#npm--npmjscom)
   - [CDN / unpkg.com](#cdn--unpkgcom)
 - [Deno Support](#deno-support)
+- [Bun Support](#bun-support)
 - [Maintenance](#maintenance)
   - [Testing](#testing)
   - [Continuous Integration](#continuous-integration)
@@ -659,6 +660,10 @@ See `example/deno-*.ts` for examples.
 
 `deno.land/x` is not supported.
 
+## Bun Support
+
+You can use this module on Bun.
+
 ## Maintenance
 
 ### Testing
@@ -671,16 +676,16 @@ npm run test
 
 ### Continuous Integration
 
-This library uses Travis CI.
+This library uses GitHub Actions.
 
-test matrix:
+Test matrix:
 
-* Node.js versions:
+* NodeJS
   * v18 / v20 / v22
-* TypeScript targets
-  * `target=es2019` / `target=es5`
-* JavaScript engines
-  * NodeJS, browsers (Chrome, Firefox)
+* Browsers:
+  * Chrome, Firefox
+* Deno
+* Bun
 
 ### Release Engineering
 
