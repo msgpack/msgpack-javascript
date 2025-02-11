@@ -2,7 +2,7 @@
 
 ## 3.0.1 2025-02-11
 
-https://github.com/msgpack/msgpack-javascript/compare/v3.0.1...v3.0.1
+https://github.com/msgpack/msgpack-javascript/compare/v3.0.0...v3.0.1
 
 * Implement a tiny polyfill to Symbol.dispose ([#261](https://github.com/msgpack/msgpack-javascript/pull/261) to fix #260)
 
