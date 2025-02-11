@@ -13,9 +13,9 @@ for (const file of files) {
   // .js => .mjs
   const content = fs.readFileSync(file).toString("utf-8");
   const newContent = content
-    .replace(/\bfrom "(\.\.?\/[^"]+).js";/g, `from "$1.${ext}";`)
-    .replace(/\bimport "(\.\.?\/[^"]+)";/g, 'import "$1.mjs";')
-    .replace(/\brequire\("(\.\.?\/[^"]+).js"\)/g, `require("$1.${ext}");`)
+    .replace(/\bfrom "(\.\.?\/[^"]+)(?:\.js)?";/g, `from "$1.${ext}";`)
+    .replace(/\bimport "(\.\.?\/[^"]+)(?:\.js)?";/g, `import "$1.${ext}";`)
+    .replace(/\brequire\("(\.\.?\/[^"]+)(?:\.js)?"\)/g, `require("$1.${ext}");`)
     .replace(/\/\/# sourceMappingURL=(.+)\.js\.map$/, `//# sourceMappingURL=$1.${ext}.map`);
   fs.writeFileSync(fileMjs, newContent);
   fs.unlinkSync(file);
