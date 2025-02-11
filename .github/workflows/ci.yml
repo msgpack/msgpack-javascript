@@ -16,7 +16,6 @@ jobs:
           - '18'
           - '20'
           - '22'
-
     steps:
     - uses: actions/checkout@v4
     - name: Setup Node.js ${{ matrix.node-version }}
@@ -24,11 +23,9 @@ jobs:
       with:
         cache: npm
         node-version: ${{ matrix.node-version }}
-
     - run: npm install -g nyc
     - run: npm ci
     - run: npm run test:cover
-
     - uses: codecov/codecov-action@v5
       with:
         files: coverage/coverage-final.json
@@ -39,7 +36,6 @@ jobs:
     strategy:
       matrix:
         browser: [ChromeHeadless, FirefoxHeadless]
-
     steps:
     - uses: actions/checkout@v4
     - name: Setup Node.js
@@ -54,7 +50,6 @@ jobs:
 
   deno:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Setup Deno
@@ -62,15 +57,14 @@ jobs:
       with:
         deno-version: "v2.x"
     - run: npm ci
-    - run: deno test test/deno_test.ts
+    - run: npm run test:deno
 
   bun:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
     - run: bun install
-    - run: bun test test/bun.spec.ts
+    - run: npm run test:bun
 

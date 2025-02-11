@@ -43,9 +43,8 @@ export default function configure(config: any) {
             test: /\.tsx?$/,
             loader: "ts-loader",
             options: {
-              configFile: "tsconfig.test-karma.json",
-              // FIXME: some types for dependencies cannot be resolved, so ignore type checking for now.
               transpileOnly: true,
+              configFile: "tsconfig.test-karma.json",
             },
           },
         ],

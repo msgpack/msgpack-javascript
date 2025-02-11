@@ -1,8 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "esnext",
+    "module": "ESNext",
     "noEmitOnError": true,
+    "noEmit": false,
     "outDir": "./build/webpack"
   },
   "include": ["src/**/*.ts"]
