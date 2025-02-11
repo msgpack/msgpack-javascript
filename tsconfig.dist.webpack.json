@@ -4,6 +4,7 @@
     "module": "ESNext",
     "noEmitOnError": true,
     "noEmit": false,
+    "allowImportingTsExtensions": false,
     "outDir": "./build/webpack"
   },
   "include": ["src/**/*.ts"]

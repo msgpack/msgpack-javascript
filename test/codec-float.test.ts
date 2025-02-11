@@ -1,6 +1,6 @@
 import assert from "assert";
 import * as ieee754 from "ieee754";
-import { decode } from "../src/index";
+import { decode } from "../src/index.ts";
 
 const FLOAT32_TYPE = 0xca;
 const FLOAT64_TYPE = 0xcb;

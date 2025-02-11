@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode, decodeAsync } from "../src/index";
+import { encode, decode, decodeAsync } from "../src/index.ts";
 
 (typeof Blob !== "undefined" ? describe : describe.skip)("Blob", () => {
   it("decodes it with `decode()`", async function () {

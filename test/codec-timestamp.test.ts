@@ -7,7 +7,7 @@ import {
   decodeTimestampExtension,
   decodeTimestampToTimeSpec,
   encodeTimestampExtension,
-} from "../src/index";
+} from "../src/index.ts";
 
 const TIME = 1556636810389;
 

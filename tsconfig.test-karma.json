@@ -2,8 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
-    "outDir": "./build/karma",
+    "noEmitOnError": true,
     "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "outDir": "./build/karma",
     "incremental": false
   }
 }

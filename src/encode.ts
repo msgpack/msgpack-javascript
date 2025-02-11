@@ -1,6 +1,6 @@
-import { Encoder } from "./Encoder";
-import type { EncoderOptions } from "./Encoder";
-import type { SplitUndefined } from "./context";
+import { Encoder } from "./Encoder.ts";
+import type { EncoderOptions } from "./Encoder.ts";
+import type { SplitUndefined } from "./context.ts";
 
 /**
  * It encodes `value` in the MessagePack format and

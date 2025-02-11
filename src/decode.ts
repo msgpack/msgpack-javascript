@@ -1,6 +1,6 @@
-import { Decoder } from "./Decoder";
-import type { DecoderOptions } from "./Decoder";
-import type { SplitUndefined } from "./context";
+import { Decoder } from "./Decoder.ts";
+import type { DecoderOptions } from "./Decoder.ts";
+import type { SplitUndefined } from "./context.ts";
 
 /**
  * It decodes a single MessagePack object in a buffer.

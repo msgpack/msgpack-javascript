@@ -1,5 +1,5 @@
 import assert from "assert";
-import { setInt64, getInt64, getUint64, setUint64 } from "../src/utils/int";
+import { setInt64, getInt64, getUint64, setUint64 } from "../src/utils/int.ts";
 
 const INT64SPECS = {
   ZERO: 0,

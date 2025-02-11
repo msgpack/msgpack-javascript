@@ -1,7 +1,7 @@
 // kind of hand-written fuzzing data
 // any errors should not break Encoder/Decoder instance states
 import assert from "assert";
-import { encode, decodeAsync, decode, Encoder, Decoder, decodeMulti, decodeMultiStream } from "../src/index";
+import { encode, decodeAsync, decode, Encoder, Decoder, decodeMulti, decodeMultiStream } from "../src/index.ts";
 
 function testEncoder(encoder: Encoder): void {
   const object = {

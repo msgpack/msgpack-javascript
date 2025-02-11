@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decodeAsync } from "../src/index";
+import { encode, decodeAsync } from "../src/index.ts";
 
 describe("decodeAsync", () => {
   function wrapWithNoisyBuffer(byte: number) {

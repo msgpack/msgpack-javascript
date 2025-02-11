@@ -1,7 +1,7 @@
 // https://github.com/msgpack/msgpack-javascript/issues/195
 
 import { deepStrictEqual } from "assert";
-import { Encoder, Decoder, ExtensionCodec } from "../src/index";
+import { Encoder, Decoder, ExtensionCodec } from "../src/index.ts";
 
 const MSGPACK_EXT_TYPE_BIGINT = 0;
 
