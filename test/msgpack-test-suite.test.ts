@@ -2,7 +2,7 @@ import assert from "assert";
 import util from "util";
 import { Exam } from "msgpack-test-js";
 import { MsgTimestamp } from "msg-timestamp";
-import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, encodeTimeSpecToTimestamp } from "../src/index";
+import { encode, decode, ExtensionCodec, EXT_TIMESTAMP, encodeTimeSpecToTimestamp } from "../src/index.ts";
 
 const extensionCodec = new ExtensionCodec();
 extensionCodec.register({

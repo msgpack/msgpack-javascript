@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode, ExtData } from "../src/index";
+import { encode, decode, ExtData } from "../src/index.ts";
 
 function seq(n: number) {
   const a: Array<number> = [];

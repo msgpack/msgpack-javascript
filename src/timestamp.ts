@@ -1,6 +1,6 @@
 // https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type
-import { DecodeError } from "./DecodeError";
-import { getInt64, setInt64 } from "./utils/int";
+import { DecodeError } from "./DecodeError.ts";
+import { getInt64, setInt64 } from "./utils/int.ts";
 
 export const EXT_TIMESTAMP = -1;
 

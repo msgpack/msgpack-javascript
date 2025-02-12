@@ -1,33 +1,33 @@
 // Main Functions:
 
-import { encode } from "./encode";
+import { encode } from "./encode.ts";
 export { encode };
 
-import { decode, decodeMulti } from "./decode";
+import { decode, decodeMulti } from "./decode.ts";
 export { decode, decodeMulti };
 
-import { decodeAsync, decodeArrayStream, decodeMultiStream } from "./decodeAsync";
+import { decodeAsync, decodeArrayStream, decodeMultiStream } from "./decodeAsync.ts";
 export { decodeAsync, decodeArrayStream, decodeMultiStream };
 
-import { Decoder } from "./Decoder";
+import { Decoder } from "./Decoder.ts";
 export { Decoder };
-import type { DecoderOptions } from "./Decoder";
+import type { DecoderOptions } from "./Decoder.ts";
 export type { DecoderOptions };
-import { DecodeError } from "./DecodeError";
+import { DecodeError } from "./DecodeError.ts";
 export { DecodeError };
 
-import { Encoder } from "./Encoder";
+import { Encoder } from "./Encoder.ts";
 export { Encoder };
-import type { EncoderOptions } from "./Encoder";
+import type { EncoderOptions } from "./Encoder.ts";
 export type { EncoderOptions };
 
 // Utilities for Extension Types:
 
-import { ExtensionCodec } from "./ExtensionCodec";
+import { ExtensionCodec } from "./ExtensionCodec.ts";
 export { ExtensionCodec };
-import type { ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType } from "./ExtensionCodec";
+import type { ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType } from "./ExtensionCodec.ts";
 export type { ExtensionCodecType, ExtensionDecoderType, ExtensionEncoderType };
-import { ExtData } from "./ExtData";
+import { ExtData } from "./ExtData.ts";
 export { ExtData };
 
 import {
@@ -37,7 +37,7 @@ import {
   decodeTimestampToTimeSpec,
   encodeTimestampExtension,
   decodeTimestampExtension,
-} from "./timestamp";
+} from "./timestamp.ts";
 export {
   EXT_TIMESTAMP,
   encodeDateToTimeSpec,

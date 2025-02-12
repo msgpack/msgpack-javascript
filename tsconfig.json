@@ -41,7 +41,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitOverride": true,
     "verbatimModuleSyntax": false,
-    // "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
 
     /* Module Resolution Options */

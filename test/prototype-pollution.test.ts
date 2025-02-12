@@ -1,5 +1,5 @@
 import { throws } from "assert";
-import { encode, decode, DecodeError } from "../src/index";
+import { encode, decode, DecodeError } from "../src/index.ts";
 
 describe("prototype pollution", () => {
   context("__proto__ exists as a map key", () => {

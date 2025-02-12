@@ -1,5 +1,5 @@
 import { deepStrictEqual } from "assert";
-import { Encoder, Decoder, decode } from "../src/index";
+import { Encoder, Decoder, decode } from "../src/index.ts";
 
 const createStream = async function* (...args: any) {
   for (const item of args) {

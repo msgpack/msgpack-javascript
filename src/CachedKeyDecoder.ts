@@ -1,4 +1,4 @@
-import { utf8DecodeJs } from "./utils/utf8";
+import { utf8DecodeJs } from "./utils/utf8.ts";
 
 const DEFAULT_MAX_KEY_LENGTH = 16;
 const DEFAULT_MAX_LENGTH_PER_KEY = 16;

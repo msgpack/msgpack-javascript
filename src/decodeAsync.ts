@@ -1,8 +1,8 @@
-import { Decoder } from "./Decoder";
-import { ensureAsyncIterable } from "./utils/stream";
-import type { DecoderOptions } from "./Decoder";
-import type { ReadableStreamLike } from "./utils/stream";
-import type { SplitUndefined } from "./context";
+import { Decoder } from "./Decoder.ts";
+import { ensureAsyncIterable } from "./utils/stream.ts";
+import type { DecoderOptions } from "./Decoder.ts";
+import type { ReadableStreamLike } from "./utils/stream.ts";
+import type { SplitUndefined } from "./context.ts";
 
 /**
  * @throws {@link RangeError} if the buffer is incomplete, including the case where the buffer is empty.

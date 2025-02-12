@@ -1,7 +1,7 @@
 // ExtensionCodec to handle MessagePack extensions
 
-import { ExtData } from "./ExtData";
-import { timestampExtension } from "./timestamp";
+import { ExtData } from "./ExtData.ts";
+import { timestampExtension } from "./timestamp.ts";
 
 export type ExtensionDecoderType<ContextType> = (
   data: Uint8Array,
