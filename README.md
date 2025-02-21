@@ -145,17 +145,20 @@ NodeJS `Buffer` is also acceptable because it is a subclass of `Uint8Array`.
 
 #### `DecoderOptions`
 
-| Name           | Type           | Default                       |
-| -------------- | -------------- | ----------------------------- |
-| extensionCodec | ExtensionCodec | `ExtensionCodec.defaultCodec` |
-| context        | user-defined   | -                             |
-| useBigInt64    | boolean        | false                         |
-| rawStrings     | boolean        | false                         |
-| maxStrLength   | number         | `4_294_967_295` (UINT32_MAX)  |
-| maxBinLength   | number         | `4_294_967_295` (UINT32_MAX)  |
-| maxArrayLength | number         | `4_294_967_295` (UINT32_MAX)  |
-| maxMapLength   | number         | `4_294_967_295` (UINT32_MAX)  |
-| maxExtLength   | number         | `4_294_967_295` (UINT32_MAX)  |
+| Name            | Type                | Default                                        |
+| --------------- | ------------------- | ---------------------------------------------- |
+| extensionCodec  | ExtensionCodec      | `ExtensionCodec.defaultCodec`                  |
+| context         | user-defined        | -                                              |
+| useBigInt64     | boolean             | false                                          |
+| rawStrings      | boolean             | false                                          |
+| maxStrLength    | number              | `4_294_967_295` (UINT32_MAX)                   |
+| maxBinLength    | number              | `4_294_967_295` (UINT32_MAX)                   |
+| maxArrayLength  | number              | `4_294_967_295` (UINT32_MAX)                   |
+| maxMapLength    | number              | `4_294_967_295` (UINT32_MAX)                   |
+| maxExtLength    | number              | `4_294_967_295` (UINT32_MAX)                   |
+| mapKeyConverter | MapKeyConverterType | throw exception if key is not string or number |
+
+`MapKeyConverterType` is defined as `(key: unknown) => string | number`.
 
 To skip UTF-8 decoding of strings, `rawStrings` can be set to `true`. In this case, strings are decoded into `Uint8Array`.
 

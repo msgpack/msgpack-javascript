@@ -36,6 +36,21 @@ describe("decodeAsync", () => {
     assert.deepStrictEqual(object, { "foo": "bar" });
   });
 
+  it("decodes fixmap {'[1, 2]': 'baz'} with custom map key converter", async () => {
+    const createStream = async function* () {
+      yield [0x81]; // fixmap size=1
+      yield encode([1, 2]);
+      yield encode("baz");
+    };
+
+    const object = await decodeAsync(createStream(), {
+      mapKeyConverter: (key) => JSON.stringify(key),
+    });
+
+    const key = JSON.stringify([1, 2]);
+    assert.deepStrictEqual(object, { [key]: "baz" });
+  });
+
   it("decodes multi-byte integer byte-by-byte", async () => {
     const createStream = async function* () {
       yield [0xcd]; // uint 16

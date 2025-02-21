@@ -68,6 +68,13 @@ export type DecoderOptions<ContextType = undefined> = Readonly<
      * `null` is a special value to disable the use of the key decoder at all.
      */
     keyDecoder: KeyDecoder | null;
+
+    /**
+     * A function to convert decoded map key to a valid JS key type.
+     * 
+     * Defaults to a function that throws an error if the key is not a string or a number.
+     */
+    mapKeyConverter: (key: unknown) => MapKeyType;
   }>
 > &
   ContextOf<ContextType>;
@@ -78,8 +85,11 @@ const STATE_MAP_VALUE = "map_value";
 
 type MapKeyType = string | number;
 
-const isValidMapKeyType = (key: unknown): key is MapKeyType => {
-  return typeof key === "string" || typeof key === "number";
+const mapKeyConverter = (key: unknown): MapKeyType => {
+  if (typeof key === "string" || typeof key === "number") {
+    return key;
+  }
+  throw new DecodeError("The type of key must be string or number but " + typeof key);
 };
 
 type StackMapState = {
@@ -213,6 +223,7 @@ export class Decoder<ContextType = undefined> {
   private readonly maxMapLength: number;
   private readonly maxExtLength: number;
   private readonly keyDecoder: KeyDecoder | null;
+  private readonly mapKeyConverter: (key: unknown) => MapKeyType;
 
   private totalPos = 0;
   private pos = 0;
@@ -236,6 +247,7 @@ export class Decoder<ContextType = undefined> {
     this.maxMapLength = options?.maxMapLength ?? UINT32_MAX;
     this.maxExtLength = options?.maxExtLength ?? UINT32_MAX;
     this.keyDecoder = options?.keyDecoder !== undefined ? options.keyDecoder : sharedCachedKeyDecoder;
+    this.mapKeyConverter = options?.mapKeyConverter ?? mapKeyConverter;
   }
 
   private clone(): Decoder<ContextType> {
@@ -631,14 +643,11 @@ export class Decoder<ContextType = undefined> {
             continue DECODE;
           }
         } else if (state.type === STATE_MAP_KEY) {
-          if (!isValidMapKeyType(object)) {
-            throw new DecodeError("The type of key must be string or number but " + typeof object);
-          }
           if (object === "__proto__") {
             throw new DecodeError("The key __proto__ is not allowed");
           }
 
-          state.key = object;
+          state.key = this.mapKeyConverter(object);
           state.type = STATE_MAP_VALUE;
           continue DECODE;
         } else {
