@@ -1,5 +1,12 @@
 # This is the revision history of @msgpack/msgpack
 
+
+## 3.1.0 2025-02-21
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.0.1...v3.1.0
+
+* Added support for nonstandard map keys in the decoder ([#266](https://github.com/msgpack/msgpack-javascript/pull/266) by @PejmanNik)
+
 ## 3.0.1 2025-02-11
 
 https://github.com/msgpack/msgpack-javascript/compare/v3.0.0...v3.0.1
