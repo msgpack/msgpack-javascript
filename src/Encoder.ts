@@ -1,4 +1,3 @@
-import "./utils/symbol.dispose.ts";
 import { utf8Count, utf8Encode } from "./utils/utf8.ts";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec.ts";
 import { setInt64, setUint64 } from "./utils/int.ts";
@@ -127,15 +126,6 @@ export class Encoder<ContextType = undefined> {
     this.pos = 0;
   }
 
-  private enteringGuard(): Disposable {
-    this.entered = true;
-    return {
-      [Symbol.dispose]: () => {
-        this.entered = false;
-      },
-    };
-  }
-
   /**
    * This is almost equivalent to {@link Encoder#encode}, but it returns an reference of the encoder's internal buffer and thus much faster than {@link Encoder#encode}.
    *
@@ -146,12 +136,16 @@ export class Encoder<ContextType = undefined> {
       const instance = this.clone();
       return instance.encodeSharedRef(object);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    using _guard = this.enteringGuard();
 
-    this.reinitializeState();
-    this.doEncode(object, 1);
-    return this.bytes.subarray(0, this.pos);
+    try {
+      this.entered = true;
+
+      this.reinitializeState();
+      this.doEncode(object, 1);
+      return this.bytes.subarray(0, this.pos);
+    } finally {
+      this.entered = false;
+    }
   }
 
   /**
@@ -162,12 +156,16 @@ export class Encoder<ContextType = undefined> {
       const instance = this.clone();
       return instance.encode(object);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    using _guard = this.enteringGuard();
 
-    this.reinitializeState();
-    this.doEncode(object, 1);
-    return this.bytes.slice(0, this.pos);
+    try {
+      this.entered = true;
+
+      this.reinitializeState();
+      this.doEncode(object, 1);
+      return this.bytes.slice(0, this.pos);
+    } finally {
+      this.entered = false;
+    }
   }
 
   private doEncode(object: unknown, depth: number): void {
