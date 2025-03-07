@@ -339,6 +339,8 @@ export class Encoder<ContextType = undefined> {
     const ext = this.extensionCodec.tryToEncode(object, this.context);
     if (ext != null) {
       this.encodeExtension(ext);
+    } else if (object instanceof Number) {
+      this.encodeNumber(object.valueOf());
     } else if (Array.isArray(object)) {
       this.encodeArray(object, depth);
     } else if (ArrayBuffer.isView(object)) {
