@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.1.1 2025-03-12
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.1.0...v3.1.1
+
+* Stop using `Symbol.dispose`, which is not yet supported in some environments ([#268](https://github.com/msgpack/msgpack-javascript/pull/268) by @rijenkii)
+
 
 ## 3.1.0 2025-02-21
 
