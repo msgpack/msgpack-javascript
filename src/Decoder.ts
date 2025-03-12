@@ -1,4 +1,3 @@
-import "./utils/symbol.dispose.ts";
 import { prettyByte } from "./utils/prettyByte.ts";
 import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec.ts";
 import { getInt64, getUint64, UINT32_MAX } from "./utils/int.ts";
@@ -305,15 +304,6 @@ export class Decoder<ContextType = undefined> {
     return new RangeError(`Extra ${view.byteLength - pos} of ${view.byteLength} byte(s) found at buffer[${posToShow}]`);
   }
 
-  private enteringGuard(): Disposable {
-    this.entered = true;
-    return {
-      [Symbol.dispose]: () => {
-        this.entered = false;
-      },
-    };
-  }
-
   /**
    * @throws {@link DecodeError}
    * @throws {@link RangeError}
@@ -323,17 +313,21 @@ export class Decoder<ContextType = undefined> {
       const instance = this.clone();
       return instance.decode(buffer);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    using _guard = this.enteringGuard();
 
-    this.reinitializeState();
-    this.setBuffer(buffer);
+    try {
+      this.entered = true;
 
-    const object = this.doDecodeSync();
-    if (this.hasRemaining(1)) {
-      throw this.createExtraByteError(this.pos);
+      this.reinitializeState();
+      this.setBuffer(buffer);
+
+      const object = this.doDecodeSync();
+      if (this.hasRemaining(1)) {
+        throw this.createExtraByteError(this.pos);
+      }
+      return object;
+    } finally {
+      this.entered = false;
     }
-    return object;
   }
 
   public *decodeMulti(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): Generator<unknown, void, unknown> {
@@ -342,14 +336,18 @@ export class Decoder<ContextType = undefined> {
       yield* instance.decodeMulti(buffer);
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    using _guard = this.enteringGuard();
 
-    this.reinitializeState();
-    this.setBuffer(buffer);
+    try {
+      this.entered = true;
 
-    while (this.hasRemaining(1)) {
-      yield this.doDecodeSync();
+      this.reinitializeState();
+      this.setBuffer(buffer);
+
+      while (this.hasRemaining(1)) {
+        yield this.doDecodeSync();
+      }
+    } finally {
+      this.entered = false;
     }
   }
 
@@ -358,42 +356,46 @@ export class Decoder<ContextType = undefined> {
       const instance = this.clone();
       return instance.decodeAsync(stream);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    using _guard = this.enteringGuard();
 
-    let decoded = false;
-    let object: unknown;
-    for await (const buffer of stream) {
-      if (decoded) {
-        this.entered = false;
-        throw this.createExtraByteError(this.totalPos);
-      }
+    try {
+      this.entered = true;
 
-      this.appendBuffer(buffer);
-
-      try {
-        object = this.doDecodeSync();
-        decoded = true;
-      } catch (e) {
-        if (!(e instanceof RangeError)) {
-          throw e; // rethrow
+      let decoded = false;
+      let object: unknown;
+      for await (const buffer of stream) {
+        if (decoded) {
+          this.entered = false;
+          throw this.createExtraByteError(this.totalPos);
         }
-        // fallthrough
-      }
-      this.totalPos += this.pos;
-    }
 
-    if (decoded) {
-      if (this.hasRemaining(1)) {
-        throw this.createExtraByteError(this.totalPos);
-      }
-      return object;
-    }
+        this.appendBuffer(buffer);
 
-    const { headByte, pos, totalPos } = this;
-    throw new RangeError(
-      `Insufficient data in parsing ${prettyByte(headByte)} at ${totalPos} (${pos} in the current buffer)`,
-    );
+        try {
+          object = this.doDecodeSync();
+          decoded = true;
+        } catch (e) {
+          if (!(e instanceof RangeError)) {
+            throw e; // rethrow
+          }
+          // fallthrough
+        }
+        this.totalPos += this.pos;
+      }
+
+      if (decoded) {
+        if (this.hasRemaining(1)) {
+          throw this.createExtraByteError(this.totalPos);
+        }
+        return object;
+      }
+
+      const { headByte, pos, totalPos } = this;
+      throw new RangeError(
+        `Insufficient data in parsing ${prettyByte(headByte)} at ${totalPos} (${pos} in the current buffer)`,
+      );
+    } finally {
+      this.entered = false;
+    }
   }
 
   public decodeArrayStream(
@@ -412,39 +414,43 @@ export class Decoder<ContextType = undefined> {
       yield* instance.decodeMultiAsync(stream, isArray);
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    using _guard = this.enteringGuard();
 
-    let isArrayHeaderRequired = isArray;
-    let arrayItemsLeft = -1;
+    try {
+      this.entered = true;
 
-    for await (const buffer of stream) {
-      if (isArray && arrayItemsLeft === 0) {
-        throw this.createExtraByteError(this.totalPos);
-      }
+      let isArrayHeaderRequired = isArray;
+      let arrayItemsLeft = -1;
 
-      this.appendBuffer(buffer);
+      for await (const buffer of stream) {
+        if (isArray && arrayItemsLeft === 0) {
+          throw this.createExtraByteError(this.totalPos);
+        }
 
-      if (isArrayHeaderRequired) {
-        arrayItemsLeft = this.readArraySize();
-        isArrayHeaderRequired = false;
-        this.complete();
-      }
+        this.appendBuffer(buffer);
 
-      try {
-        while (true) {
-          yield this.doDecodeSync();
-          if (--arrayItemsLeft === 0) {
-            break;
+        if (isArrayHeaderRequired) {
+          arrayItemsLeft = this.readArraySize();
+          isArrayHeaderRequired = false;
+          this.complete();
+        }
+
+        try {
+          while (true) {
+            yield this.doDecodeSync();
+            if (--arrayItemsLeft === 0) {
+              break;
+            }
           }
+        } catch (e) {
+          if (!(e instanceof RangeError)) {
+            throw e; // rethrow
+          }
+          // fallthrough
         }
-      } catch (e) {
-        if (!(e instanceof RangeError)) {
-          throw e; // rethrow
-        }
-        // fallthrough
+        this.totalPos += this.pos;
       }
-      this.totalPos += this.pos;
+    } finally {
+      this.entered = false;
     }
   }
 
