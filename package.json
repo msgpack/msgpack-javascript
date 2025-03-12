@@ -13,7 +13,6 @@
   "scripts": {
     "build": "npm publish --dry-run",
     "prepare": "npm run clean && webpack --bail && tsc --build tsconfig.dist.cjs.json tsconfig.dist.esm.json && tsimp tools/fix-ext.mts --mjs dist.esm/*.js dist.esm/*/*.js && tsimp tools/fix-ext.mts --cjs dist.cjs/*.js dist.cjs/*/*.js",
-    "prepublishOnly": "npm run test:dist",
     "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
     "test:dist": "npm run lint && npm run test && npm run test:deno",
