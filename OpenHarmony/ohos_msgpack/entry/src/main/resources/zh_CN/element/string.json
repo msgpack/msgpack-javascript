@@ -1,0 +1,88 @@
+{
+  "string": [
+    {
+      "name": "entry_MainAbility",
+      "value": "msgpack"
+    },
+    {
+      "name": "description_mainability",
+      "value": "Empty Ability"
+    },
+    {
+      "name": "Display_encoded_data",
+      "value": "编码后的数据展示"
+    },
+    {
+      "name": "Display_decoded_data",
+      "value": "解码后的数据展示"
+    },
+    {
+      "name": "Error_message",
+      "value": "错误提示"
+    },
+    {
+      "name": "Constructor_encoding",
+      "value": "点击构造器编码"
+    },
+    {
+      "name": "Encoded_data",
+      "value": "编码后的数据="
+    },
+    {
+      "name": "constructor_to_decode",
+      "value": "点击构造器解码"
+    },
+    {
+      "name": "Decoded_data",
+      "value": "解码后的数据="
+    },
+    {
+      "name": "undefined",
+      "value": "解码数据为undefined, 请先点击编码"
+    },
+    {
+      "name": "Object_encoding",
+      "value": "点击对象编码"
+    },
+    {
+      "name": "decode",
+      "value": "点击解码"
+    },
+    {
+      "name": "log",
+      "value": "点击查看log编码输入和解码输出"
+    },
+    {
+      "name": "Simple_encoding_and_decoding",
+      "value": "简单编码解码"
+    },
+    {
+      "name": "Constructor_encoding_and_decoding",
+      "value": "构造器编码解码"
+    },
+    {
+      "name": "Complex_encoding_decoding",
+      "value": "复杂Multi编码解码"
+    },
+    {
+      "name": "Special_Character",
+      "value": "特殊字符扩展编解码"
+    },
+    {
+      "name": "Display_original_data",
+      "value": "展示原数据"
+    },
+    {
+      "name": "Data_display_after_decodeMulti_decoding",
+      "value": "decodeMulti解码后的数据展示"
+    },
+    {
+      "name": "Object_Display",
+      "value": "对象展示"
+    },
+    {
+      "name": "MultiDecoder",
+      "value": "点击MultiDecode"
+    }
+  ]
+}

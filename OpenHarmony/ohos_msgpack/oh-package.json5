@@ -1,0 +1,12 @@
+{
+  "license": "",
+  "devDependencies": {
+    "@ohos/hypium": "1.0.6"
+  },
+  "author": "",
+  "name": "ohos_msgpack",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "version": "1.0.2-rc.0",
+  "dependencies": {}
+}

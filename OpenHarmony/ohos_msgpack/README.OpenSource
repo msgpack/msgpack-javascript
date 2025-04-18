@@ -1,0 +1,11 @@
+[
+    {
+        "Name": "msgpack-javascript",
+        "License": "ISC License",
+        "License File": " LICENSE ",
+        "Version Number": "v3.0.0-beta2",
+        "Owner": "xiafeng@huawei.com",
+        "Upstream URL": "https://github.com/msgpack/msgpack-javascript",
+        "Description": "MessagePack is an extremely efficient object serialization library. It's like JSON, but very fast and small."
+    }
+]

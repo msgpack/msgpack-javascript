@@ -1,0 +1,88 @@
+{
+  "string": [
+    {
+      "name": "entry_MainAbility",
+      "value": "msgpack"
+    },
+    {
+      "name": "description_mainability",
+      "value": "Empty Ability"
+    },
+    {
+      "name": "Display_encoded_data",
+      "value": "Display of encoded data"
+    },
+    {
+      "name": "Display_decoded_data",
+      "value": "Display of decoded data"
+    },
+    {
+      "name": "Error_message",
+      "value": "Error message"
+    },
+    {
+      "name": "Constructor_encoding",
+      "value": "Constructor encoding"
+    },
+    {
+      "name": "Encoded_data",
+      "value": "Encoded data="
+    },
+    {
+      "name": "constructor_to_decode",
+      "value": "Constructor decoding"
+    },
+    {
+      "name": "Decoded_data",
+      "value": "Decoded data="
+    },
+    {
+      "name": "undefined",
+      "value": "The decoded data is undefined. Please click on the encoding button first"
+    },
+    {
+      "name": "Object_encoding",
+      "value": "Object encoding"
+    },
+    {
+      "name": "decode",
+      "value": "Decode"
+    },
+    {
+      "name": "log",
+      "value": "Click to view log encoding input and decoding output"
+    },
+    {
+      "name": "Simple_encoding_and_decoding",
+      "value": "Simple encoding and decoding"
+    },
+    {
+      "name": "Constructor_encoding_and_decoding",
+      "value": "Constructor encoding and decoding"
+    },
+    {
+      "name": "Complex_encoding_decoding",
+      "value": "Complex encoding and decoding"
+    },
+    {
+      "name": "Special_Character",
+      "value": "Special Character Extended Encoding and Decoding"
+    },
+    {
+      "name": "Display_original_data",
+      "value": "Display original data"
+    },
+    {
+      "name": "Data_display_after_decodeMulti_decoding",
+      "value": "Data display after decodeMulti decoding"
+    },
+    {
+      "name": "Object_Display",
+      "value": "Object Display"
+    },
+    {
+      "name": "MultiDecoder",
+      "value": "MultiDecoder"
+    }
+  ]
+}
