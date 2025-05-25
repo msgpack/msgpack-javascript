@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         cache: npm
-        node-version: "18"
+        node-version: "20"
 
     # npm@9 may fail with https://github.com/npm/cli/issues/6723
     # npm@10 may fail with "GitFetcher requires an Arborist constructor to pack a tarball"
