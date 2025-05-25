@@ -27,10 +27,6 @@ jobs:
     - run: npm install -g nyc
     - run: npm ci
     - run: npm run test:cover
-    - uses: codecov/codecov-action@v5
-      with:
-        files: coverage/coverage-final.json
-        token: ${{ secrets.CODECOV_TOKEN }}
 
   browser:
     runs-on: ubuntu-latest
