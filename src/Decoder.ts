@@ -1,11 +1,13 @@
 import { prettyByte } from "./utils/prettyByte.ts";
-import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec.ts";
+import { ExtensionCodec } from "./ExtensionCodec.ts";
 import { getInt64, getUint64, UINT32_MAX } from "./utils/int.ts";
 import { utf8Decode } from "./utils/utf8.ts";
 import { ensureUint8Array } from "./utils/typedArrays.ts";
-import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder.ts";
+import { CachedKeyDecoder } from "./CachedKeyDecoder.ts";
 import { DecodeError } from "./DecodeError.ts";
 import type { ContextOf } from "./context.ts";
+import type { ExtensionCodecType } from "./ExtensionCodec.ts";
+import type { KeyDecoder } from "./CachedKeyDecoder.ts";
 
 export type DecoderOptions<ContextType = undefined> = Readonly<
   Partial<{
@@ -70,7 +72,7 @@ export type DecoderOptions<ContextType = undefined> = Readonly<
 
     /**
      * A function to convert decoded map key to a valid JS key type.
-     * 
+     *
      * Defaults to a function that throws an error if the key is not a string or a number.
      */
     mapKeyConverter: (key: unknown) => MapKeyType;
