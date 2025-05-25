@@ -337,7 +337,7 @@ extensionCodec.register({
   type: MYTYPE_EXT_TYPE,
   encode: (object, context) => {
     if (object instanceof MyType) {
-      context.track(object); // <-- like this
+      context.track(object);
       return encode(object.toJSON(), { extensionCodec, context });
     } else {
       return null;
@@ -346,7 +346,7 @@ extensionCodec.register({
   decode: (data, extType, context) => {
     const decoded = decode(data, { extensionCodec, context });
     const my = new MyType(decoded);
-    context.track(my); // <-- and like this
+    context.track(my);
     return my;
   },
 });
@@ -356,7 +356,7 @@ import { encode, decode } from "@msgpack/msgpack";
 
 const context = new MyContext();
 
-const encoded = = encode({myType: new MyType<any>()}, { extensionCodec, context });
+const encoded = encode({ myType: new MyType<any>() }, { extensionCodec, context });
 const decoded = decode(encoded, { extensionCodec, context });
 ```
 
@@ -376,7 +376,7 @@ So you might want to define a custom codec to handle bigint like this:
 
 ```typescript
 import { deepStrictEqual } from "assert";
-import { encode, decode, ExtensionCodec } from "@msgpack/msgpack";
+import { encode, decode, ExtensionCodec, DecodeError } from "@msgpack/msgpack";
 
 // to define a custom codec:
 const BIGINT_EXT_TYPE = 0; // Any in 0-127
@@ -405,7 +405,7 @@ extensionCodec.register({
 
 // to use it:
 const value = BigInt(Number.MAX_SAFE_INTEGER) + BigInt(1);
-const encoded: = encode(value, { extensionCodec });
+const encoded = encode(value, { extensionCodec });
 deepStrictEqual(decode(encoded, { extensionCodec }), value);
 ```
 
