@@ -81,6 +81,18 @@ jobs:
     - run: bun install
     - run: npm run test:bun
 
+  node_with_strip_types:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        cache: npm
+        node-version: '24'
+    - run: npm ci
+    - run: npm run test:node_with_strip_types
+
   timeline:
     runs-on: ubuntu-latest
     permissions:
