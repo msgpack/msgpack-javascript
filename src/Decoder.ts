@@ -3,10 +3,11 @@ import { ExtensionCodec } from "./ExtensionCodec.ts";
 import { getInt64, getUint64, UINT32_MAX } from "./utils/int.ts";
 import { utf8Decode } from "./utils/utf8.ts";
 import { ensureUint8Array } from "./utils/typedArrays.ts";
-import { CachedKeyDecoder, KeyDecoder } from "./CachedKeyDecoder.ts";
+import { CachedKeyDecoder } from "./CachedKeyDecoder.ts";
 import { DecodeError } from "./DecodeError.ts";
 import type { ContextOf } from "./context.ts";
 import type { ExtensionCodecType } from "./ExtensionCodec.ts";
+import type { KeyDecoder } from "./CachedKeyDecoder.ts";
 
 export type DecoderOptions<ContextType = undefined> = Readonly<
   Partial<{
