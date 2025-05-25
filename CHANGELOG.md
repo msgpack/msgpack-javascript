@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.1.2 2025-05-25
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.1.1...v3.1.2
+
+* Make sure this library works with `node --experimental-strip-types`
+
 ## 3.1.1 2025-03-12
 
 https://github.com/msgpack/msgpack-javascript/compare/v3.1.0...v3.1.1
