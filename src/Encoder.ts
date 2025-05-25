@@ -1,9 +1,10 @@
 import { utf8Count, utf8Encode } from "./utils/utf8.ts";
-import { ExtensionCodec, ExtensionCodecType } from "./ExtensionCodec.ts";
+import { ExtensionCodec } from "./ExtensionCodec.ts";
 import { setInt64, setUint64 } from "./utils/int.ts";
 import { ensureUint8Array } from "./utils/typedArrays.ts";
 import type { ExtData } from "./ExtData.ts";
 import type { ContextOf } from "./context.ts";
+import type { ExtensionCodecType } from "./ExtensionCodec.ts";
 
 export const DEFAULT_MAX_DEPTH = 100;
 export const DEFAULT_INITIAL_BUFFER_SIZE = 2048;
