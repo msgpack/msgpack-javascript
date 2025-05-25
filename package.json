@@ -22,7 +22,7 @@
     "test:bun": "bun test test/bun.spec.ts",
     "test:fuzz": "npm exec --yes -- jsfuzz@git+https://gitlab.com/gitlab-org/security-products/analyzers/fuzzers/jsfuzz.git#39e6cf16613a0e30c7a7953f62e64292dbd5d3f3 --fuzzTime 60 --no-versifier test/decode.jsfuzz.js corpus",
     "cover:clean": "rimraf .nyc_output coverage/",
-    "cover:report": "npx nyc report --reporter=text-summary --reporter=html --reporter=json",
+    "cover:report": "npx nyc report --reporter=text-summary",
     "test:browser": "karma start --single-run",
     "test:browser:firefox": "karma start --single-run --browsers FirefoxHeadless",
     "test:browser:chrome": "karma start --single-run --browsers ChromeHeadless",
