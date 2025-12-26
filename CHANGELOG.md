@@ -1,5 +1,11 @@
 # This is the revision history of @msgpack/msgpack
 
+## 3.1.3 2025-12-26
+
+https://github.com/msgpack/msgpack-javascript/compare/v3.1.2...v3.1.3
+
+*  More specific data types - ArrayBuffer instead of ArrayBufferLike (ts 5.9 compatibility issue) by @joshkel ([#279](https://github.com/msgpack/msgpack-javascript/pull/279))
+
 ## 3.1.2 2025-05-25
 
 https://github.com/msgpack/msgpack-javascript/compare/v3.1.1...v3.1.2
