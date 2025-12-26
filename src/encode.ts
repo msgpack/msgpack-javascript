@@ -11,7 +11,7 @@ import type { SplitUndefined } from "./context.ts";
 export function encode<ContextType = undefined>(
   value: unknown,
   options?: EncoderOptions<SplitUndefined<ContextType>>,
-): Uint8Array {
+): Uint8Array<ArrayBuffer> {
   const encoder = new Encoder(options);
   return encoder.encodeSharedRef(value);
 }

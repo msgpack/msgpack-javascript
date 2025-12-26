@@ -84,8 +84,8 @@ export class Encoder<ContextType = undefined> {
   private readonly forceIntegerToFloat: boolean;
 
   private pos: number;
-  private view: DataView;
-  private bytes: Uint8Array;
+  private view: DataView<ArrayBuffer>;
+  private bytes: Uint8Array<ArrayBuffer>;
 
   private entered = false;
 
@@ -132,7 +132,7 @@ export class Encoder<ContextType = undefined> {
    *
    * @returns Encodes the object and returns a shared reference the encoder's internal buffer.
    */
-  public encodeSharedRef(object: unknown): Uint8Array {
+  public encodeSharedRef(object: unknown): Uint8Array<ArrayBuffer> {
     if (this.entered) {
       const instance = this.clone();
       return instance.encodeSharedRef(object);
@@ -152,7 +152,7 @@ export class Encoder<ContextType = undefined> {
   /**
    * @returns Encodes the object and returns a copy of the encoder's internal buffer.
    */
-  public encode(object: unknown): Uint8Array {
+  public encode(object: unknown): Uint8Array<ArrayBuffer> {
     if (this.entered) {
       const instance = this.clone();
       return instance.encode(object);
