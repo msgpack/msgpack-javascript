@@ -1,8 +1,6 @@
-'use strict';
+import "ts-node/register";
 
-require("ts-node/register");
-
-module.exports = {
+export default {
   diff: true,
   extension: ['ts'],
   package: '../package.json',

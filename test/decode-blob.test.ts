@@ -18,8 +18,6 @@ import { encode, decode, decodeAsync } from "../src/index.ts";
       this.skip();
     }
 
-    // use any because the type of Blob#stream() in @types/node does not make sense here.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    assert.deepStrictEqual(await decodeAsync(blob.stream() as any), "Hello!");
+    assert.deepStrictEqual(await decodeAsync(blob.stream()), "Hello!");
   });
 });
