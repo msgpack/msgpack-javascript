@@ -1,5 +1,5 @@
 import { deepStrictEqual } from "assert";
-import { encode, decode } from "../src/index";
+import { encode, decode } from "../src/index.ts";
 
 describe("README", () => {
   context("## Synopsis", () => {
