@@ -58,7 +58,7 @@ jobs:
         cache: npm
         node-version: '22'
     - run: npm ci
-    - run: npx tsc
+    - run: npx tsgo
     - run: npm run lint
 
   deno:
