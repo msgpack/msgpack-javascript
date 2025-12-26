@@ -3,7 +3,7 @@ import { encode, decode, decodeAsync } from "../src/index.ts";
 
 (typeof Blob !== "undefined" ? describe : describe.skip)("Blob", () => {
   it("decodes it with `decode()`", async function () {
-    const blob = new Blob([encode("Hello!") as BlobPart]);
+    const blob = new Blob([encode("Hello!")]);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!blob.arrayBuffer) {
       this.skip();
@@ -12,7 +12,7 @@ import { encode, decode, decodeAsync } from "../src/index.ts";
   });
 
   it("decodes it with `decodeAsync()`", async function () {
-    const blob = new Blob([encode("Hello!") as BlobPart]);
+    const blob = new Blob([encode("Hello!")]);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!blob.stream) {
       this.skip();
