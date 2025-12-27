@@ -1,14 +1,12 @@
 /**
- * WebAssembly-based UTF-8 string processing using js-string-builtins.
+ * WebAssembly-based UTF-8 string processing using js-string-builtins with GC arrays.
  *
  * Environment variables:
  * - MSGPACK_WASM=force: Force wasm mode, throw error if wasm fails to load
  * - MSGPACK_WASM=never: Disable wasm, always use pure JS
  *
- * Three-tier fallback:
- * 1. Native js-string-builtins (Chrome 130+, Firefox 134+)
- * 2. Wasm + polyfill (older browsers with WebAssembly)
- * 3. Pure JS (no WebAssembly support)
+ * This implementation uses WASM GC arrays with intoCharCodeArray/fromCharCodeArray
+ * for efficient bulk string operations instead of character-by-character processing.
  */
 
 import { wasmBinary } from "./utf8-wasm-binary.ts";
@@ -39,18 +37,17 @@ function getWasmMode(): "force" | "never" | "auto" {
 
 const WASM_MODE = getWasmMode();
 
+// GC array type (opaque reference)
+type I16Array = object;
+
 interface WasmExports {
   memory: WebAssembly.Memory;
   utf8Count(str: string): number;
   utf8Encode(str: string, offset: number): number;
-  utf8DecodeToMemory(length: number): number;
+  utf8DecodeToArray(length: number, arr: I16Array): number;
+  allocArray(size: number): I16Array;
+  arrayToString(arr: I16Array, start: number, end: number): string;
 }
-
-// Memory layout constants (must match WAT file)
-const UTF16_OFFSET = 32768; // 32KB offset for UTF-16 output
-
-// Shared TextDecoder for UTF-16LE decoding
-const utf16Decoder = new TextDecoder("utf-16le");
 
 let wasmInstance: WasmExports | null = null;
 let wasmInitError: Error | null = null;
@@ -67,17 +64,6 @@ function base64ToBytes(base64: string): Uint8Array {
   // Node.js fallback
   return new Uint8Array(Buffer.from(base64, "base64"));
 }
-
-// Polyfill for js-string-builtins (used when native builtins unavailable)
-const jsStringPolyfill = {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  "wasm:js-string": {
-    length: (s: string) => s.length,
-    charCodeAt: (s: string, i: number) => s.charCodeAt(i),
-    fromCharCode: (code: number) => String.fromCharCode(code),
-    concat: (a: string, b: string) => a + b,
-  },
-};
 
 function tryInitWasm(): void {
   if (wasmInstance !== null || wasmInitError !== null) {
@@ -96,14 +82,9 @@ function tryInitWasm(): void {
 
     const bytes = base64ToBytes(wasmBinary);
 
-    // Try with builtins option (native support)
-    // If builtins not supported, option is ignored and polyfill is used
-
-
+    // Requires js-string builtins support (Node.js 24+ / Chrome 130+ / Firefox 134+)
     const module: WebAssembly.Module = new (WebAssembly.Module as any)(bytes, { builtins: ["js-string"] });
-
-
-    const instance = new (WebAssembly.Instance)(module, jsStringPolyfill);
+    const instance = new WebAssembly.Instance(module);
     wasmInstance = instance.exports as unknown as WasmExports;
   } catch (e) {
     wasmInitError = e instanceof Error ? e : new Error(String(e));
@@ -121,7 +102,7 @@ tryInitWasm();
  * Whether wasm is available and initialized.
  */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-export const WASM_AVAILABLE = (wasmInstance !== null);
+export const WASM_AVAILABLE = wasmInstance !== null;
 
 /**
  * Get the wasm initialization error, if any.
@@ -156,16 +137,20 @@ export function utf8EncodeWasm(str: string, output: Uint8Array, outputOffset: nu
     throw new Error("wasm not initialized");
   }
 
+  // Estimate max byte length without a full pass over the string.
+  // Each UTF-16 code unit can produce at most 3 UTF-8 bytes (BMP chars).
+  // Surrogate pairs (2 code units) produce 4 bytes, so 3 bytes/code unit is safe.
+  const maxByteLength = str.length * 3;
+
   // Ensure wasm memory is large enough
-  const byteLength = wasmInstance.utf8Count(str);
-  const requiredPages = Math.ceil((outputOffset + byteLength) / 65536);
+  const requiredPages = Math.ceil(maxByteLength / 65536);
   const currentPages = wasmInstance.memory.buffer.byteLength / 65536;
 
   if (requiredPages > currentPages) {
     wasmInstance.memory.grow(requiredPages - currentPages);
   }
 
-  // Encode to wasm memory
+  // Encode to wasm memory (uses intoCharCodeArray for bulk char extraction)
   const bytesWritten = wasmInstance.utf8Encode(str, 0);
 
   // Copy from wasm memory to output buffer
@@ -177,32 +162,36 @@ export function utf8EncodeWasm(str: string, output: Uint8Array, outputOffset: nu
 
 /**
  * Decode UTF-8 bytes to string.
+ * Uses GC arrays with fromCharCodeArray for efficient string creation.
  */
 export function utf8DecodeWasm(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   if (wasmInstance === null) {
     throw new Error("wasm not initialized");
   }
 
-  // Ensure wasm memory is large enough
-  // Need space for UTF-8 input (0 to byteLength) and UTF-16 output (UTF16_OFFSET onwards)
-  // Max UTF-16 output is 2 bytes per code unit, and max expansion is 2x (for ASCII)
-  const utf16MaxBytes = byteLength * 2;
-  const requiredBytes = UTF16_OFFSET + utf16MaxBytes;
-  const requiredPages = Math.ceil(requiredBytes / 65536);
+  // Handle empty input
+  if (byteLength === 0) {
+    return "";
+  }
+
+  // Ensure wasm memory is large enough for UTF-8 input
+  const requiredPages = Math.ceil(byteLength / 65536);
   const currentPages = wasmInstance.memory.buffer.byteLength / 65536;
 
   if (requiredPages > currentPages) {
     wasmInstance.memory.grow(requiredPages - currentPages);
   }
 
-  // Copy bytes to wasm memory at offset 0
+  // Copy UTF-8 bytes to wasm linear memory at offset 0
   const wasmBytes = new Uint8Array(wasmInstance.memory.buffer, 0, byteLength);
   wasmBytes.set(bytes.subarray(inputOffset, inputOffset + byteLength));
 
-  // Decode UTF-8 to UTF-16 in wasm memory, get number of code units
-  const codeUnits = wasmInstance.utf8DecodeToMemory(byteLength);
+  // Allocate GC array for UTF-16 output (max size = byteLength for ASCII)
+  const arr = wasmInstance.allocArray(byteLength);
 
-  // Read UTF-16 code units from wasm memory and decode to string
-  const utf16Bytes = new Uint8Array(wasmInstance.memory.buffer, UTF16_OFFSET, codeUnits * 2);
-  return utf16Decoder.decode(utf16Bytes);
+  // Decode UTF-8 to UTF-16 in GC array
+  const codeUnits = wasmInstance.utf8DecodeToArray(byteLength, arr);
+
+  // Create string directly from GC array using fromCharCodeArray
+  return wasmInstance.arrayToString(arr, 0, codeUnits);
 }

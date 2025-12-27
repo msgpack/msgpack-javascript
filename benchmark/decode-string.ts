@@ -5,6 +5,11 @@ import { getWasmError, utf8DecodeWasm } from "../src/utils/utf8-wasm.ts";
 // @ts-ignore
 import Benchmark from "benchmark";
 
+// description
+console.log("utf8DecodeJs - pure JS implementation");
+console.log("utf8DecodeTD - TextDecoder implementation");
+console.log("utf8DecodeWasm - WebAssembly implementation");
+
 // Show wasm status
 console.log("=".repeat(60));
 console.log("WebAssembly Status:");
@@ -42,7 +47,7 @@ for (const baseStr of ["A", "あ", "🌏"]) {
       }
     });
 
-    suite.add("utf8DecodeTD (TextDecoder)", () => {
+    suite.add("utf8DecodeTD", () => {
       if (utf8DecodeTD(bytes, 0, byteLength) !== str) {
         throw new Error("wrong result!");
       }

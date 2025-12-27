@@ -5,6 +5,11 @@ import { getWasmError, utf8EncodeWasm } from "../src/utils/utf8-wasm.ts";
 // @ts-ignore
 import Benchmark from "benchmark";
 
+// description
+console.log("utf8EncodeJs - pure JS implementation");
+console.log("utf8EncodeTE - TextEncoder implementation");
+console.log("utf8EncodeWasm - WebAssembly implementation");
+
 // Show wasm status
 console.log("=".repeat(60));
 console.log("WebAssembly Status:");
@@ -39,7 +44,7 @@ for (const baseStr of ["A", "あ", "🌏"]) {
       utf8EncodeJs(str, buffer, 0);
     });
 
-    suite.add("utf8EncodeTE (TextEncoder)", () => {
+    suite.add("utf8EncodeTE", () => {
       utf8EncodeTE(str, buffer, 0);
     });
 

@@ -20,7 +20,9 @@ describe("utf8-wasm", () => {
         assert.ok(exports !== null);
         assert.ok(typeof exports!.utf8Count === "function");
         assert.ok(typeof exports!.utf8Encode === "function");
-        assert.ok(typeof exports!.utf8DecodeToMemory === "function");
+        assert.ok(typeof exports!.utf8DecodeToArray === "function");
+        assert.ok(typeof exports!.allocArray === "function");
+        assert.ok(typeof exports!.arrayToString === "function");
         assert.ok(exports!.memory instanceof WebAssembly.Memory);
       } else {
         assert.strictEqual(exports, null);

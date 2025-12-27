@@ -7,7 +7,7 @@ set -e
 cd "$(dirname "$0")"
 
 echo "Compiling utf8.wat -> utf8.wasm..."
-wasm-as utf8.wat -o utf8.wasm --enable-reference-types --enable-gc
+wasm-as utf8.wat -o utf8.wasm --enable-reference-types --enable-gc --enable-strings
 
 echo "Generating base64 TypeScript module..."
 cat > ../src/utils/utf8-wasm-binary.ts << 'HEADER'

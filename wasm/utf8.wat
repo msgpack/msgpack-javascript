@@ -1,41 +1,49 @@
-;; UTF-8 string processing using js-string-builtins
+;; UTF-8 string processing using js-string-builtins with GC arrays
 ;; https://github.com/WebAssembly/js-string-builtins
+;;
+;; This implementation uses WASM GC arrays with intoCharCodeArray/fromCharCodeArray
+;; for efficient bulk string operations instead of character-by-character processing.
 
 (module
+  ;; Define i16 array type for UTF-16 code units
+  (type $i16_array (array (mut i16)))
+
   ;; Import js-string builtins
-  ;; Note: string parameters use externref, string returns use (ref extern)
   (import "wasm:js-string" "length"
     (func $str_length (param externref) (result i32)))
-  (import "wasm:js-string" "charCodeAt"
-    (func $str_charCodeAt (param externref i32) (result i32)))
-  (import "wasm:js-string" "fromCharCode"
-    (func $str_fromCharCode (param i32) (result (ref extern))))
-  (import "wasm:js-string" "concat"
-    (func $str_concat (param externref externref) (result (ref extern))))
+  (import "wasm:js-string" "intoCharCodeArray"
+    (func $str_into_array (param externref (ref $i16_array) i32) (result i32)))
+  (import "wasm:js-string" "fromCharCodeArray"
+    (func $str_from_array (param (ref $i16_array) i32 i32) (result (ref extern))))
 
-  ;; Linear memory layout:
-  ;; - 0 to 32KB: UTF-8 input bytes
-  ;; - 32KB onwards: UTF-16 code units output (i16 array)
+  ;; Linear memory for UTF-8 bytes (64KB initial, exported for JS access)
   (memory (export "memory") 1)
 
-  ;; Offset where UTF-16 output starts (32KB = 32768)
-  (global $utf16_offset i32 (i32.const 32768))
-
   ;; Count UTF-8 byte length of a JS string
-  ;; This is equivalent to Buffer.byteLength(str, 'utf8') or TextEncoder().encode(str).length
+  ;; Uses GC array to get all char codes at once
   (func (export "utf8Count") (param $str externref) (result i32)
-    (local $i i32)
     (local $len i32)
+    (local $arr (ref $i16_array))
+    (local $i i32)
     (local $byteLen i32)
     (local $code i32)
 
     (local.set $len (call $str_length (local.get $str)))
 
+    ;; Handle empty string
+    (if (i32.eqz (local.get $len))
+      (then (return (i32.const 0))))
+
+    ;; Allocate array and copy string chars
+    (local.set $arr (array.new $i16_array (i32.const 0) (local.get $len)))
+    (drop (call $str_into_array (local.get $str) (local.get $arr) (i32.const 0)))
+
+    ;; Count UTF-8 bytes
     (block $break
       (loop $continue
         (br_if $break (i32.ge_u (local.get $i) (local.get $len)))
 
-        (local.set $code (call $str_charCodeAt (local.get $str) (local.get $i)))
+        (local.set $code (array.get_u $i16_array (local.get $arr) (local.get $i)))
 
         ;; 1-byte: 0x00-0x7F
         (if (i32.lt_u (local.get $code) (i32.const 0x80))
@@ -64,9 +72,11 @@
 
   ;; Encode JS string to UTF-8 bytes at offset in linear memory
   ;; Returns number of bytes written
+  ;; Uses intoCharCodeArray for bulk char code extraction
   (func (export "utf8Encode") (param $str externref) (param $offset i32) (result i32)
-    (local $i i32)
     (local $len i32)
+    (local $arr (ref $i16_array))
+    (local $i i32)
     (local $pos i32)
     (local $code i32)
     (local $code2 i32)
@@ -74,11 +84,20 @@
     (local.set $len (call $str_length (local.get $str)))
     (local.set $pos (local.get $offset))
 
+    ;; Handle empty string
+    (if (i32.eqz (local.get $len))
+      (then (return (i32.const 0))))
+
+    ;; Allocate array and copy all char codes at once
+    (local.set $arr (array.new $i16_array (i32.const 0) (local.get $len)))
+    (drop (call $str_into_array (local.get $str) (local.get $arr) (i32.const 0)))
+
+    ;; Encode to UTF-8
     (block $break
       (loop $continue
         (br_if $break (i32.ge_u (local.get $i) (local.get $len)))
 
-        (local.set $code (call $str_charCodeAt (local.get $str) (local.get $i)))
+        (local.set $code (array.get_u $i16_array (local.get $arr) (local.get $i)))
 
         ;; 1-byte: ASCII (0x00-0x7F)
         (if (i32.lt_u (local.get $code) (i32.const 0x80))
@@ -101,9 +120,9 @@
                         (i32.le_u (local.get $code) (i32.const 0xDBFF)))
               ;; 4-byte: surrogate pair
               (then
-                ;; Get low surrogate
+                ;; Get low surrogate from array
                 (local.set $i (i32.add (local.get $i) (i32.const 1)))
-                (local.set $code2 (call $str_charCodeAt (local.get $str) (local.get $i)))
+                (local.set $code2 (array.get_u $i16_array (local.get $arr) (local.get $i)))
                 ;; Calculate code point: ((high - 0xD800) << 10) + (low - 0xDC00) + 0x10000
                 (local.set $code
                   (i32.add
@@ -139,23 +158,21 @@
 
     (i32.sub (local.get $pos) (local.get $offset)))
 
-  ;; Decode UTF-8 bytes to UTF-16 code units in memory
-  ;; Reads UTF-8 from offset 0 for $length bytes
-  ;; Writes UTF-16 code units to utf16_offset
-  ;; Returns number of UTF-16 code units written
-  (func (export "utf8DecodeToMemory") (param $length i32) (result i32)
+  ;; Decode UTF-8 bytes from linear memory to JS string
+  ;; Uses fromCharCodeArray for direct string creation
+  ;; Returns: (codeUnitsWritten << 16) | 0 for success, packed in i32
+  ;; The actual string is returned via a separate export
+  (func (export "utf8DecodeToArray") (param $length i32) (param $arr (ref $i16_array)) (result i32)
     (local $pos i32)
     (local $end i32)
-    (local $outPos i32)
+    (local $outIdx i32)
     (local $byte1 i32)
     (local $byte2 i32)
     (local $byte3 i32)
     (local $byte4 i32)
     (local $codePoint i32)
 
-    (local.set $pos (i32.const 0))
     (local.set $end (local.get $length))
-    (local.set $outPos (global.get $utf16_offset))
 
     (block $break
       (loop $continue
@@ -166,8 +183,8 @@
         ;; 1-byte: 0xxxxxxx
         (if (i32.eqz (i32.and (local.get $byte1) (i32.const 0x80)))
           (then
-            (i32.store16 (local.get $outPos) (local.get $byte1))
-            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
+            (array.set $i16_array (local.get $arr) (local.get $outIdx) (local.get $byte1))
+            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
             (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
             (br $continue)))
 
@@ -179,8 +196,8 @@
               (i32.or
                 (i32.shl (i32.and (local.get $byte1) (i32.const 0x1F)) (i32.const 6))
                 (i32.and (local.get $byte2) (i32.const 0x3F))))
-            (i32.store16 (local.get $outPos) (local.get $codePoint))
-            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
+            (array.set $i16_array (local.get $arr) (local.get $outIdx) (local.get $codePoint))
+            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
             (local.set $pos (i32.add (local.get $pos) (i32.const 2)))
             (br $continue)))
 
@@ -195,8 +212,8 @@
                   (i32.shl (i32.and (local.get $byte1) (i32.const 0x0F)) (i32.const 12))
                   (i32.shl (i32.and (local.get $byte2) (i32.const 0x3F)) (i32.const 6)))
                 (i32.and (local.get $byte3) (i32.const 0x3F))))
-            (i32.store16 (local.get $outPos) (local.get $codePoint))
-            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
+            (array.set $i16_array (local.get $arr) (local.get $outIdx) (local.get $codePoint))
+            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
             (local.set $pos (i32.add (local.get $pos) (i32.const 3)))
             (br $continue)))
 
@@ -217,17 +234,17 @@
             ;; Convert to surrogate pair
             (local.set $codePoint (i32.sub (local.get $codePoint) (i32.const 0x10000)))
             ;; High surrogate
-            (i32.store16 (local.get $outPos)
+            (array.set $i16_array (local.get $arr) (local.get $outIdx)
               (i32.or
                 (i32.shr_u (local.get $codePoint) (i32.const 10))
                 (i32.const 0xD800)))
-            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
+            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
             ;; Low surrogate
-            (i32.store16 (local.get $outPos)
+            (array.set $i16_array (local.get $arr) (local.get $outIdx)
               (i32.or
                 (i32.and (local.get $codePoint) (i32.const 0x3FF))
                 (i32.const 0xDC00)))
-            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
+            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
             (local.set $pos (i32.add (local.get $pos) (i32.const 4)))
             (br $continue)))
 
@@ -235,6 +252,14 @@
         (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
         (br $continue)))
 
-    ;; Return number of UTF-16 code units written
-    (i32.shr_u (i32.sub (local.get $outPos) (global.get $utf16_offset)) (i32.const 1)))
+    ;; Return number of code units written
+    (local.get $outIdx))
+
+  ;; Allocate a GC array for UTF-16 code units
+  (func (export "allocArray") (param $size i32) (result (ref $i16_array))
+    (array.new $i16_array (i32.const 0) (local.get $size)))
+
+  ;; Create string from GC array
+  (func (export "arrayToString") (param $arr (ref $i16_array)) (param $start i32) (param $end i32) (result externref)
+    (call $str_from_array (local.get $arr) (local.get $start) (local.get $end)))
 )
