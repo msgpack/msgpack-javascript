@@ -11,6 +11,8 @@
   ;; Import js-string builtins
   (import "wasm:js-string" "length"
     (func $str_length (param externref) (result i32)))
+  (import "wasm:js-string" "charCodeAt"
+    (func $str_charCodeAt (param externref i32) (result i32)))
   (import "wasm:js-string" "intoCharCodeArray"
     (func $str_into_array (param externref (ref $i16_array) i32) (result i32)))
   (import "wasm:js-string" "fromCharCodeArray"
@@ -20,30 +22,21 @@
   (memory (export "memory") 1)
 
   ;; Count UTF-8 byte length of a JS string
-  ;; Uses GC array to get all char codes at once
+  ;; Uses charCodeAt directly to avoid array allocation overhead
   (func (export "utf8Count") (param $str externref) (result i32)
     (local $len i32)
-    (local $arr (ref $i16_array))
     (local $i i32)
     (local $byteLen i32)
     (local $code i32)
 
     (local.set $len (call $str_length (local.get $str)))
 
-    ;; Handle empty string
-    (if (i32.eqz (local.get $len))
-      (then (return (i32.const 0))))
-
-    ;; Allocate array and copy string chars
-    (local.set $arr (array.new $i16_array (i32.const 0) (local.get $len)))
-    (drop (call $str_into_array (local.get $str) (local.get $arr) (i32.const 0)))
-
     ;; Count UTF-8 bytes
     (block $break
       (loop $continue
         (br_if $break (i32.ge_u (local.get $i) (local.get $len)))
 
-        (local.set $code (array.get_u $i16_array (local.get $arr) (local.get $i)))
+        (local.set $code (call $str_charCodeAt (local.get $str) (local.get $i)))
 
         ;; 1-byte: 0x00-0x7F
         (if (i32.lt_u (local.get $code) (i32.const 0x80))
