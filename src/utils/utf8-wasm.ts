@@ -147,11 +147,6 @@ export function utf8EncodeWasm(str: string, output: Uint8Array, outputOffset: nu
  * Uses GC arrays with fromCharCodeArray for efficient string creation.
  */
 export function utf8DecodeWasm(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
-  // Handle empty input
-  if (byteLength === 0) {
-    return "";
-  }
-
   // Ensure wasm memory is large enough for UTF-8 input
   const requiredPages = Math.ceil(byteLength / 65536);
   const currentPages = wasmInstance!.memory.buffer.byteLength / 65536;

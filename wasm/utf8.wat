@@ -84,10 +84,6 @@
     (local.set $len (call $str_length (local.get $str)))
     (local.set $pos (local.get $offset))
 
-    ;; Handle empty string
-    (if (i32.eqz (local.get $len))
-      (then (return (i32.const 0))))
-
     ;; Allocate array and copy all char codes at once
     (local.set $arr (array.new $i16_array (i32.const 0) (local.get $len)))
     (drop (call $str_into_array (local.get $str) (local.get $arr) (i32.const 0)))
