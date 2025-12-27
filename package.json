@@ -29,6 +29,7 @@
     "prepublishOnly": "npm run test:dist",
     "clean": "rimraf build dist dist.*",
     "test": "mocha 'test/**/*.test.ts'",
+    "test:wasm": "MSGPACK_WASM=force node --experimental-wasm-imported-strings node_modules/.bin/mocha 'test/**/*.test.ts'",
     "test:dist": "npm run lint && npm run test && npm run test:deno",
     "test:cover": "npm run cover:clean && npx nyc --no-clean npm run 'test' && npm run cover:report",
     "test:node_with_strip_types": "node --experimental-strip-types test/deno_test.ts",
