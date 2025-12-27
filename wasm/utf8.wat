@@ -13,8 +13,13 @@
   (import "wasm:js-string" "concat"
     (func $str_concat (param externref externref) (result (ref extern))))
 
-  ;; Linear memory for UTF-8 bytes (64KB initial, exported for JS access)
+  ;; Linear memory layout:
+  ;; - 0 to 32KB: UTF-8 input bytes
+  ;; - 32KB onwards: UTF-16 code units output (i16 array)
   (memory (export "memory") 1)
+
+  ;; Offset where UTF-16 output starts (32KB = 32768)
+  (global $utf16_offset i32 (i32.const 32768))
 
   ;; Count UTF-8 byte length of a JS string
   ;; This is equivalent to Buffer.byteLength(str, 'utf8') or TextEncoder().encode(str).length
@@ -134,22 +139,23 @@
 
     (i32.sub (local.get $pos) (local.get $offset)))
 
-  ;; Decode UTF-8 bytes from linear memory to JS string
-  ;; Reads from offset for length bytes
-  (func (export "utf8Decode") (param $offset i32) (param $length i32) (result externref)
+  ;; Decode UTF-8 bytes to UTF-16 code units in memory
+  ;; Reads UTF-8 from offset 0 for $length bytes
+  ;; Writes UTF-16 code units to utf16_offset
+  ;; Returns number of UTF-16 code units written
+  (func (export "utf8DecodeToMemory") (param $length i32) (result i32)
     (local $pos i32)
     (local $end i32)
-    (local $result externref)
+    (local $outPos i32)
     (local $byte1 i32)
     (local $byte2 i32)
     (local $byte3 i32)
     (local $byte4 i32)
     (local $codePoint i32)
 
-    (local.set $pos (local.get $offset))
-    (local.set $end (i32.add (local.get $offset) (local.get $length)))
-    ;; Start with empty string (NUL char, will be trimmed by JS side if needed)
-    (local.set $result (call $str_fromCharCode (i32.const 0)))
+    (local.set $pos (i32.const 0))
+    (local.set $end (local.get $length))
+    (local.set $outPos (global.get $utf16_offset))
 
     (block $break
       (loop $continue
@@ -160,10 +166,8 @@
         ;; 1-byte: 0xxxxxxx
         (if (i32.eqz (i32.and (local.get $byte1) (i32.const 0x80)))
           (then
-            (local.set $result
-              (call $str_concat
-                (local.get $result)
-                (call $str_fromCharCode (local.get $byte1))))
+            (i32.store16 (local.get $outPos) (local.get $byte1))
+            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
             (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
             (br $continue)))
 
@@ -175,10 +179,8 @@
               (i32.or
                 (i32.shl (i32.and (local.get $byte1) (i32.const 0x1F)) (i32.const 6))
                 (i32.and (local.get $byte2) (i32.const 0x3F))))
-            (local.set $result
-              (call $str_concat
-                (local.get $result)
-                (call $str_fromCharCode (local.get $codePoint))))
+            (i32.store16 (local.get $outPos) (local.get $codePoint))
+            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
             (local.set $pos (i32.add (local.get $pos) (i32.const 2)))
             (br $continue)))
 
@@ -193,10 +195,8 @@
                   (i32.shl (i32.and (local.get $byte1) (i32.const 0x0F)) (i32.const 12))
                   (i32.shl (i32.and (local.get $byte2) (i32.const 0x3F)) (i32.const 6)))
                 (i32.and (local.get $byte3) (i32.const 0x3F))))
-            (local.set $result
-              (call $str_concat
-                (local.get $result)
-                (call $str_fromCharCode (local.get $codePoint))))
+            (i32.store16 (local.get $outPos) (local.get $codePoint))
+            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
             (local.set $pos (i32.add (local.get $pos) (i32.const 3)))
             (br $continue)))
 
@@ -217,21 +217,17 @@
             ;; Convert to surrogate pair
             (local.set $codePoint (i32.sub (local.get $codePoint) (i32.const 0x10000)))
             ;; High surrogate
-            (local.set $result
-              (call $str_concat
-                (local.get $result)
-                (call $str_fromCharCode
-                  (i32.or
-                    (i32.shr_u (local.get $codePoint) (i32.const 10))
-                    (i32.const 0xD800)))))
+            (i32.store16 (local.get $outPos)
+              (i32.or
+                (i32.shr_u (local.get $codePoint) (i32.const 10))
+                (i32.const 0xD800)))
+            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
             ;; Low surrogate
-            (local.set $result
-              (call $str_concat
-                (local.get $result)
-                (call $str_fromCharCode
-                  (i32.or
-                    (i32.and (local.get $codePoint) (i32.const 0x3FF))
-                    (i32.const 0xDC00)))))
+            (i32.store16 (local.get $outPos)
+              (i32.or
+                (i32.and (local.get $codePoint) (i32.const 0x3FF))
+                (i32.const 0xDC00)))
+            (local.set $outPos (i32.add (local.get $outPos) (i32.const 2)))
             (local.set $pos (i32.add (local.get $pos) (i32.const 4)))
             (br $continue)))
 
@@ -239,6 +235,6 @@
         (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
         (br $continue)))
 
-    ;; Result has leading NUL char - JS side will slice it off
-    (local.get $result))
+    ;; Return number of UTF-16 code units written
+    (i32.shr_u (i32.sub (local.get $outPos) (global.get $utf16_offset)) (i32.const 1)))
 )

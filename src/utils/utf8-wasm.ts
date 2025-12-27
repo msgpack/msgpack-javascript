@@ -43,8 +43,14 @@ interface WasmExports {
   memory: WebAssembly.Memory;
   utf8Count(str: string): number;
   utf8Encode(str: string, offset: number): number;
-  utf8Decode(offset: number, length: number): string;
+  utf8DecodeToMemory(length: number): number;
 }
+
+// Memory layout constants (must match WAT file)
+const UTF16_OFFSET = 32768; // 32KB offset for UTF-16 output
+
+// Shared TextDecoder for UTF-16LE decoding
+const utf16Decoder = new TextDecoder("utf-16le");
 
 let wasmInstance: WasmExports | null = null;
 let wasmInitError: Error | null = null;
@@ -178,20 +184,25 @@ export function utf8DecodeWasm(bytes: Uint8Array, inputOffset: number, byteLengt
   }
 
   // Ensure wasm memory is large enough
-  const requiredPages = Math.ceil(byteLength / 65536);
+  // Need space for UTF-8 input (0 to byteLength) and UTF-16 output (UTF16_OFFSET onwards)
+  // Max UTF-16 output is 2 bytes per code unit, and max expansion is 2x (for ASCII)
+  const utf16MaxBytes = byteLength * 2;
+  const requiredBytes = UTF16_OFFSET + utf16MaxBytes;
+  const requiredPages = Math.ceil(requiredBytes / 65536);
   const currentPages = wasmInstance.memory.buffer.byteLength / 65536;
 
   if (requiredPages > currentPages) {
     wasmInstance.memory.grow(requiredPages - currentPages);
   }
 
-  // Copy bytes to wasm memory
+  // Copy bytes to wasm memory at offset 0
   const wasmBytes = new Uint8Array(wasmInstance.memory.buffer, 0, byteLength);
   wasmBytes.set(bytes.subarray(inputOffset, inputOffset + byteLength));
 
-  // Decode from wasm memory
-  const result = wasmInstance.utf8Decode(0, byteLength);
+  // Decode UTF-8 to UTF-16 in wasm memory, get number of code units
+  const codeUnits = wasmInstance.utf8DecodeToMemory(byteLength);
 
-  // Remove leading NUL character (artifact of wasm implementation)
-  return result.length > 0 && result.charCodeAt(0) === 0 ? result.slice(1) : result;
+  // Read UTF-16 code units from wasm memory and decode to string
+  const utf16Bytes = new Uint8Array(wasmInstance.memory.buffer, UTF16_OFFSET, codeUnits * 2);
+  return utf16Decoder.decode(utf16Bytes);
 }
