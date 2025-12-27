@@ -1,4 +1,8 @@
-export function utf8Count(str: string): number {
+import { WASM_AVAILABLE, utf8CountWasm, utf8EncodeWasm, utf8DecodeWasm } from "./utf8-wasm.ts";
+
+export { WASM_AVAILABLE };
+
+export function utf8CountJs(str: string): number {
   const strLength = str.length;
 
   let byteLength = 0;
@@ -37,6 +41,8 @@ export function utf8Count(str: string): number {
   }
   return byteLength;
 }
+
+export const utf8Count: (str: string) => number = WASM_AVAILABLE ? utf8CountWasm : utf8CountJs;
 
 export function utf8EncodeJs(str: string, output: Uint8Array, outputOffset: number): void {
   const strLength = str.length;
@@ -98,13 +104,33 @@ export function utf8EncodeTE(str: string, output: Uint8Array, outputOffset: numb
   sharedTextEncoder.encodeInto(str, output.subarray(outputOffset));
 }
 
-export function utf8Encode(str: string, output: Uint8Array, outputOffset: number): void {
+// Wasm threshold: use wasm for medium strings, TextEncoder for large strings
+// These thresholds should be determined by benchmarking.
+// Run `npx ts-node benchmark/encode-string.ts` for details.
+const WASM_ENCODE_MAX = 1000;
+
+function utf8EncodeWithWasm(str: string, output: Uint8Array, outputOffset: number): void {
+  const len = str.length;
+  if (len > WASM_ENCODE_MAX) {
+    utf8EncodeTE(str, output, outputOffset);
+  } else if (len > TEXT_ENCODER_THRESHOLD) {
+    utf8EncodeWasm(str, output, outputOffset);
+  } else {
+    utf8EncodeJs(str, output, outputOffset);
+  }
+}
+
+function utf8EncodeNoWasm(str: string, output: Uint8Array, outputOffset: number): void {
   if (str.length > TEXT_ENCODER_THRESHOLD) {
     utf8EncodeTE(str, output, outputOffset);
   } else {
     utf8EncodeJs(str, output, outputOffset);
   }
 }
+
+export const utf8Encode: (str: string, output: Uint8Array, outputOffset: number) => void = WASM_AVAILABLE
+  ? utf8EncodeWithWasm
+  : utf8EncodeNoWasm;
 
 const CHUNK_SIZE = 0x1_000;
 
@@ -168,10 +194,27 @@ export function utf8DecodeTD(bytes: Uint8Array, inputOffset: number, byteLength:
   return sharedTextDecoder.decode(stringBytes);
 }
 
-export function utf8Decode(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
+// Wasm decode threshold: use wasm for medium strings, TextDecoder for large strings
+const WASM_DECODE_MAX = 1000;
+
+function utf8DecodeWithWasm(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
+  if (byteLength > WASM_DECODE_MAX) {
+    return utf8DecodeTD(bytes, inputOffset, byteLength);
+  } else if (byteLength > TEXT_DECODER_THRESHOLD) {
+    return utf8DecodeWasm(bytes, inputOffset, byteLength);
+  } else {
+    return utf8DecodeJs(bytes, inputOffset, byteLength);
+  }
+}
+
+function utf8DecodeNoWasm(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   if (byteLength > TEXT_DECODER_THRESHOLD) {
     return utf8DecodeTD(bytes, inputOffset, byteLength);
   } else {
     return utf8DecodeJs(bytes, inputOffset, byteLength);
   }
 }
+
+export const utf8Decode: (bytes: Uint8Array, inputOffset: number, byteLength: number) => string = WASM_AVAILABLE
+  ? utf8DecodeWithWasm
+  : utf8DecodeNoWasm;

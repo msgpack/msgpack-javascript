@@ -1,8 +1,26 @@
 /* eslint-disable no-console */
-import { utf8EncodeJs, utf8Count, utf8EncodeTE } from "../src/utils/utf8";
+import { utf8EncodeJs, utf8Count, utf8EncodeTE, WASM_AVAILABLE } from "../src/utils/utf8.ts";
+import { getWasmError, utf8EncodeWasm } from "../src/utils/utf8-wasm.ts";
 
 // @ts-ignore
 import Benchmark from "benchmark";
+
+// Show wasm status
+console.log("=".repeat(60));
+console.log("WebAssembly Status:");
+console.log(`  WASM_AVAILABLE: ${WASM_AVAILABLE}`);
+if (WASM_AVAILABLE) {
+  console.log("  js-string-builtins: enabled");
+} else {
+  const error = getWasmError();
+  console.log(`  Error: ${error?.message || "unknown"}`);
+  if (error?.message?.includes("js-string") || error?.message?.includes("builtin")) {
+    console.log("\n  js-string-builtins is enabled by default in Node.js 24+ (V8 13.6+).");
+    console.log("  For older versions, run with:");
+    console.log("    node --experimental-wasm-imported-strings node_modules/.bin/ts-node benchmark/encode-string.ts");
+  }
+}
+console.log("=".repeat(60));
 
 for (const baseStr of ["A", "あ", "🌏"]) {
   const dataSet = [10, 30, 50, 100].map((n) => {
@@ -21,9 +39,16 @@ for (const baseStr of ["A", "あ", "🌏"]) {
       utf8EncodeJs(str, buffer, 0);
     });
 
-    suite.add("utf8DecodeTE", () => {
+    suite.add("utf8EncodeTE (TextEncoder)", () => {
       utf8EncodeTE(str, buffer, 0);
     });
+
+    if (WASM_AVAILABLE) {
+      suite.add("utf8EncodeWasm", () => {
+        utf8EncodeWasm(str, buffer, 0);
+      });
+    }
+
     suite.on("cycle", (event: any) => {
       console.log(String(event.target));
     });
