@@ -98,15 +98,18 @@ const sharedTextEncoder = new TextEncoder();
 
 // This threshold should be determined by benchmarking, which might vary in engines and input data.
 // Run `npx ts-node benchmark/encode-string.ts` for details.
+// For mixed content (ASCII + CJK + emoji), JS wins for strLength < 30-50.
+// After that, WASM or TextEncoder is faster depending on content type.
 const TEXT_ENCODER_THRESHOLD = 50;
 
 export function utf8EncodeTE(str: string, output: Uint8Array, outputOffset: number): void {
   sharedTextEncoder.encodeInto(str, output.subarray(outputOffset));
 }
 
-// Wasm threshold: use wasm for medium strings, TextEncoder for large strings
-// These thresholds should be determined by benchmarking.
-// Run `npx ts-node benchmark/encode-string.ts` for details.
+// Wasm threshold: use wasm for medium strings, TextEncoder for large strings.
+// For pure ASCII, TextEncoder is ~1.7x faster at 100+ strLength.
+// For CJK/emoji, WASM is ~1.4-1.6x faster than TextEncoder at all sizes.
+// 1000 is a compromise for mixed content.
 const WASM_ENCODE_MAX = 1000;
 
 function utf8EncodeWithWasm(str: string, output: Uint8Array, outputOffset: number): void {
@@ -187,14 +190,19 @@ const sharedTextDecoder = new TextDecoder();
 
 // This threshold should be determined by benchmarking, which might vary in engines and input data.
 // Run `npx ts-node benchmark/decode-string.ts` for details.
-const TEXT_DECODER_THRESHOLD = 200;
+// For mixed content (ASCII + CJK + emoji), JS wins for very short strings only.
+// WASM becomes superior at ~30-50 bytes for non-ASCII content.
+const TEXT_DECODER_THRESHOLD = 50;
 
 export function utf8DecodeTD(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   const stringBytes = bytes.subarray(inputOffset, inputOffset + byteLength);
   return sharedTextDecoder.decode(stringBytes);
 }
 
-// Wasm decode threshold: use wasm for medium strings, TextDecoder for large strings
+// Wasm decode threshold: use wasm for medium strings, TextDecoder for large strings.
+// For pure ASCII, TextDecoder is ~5x faster at 1000+ bytes.
+// For CJK/emoji, WASM is ~5-6x faster than TextDecoder at all sizes.
+// 1000 is a compromise for mixed content.
 const WASM_DECODE_MAX = 1000;
 
 function utf8DecodeWithWasm(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
