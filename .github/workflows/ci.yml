@@ -18,9 +18,9 @@ jobs:
           - '22'
           - '24'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         cache: npm
         node-version: ${{ matrix.node-version }}
@@ -38,9 +38,9 @@ jobs:
       matrix:
         browser: [ChromeHeadless, FirefoxHeadless]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         cache: npm
         node-version: '22'
@@ -51,9 +51,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         cache: npm
         node-version: '22'
@@ -64,7 +64,7 @@ jobs:
   deno:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup Deno
       uses: denoland/setup-deno@v2
       with:
@@ -75,7 +75,7 @@ jobs:
   bun:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
     - run: bun install
@@ -84,9 +84,9 @@ jobs:
   node_with_strip_types:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         cache: npm
         node-version: '24'
