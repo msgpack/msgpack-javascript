@@ -194,6 +194,7 @@
     (local $b3 i32)
     (local $b4 i32)
     (local $cp i32)
+    (local $remaining i32)
 
     (local.set $end (local.get $length))
 
@@ -202,6 +203,8 @@
         (br_if $break (i32.ge_u (local.get $pos) (local.get $end)))
 
         (local.set $b1 (i32.load8_u (local.get $pos)))
+        ;; Calculate remaining bytes including current
+        (local.set $remaining (i32.sub (local.get $end) (local.get $pos)))
 
         (if (i32.eqz (i32.and (local.get $b1) (i32.const 0x80)))
           (then
@@ -212,54 +215,105 @@
           (else
             (if (i32.eq (i32.and (local.get $b1) (i32.const 0xE0)) (i32.const 0xC0))
               (then
-                ;; 2-byte: 110xxxxx 10xxxxxx
-                (local.set $b2 (i32.load8_u (i32.add (local.get $pos) (i32.const 1))))
-                (array.set $i16_array (local.get $arr) (local.get $outIdx)
-                  (i32.or
-                    (i32.shl (i32.and (local.get $b1) (i32.const 0x1F)) (i32.const 6))
-                    (i32.and (local.get $b2) (i32.const 0x3F))))
-                (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
-                (local.set $pos (i32.add (local.get $pos) (i32.const 2))))
+                ;; 2-byte: 110xxxxx 10xxxxxx - need 2 bytes
+                (if (i32.lt_u (local.get $remaining) (i32.const 2))
+                  (then
+                    ;; Truncated: preserve lead byte and any remaining bytes
+                    (array.set $i16_array (local.get $arr) (local.get $outIdx) (local.get $b1))
+                    (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                    (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
+                    ;; Preserve any remaining bytes
+                    (block $done_remaining
+                      (loop $copy_remaining
+                        (br_if $done_remaining (i32.ge_u (local.get $pos) (local.get $end)))
+                        (array.set $i16_array (local.get $arr) (local.get $outIdx)
+                          (i32.load8_u (local.get $pos)))
+                        (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                        (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
+                        (br $copy_remaining)))
+                    (br $break))
+                  (else
+                    (local.set $b2 (i32.load8_u (i32.add (local.get $pos) (i32.const 1))))
+                    (array.set $i16_array (local.get $arr) (local.get $outIdx)
+                      (i32.or
+                        (i32.shl (i32.and (local.get $b1) (i32.const 0x1F)) (i32.const 6))
+                        (i32.and (local.get $b2) (i32.const 0x3F))))
+                    (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                    (local.set $pos (i32.add (local.get $pos) (i32.const 2))))))
               (else
                 (if (i32.eq (i32.and (local.get $b1) (i32.const 0xF0)) (i32.const 0xE0))
                   (then
-                    ;; 3-byte: 1110xxxx 10xxxxxx 10xxxxxx
-                    (local.set $b2 (i32.load8_u (i32.add (local.get $pos) (i32.const 1))))
-                    (local.set $b3 (i32.load8_u (i32.add (local.get $pos) (i32.const 2))))
-                    (array.set $i16_array (local.get $arr) (local.get $outIdx)
-                      (i32.or
-                        (i32.or
-                          (i32.shl (i32.and (local.get $b1) (i32.const 0x0F)) (i32.const 12))
-                          (i32.shl (i32.and (local.get $b2) (i32.const 0x3F)) (i32.const 6)))
-                        (i32.and (local.get $b3) (i32.const 0x3F))))
-                    (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
-                    (local.set $pos (i32.add (local.get $pos) (i32.const 3))))
+                    ;; 3-byte: 1110xxxx 10xxxxxx 10xxxxxx - need 3 bytes
+                    (if (i32.lt_u (local.get $remaining) (i32.const 3))
+                      (then
+                        ;; Truncated: preserve all remaining bytes individually
+                        (array.set $i16_array (local.get $arr) (local.get $outIdx) (local.get $b1))
+                        (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                        (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
+                        ;; Preserve any remaining bytes
+                        (block $done_remaining2
+                          (loop $copy_remaining2
+                            (br_if $done_remaining2 (i32.ge_u (local.get $pos) (local.get $end)))
+                            (array.set $i16_array (local.get $arr) (local.get $outIdx)
+                              (i32.load8_u (local.get $pos)))
+                            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                            (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
+                            (br $copy_remaining2)))
+                        (br $break))
+                      (else
+                        (local.set $b2 (i32.load8_u (i32.add (local.get $pos) (i32.const 1))))
+                        (local.set $b3 (i32.load8_u (i32.add (local.get $pos) (i32.const 2))))
+                        (array.set $i16_array (local.get $arr) (local.get $outIdx)
+                          (i32.or
+                            (i32.or
+                              (i32.shl (i32.and (local.get $b1) (i32.const 0x0F)) (i32.const 12))
+                              (i32.shl (i32.and (local.get $b2) (i32.const 0x3F)) (i32.const 6)))
+                            (i32.and (local.get $b3) (i32.const 0x3F))))
+                        (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                        (local.set $pos (i32.add (local.get $pos) (i32.const 3))))))
                   (else
                     (if (i32.eq (i32.and (local.get $b1) (i32.const 0xF8)) (i32.const 0xF0))
                       (then
-                        ;; 4-byte: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                        (local.set $b2 (i32.load8_u (i32.add (local.get $pos) (i32.const 1))))
-                        (local.set $b3 (i32.load8_u (i32.add (local.get $pos) (i32.const 2))))
-                        (local.set $b4 (i32.load8_u (i32.add (local.get $pos) (i32.const 3))))
-                        (local.set $cp
-                          (i32.sub
-                            (i32.or
-                              (i32.or
+                        ;; 4-byte: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx - need 4 bytes
+                        (if (i32.lt_u (local.get $remaining) (i32.const 4))
+                          (then
+                            ;; Truncated: preserve all remaining bytes individually
+                            (array.set $i16_array (local.get $arr) (local.get $outIdx) (local.get $b1))
+                            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                            (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
+                            ;; Preserve any remaining bytes
+                            (block $done_remaining3
+                              (loop $copy_remaining3
+                                (br_if $done_remaining3 (i32.ge_u (local.get $pos) (local.get $end)))
+                                (array.set $i16_array (local.get $arr) (local.get $outIdx)
+                                  (i32.load8_u (local.get $pos)))
+                                (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                                (local.set $pos (i32.add (local.get $pos) (i32.const 1)))
+                                (br $copy_remaining3)))
+                            (br $break))
+                          (else
+                            (local.set $b2 (i32.load8_u (i32.add (local.get $pos) (i32.const 1))))
+                            (local.set $b3 (i32.load8_u (i32.add (local.get $pos) (i32.const 2))))
+                            (local.set $b4 (i32.load8_u (i32.add (local.get $pos) (i32.const 3))))
+                            (local.set $cp
+                              (i32.sub
                                 (i32.or
-                                  (i32.shl (i32.and (local.get $b1) (i32.const 0x07)) (i32.const 18))
-                                  (i32.shl (i32.and (local.get $b2) (i32.const 0x3F)) (i32.const 12)))
-                                (i32.shl (i32.and (local.get $b3) (i32.const 0x3F)) (i32.const 6)))
-                              (i32.and (local.get $b4) (i32.const 0x3F)))
-                            (i32.const 0x10000)))
-                        ;; High surrogate
-                        (array.set $i16_array (local.get $arr) (local.get $outIdx)
-                          (i32.or (i32.const 0xD800) (i32.shr_u (local.get $cp) (i32.const 10))))
-                        (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
-                        ;; Low surrogate
-                        (array.set $i16_array (local.get $arr) (local.get $outIdx)
-                          (i32.or (i32.const 0xDC00) (i32.and (local.get $cp) (i32.const 0x3FF))))
-                        (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
-                        (local.set $pos (i32.add (local.get $pos) (i32.const 4))))
+                                  (i32.or
+                                    (i32.or
+                                      (i32.shl (i32.and (local.get $b1) (i32.const 0x07)) (i32.const 18))
+                                      (i32.shl (i32.and (local.get $b2) (i32.const 0x3F)) (i32.const 12)))
+                                    (i32.shl (i32.and (local.get $b3) (i32.const 0x3F)) (i32.const 6)))
+                                  (i32.and (local.get $b4) (i32.const 0x3F)))
+                                (i32.const 0x10000)))
+                            ;; High surrogate
+                            (array.set $i16_array (local.get $arr) (local.get $outIdx)
+                              (i32.or (i32.const 0xD800) (i32.shr_u (local.get $cp) (i32.const 10))))
+                            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                            ;; Low surrogate
+                            (array.set $i16_array (local.get $arr) (local.get $outIdx)
+                              (i32.or (i32.const 0xDC00) (i32.and (local.get $cp) (i32.const 0x3FF))))
+                            (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
+                            (local.set $pos (i32.add (local.get $pos) (i32.const 4))))))
                       (else
                         ;; Invalid byte: preserve as code unit (same as JS)
                         (array.set $i16_array (local.get $arr) (local.get $outIdx) (local.get $b1))

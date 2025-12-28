@@ -361,4 +361,158 @@ describe("utf8-wasm", () => {
       });
     });
   });
+
+  describe("edge cases: truncated multi-byte sequences at end of input", () => {
+    // These test cases verify behavior when multi-byte UTF-8 sequences
+    // are truncated at the end of input (missing continuation bytes)
+    //
+    // Expected behavior: preserve each byte individually when the sequence
+    // cannot be completed due to end of input.
+
+    describe("truncated 2-byte at end preserves lead byte", () => {
+      it("0xC2 at end becomes char(0xC2)", () => {
+        const bytes = new Uint8Array([0xC2]);
+        const jsResult = utf8DecodeJs(bytes, 0, 1);
+
+        assert.strictEqual(jsResult.length, 1);
+        assert.strictEqual(jsResult.charCodeAt(0), 0xC2);
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 1);
+          assert.strictEqual(wasmResult.length, 1);
+          assert.strictEqual(wasmResult.charCodeAt(0), 0xC2);
+        }
+      });
+
+      it("'A' then 0xC2 at end preserves both", () => {
+        const bytes = new Uint8Array([0x41, 0xC2]); // 'A' + truncated 2-byte
+        const jsResult = utf8DecodeJs(bytes, 0, 2);
+
+        assert.strictEqual(jsResult.length, 2);
+        assert.strictEqual(jsResult.charCodeAt(0), 0x41); // 'A'
+        assert.strictEqual(jsResult.charCodeAt(1), 0xC2); // preserved lead byte
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 2);
+          assert.strictEqual(wasmResult.length, 2);
+          assert.strictEqual(wasmResult, jsResult);
+        }
+      });
+    });
+
+    describe("truncated 3-byte at end preserves bytes", () => {
+      it("0xE2 at end becomes char(0xE2)", () => {
+        const bytes = new Uint8Array([0xE2]);
+        const jsResult = utf8DecodeJs(bytes, 0, 1);
+
+        assert.strictEqual(jsResult.length, 1);
+        assert.strictEqual(jsResult.charCodeAt(0), 0xE2);
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 1);
+          assert.strictEqual(wasmResult.length, 1);
+          assert.strictEqual(wasmResult.charCodeAt(0), 0xE2);
+        }
+      });
+
+      it("0xE2 0x82 at end becomes two chars", () => {
+        const bytes = new Uint8Array([0xE2, 0x82]);
+        const jsResult = utf8DecodeJs(bytes, 0, 2);
+
+        assert.strictEqual(jsResult.length, 2);
+        assert.strictEqual(jsResult.charCodeAt(0), 0xE2);
+        assert.strictEqual(jsResult.charCodeAt(1), 0x82);
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 2);
+          assert.strictEqual(wasmResult.length, 2);
+          assert.strictEqual(wasmResult.charCodeAt(0), 0xE2);
+          assert.strictEqual(wasmResult.charCodeAt(1), 0x82);
+        }
+      });
+
+      it("'A' then 0xE2 0x82 at end preserves all", () => {
+        const bytes = new Uint8Array([0x41, 0xE2, 0x82]);
+        const jsResult = utf8DecodeJs(bytes, 0, 3);
+
+        assert.strictEqual(jsResult.length, 3);
+        assert.strictEqual(jsResult.charCodeAt(0), 0x41); // 'A'
+        assert.strictEqual(jsResult.charCodeAt(1), 0xE2);
+        assert.strictEqual(jsResult.charCodeAt(2), 0x82);
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 3);
+          assert.strictEqual(wasmResult.length, 3);
+          assert.strictEqual(wasmResult, jsResult);
+        }
+      });
+    });
+
+    describe("truncated 4-byte at end preserves bytes", () => {
+      it("0xF0 at end becomes char(0xF0)", () => {
+        const bytes = new Uint8Array([0xF0]);
+        const jsResult = utf8DecodeJs(bytes, 0, 1);
+
+        assert.strictEqual(jsResult.length, 1);
+        assert.strictEqual(jsResult.charCodeAt(0), 0xF0);
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 1);
+          assert.strictEqual(wasmResult.length, 1);
+          assert.strictEqual(wasmResult.charCodeAt(0), 0xF0);
+        }
+      });
+
+      it("0xF0 0x9F at end becomes two chars", () => {
+        const bytes = new Uint8Array([0xF0, 0x9F]);
+        const jsResult = utf8DecodeJs(bytes, 0, 2);
+
+        assert.strictEqual(jsResult.length, 2);
+        assert.strictEqual(jsResult.charCodeAt(0), 0xF0);
+        assert.strictEqual(jsResult.charCodeAt(1), 0x9F);
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 2);
+          assert.strictEqual(wasmResult.length, 2);
+          assert.strictEqual(wasmResult.charCodeAt(0), 0xF0);
+          assert.strictEqual(wasmResult.charCodeAt(1), 0x9F);
+        }
+      });
+
+      it("0xF0 0x9F 0x98 at end becomes three chars", () => {
+        const bytes = new Uint8Array([0xF0, 0x9F, 0x98]);
+        const jsResult = utf8DecodeJs(bytes, 0, 3);
+
+        assert.strictEqual(jsResult.length, 3);
+        assert.strictEqual(jsResult.charCodeAt(0), 0xF0);
+        assert.strictEqual(jsResult.charCodeAt(1), 0x9F);
+        assert.strictEqual(jsResult.charCodeAt(2), 0x98);
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 3);
+          assert.strictEqual(wasmResult.length, 3);
+          assert.strictEqual(wasmResult.charCodeAt(0), 0xF0);
+          assert.strictEqual(wasmResult.charCodeAt(1), 0x9F);
+          assert.strictEqual(wasmResult.charCodeAt(2), 0x98);
+        }
+      });
+
+      it("'A' then 0xF0 0x9F 0x98 at end preserves all", () => {
+        const bytes = new Uint8Array([0x41, 0xF0, 0x9F, 0x98]);
+        const jsResult = utf8DecodeJs(bytes, 0, 4);
+
+        assert.strictEqual(jsResult.length, 4);
+        assert.strictEqual(jsResult.charCodeAt(0), 0x41); // 'A'
+        assert.strictEqual(jsResult.charCodeAt(1), 0xF0);
+        assert.strictEqual(jsResult.charCodeAt(2), 0x9F);
+        assert.strictEqual(jsResult.charCodeAt(3), 0x98);
+
+        if (WASM_AVAILABLE) {
+          const wasmResult = utf8DecodeWasm(bytes, 0, 4);
+          assert.strictEqual(wasmResult.length, 4);
+          assert.strictEqual(wasmResult, jsResult);
+        }
+      });
+    });
+  });
 });

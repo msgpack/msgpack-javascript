@@ -150,15 +150,36 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
       units.push(byte1);
     } else if ((byte1 & 0xe0) === 0xc0) {
       // 2 bytes
+      if (offset >= end) {
+        // Truncated sequence: preserve lead byte
+        units.push(byte1);
+        break;
+      }
       const byte2 = bytes[offset++]! & 0x3f;
       units.push(((byte1 & 0x1f) << 6) | byte2);
     } else if ((byte1 & 0xf0) === 0xe0) {
       // 3 bytes
+      if (offset + 1 >= end) {
+        // Truncated sequence: preserve remaining bytes individually
+        units.push(byte1);
+        while (offset < end) {
+          units.push(bytes[offset++]!);
+        }
+        break;
+      }
       const byte2 = bytes[offset++]! & 0x3f;
       const byte3 = bytes[offset++]! & 0x3f;
       units.push(((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
     } else if ((byte1 & 0xf8) === 0xf0) {
       // 4 bytes
+      if (offset + 2 >= end) {
+        // Truncated sequence: preserve remaining bytes individually
+        units.push(byte1);
+        while (offset < end) {
+          units.push(bytes[offset++]!);
+        }
+        break;
+      }
       const byte2 = bytes[offset++]! & 0x3f;
       const byte3 = bytes[offset++]! & 0x3f;
       const byte4 = bytes[offset++]! & 0x3f;
