@@ -11,26 +11,20 @@
 
 import { wasmBinary } from "./utf8-wasm-binary.ts";
 
-// Check environment variable for wasm mode
-declare const process: { env?: Record<string, string | undefined> } | undefined;
-
 function getWasmMode(): "force" | "never" | "auto" {
-  try {
-    if (process?.env) {
-      const mode = process.env["MSGPACK_WASM"];
-      if (mode) {
-        switch (mode.toLowerCase()) {
-          case "force":
-            return "force";
-          case "never":
-            return "never";
-          default:
-            return "auto";
-        }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (typeof process !== "undefined" && process.env) {
+    const mode = process.env["MSGPACK_WASM"];
+    if (mode) {
+      switch (mode.toLowerCase()) {
+        case "force":
+          return "force";
+        case "never":
+          return "never";
+        default:
+          return "auto";
       }
     }
-  } catch {
-    // process may not be defined in browser
   }
   return "auto";
 }
@@ -53,7 +47,15 @@ let wasmInstance: WasmExports | null = null;
 let wasmInitError: Error | null = null;
 
 function base64ToBytes(base64: string): Uint8Array {
-  if (typeof atob === "function") {
+  // @ts-expect-error - fromBase64 is not yet supported in TypeScript
+  if (Uint8Array.fromBase64) {
+    // @ts-expect-error - fromBase64 is not yet supported in TypeScript
+    return Uint8Array.fromBase64(base64);
+  } else if (typeof Buffer !== "undefined") {
+    // Node.js
+    return new Uint8Array(Buffer.from(base64, "base64"));
+  } else {
+    // Legacy fallback
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) {
@@ -61,8 +63,6 @@ function base64ToBytes(base64: string): Uint8Array {
     }
     return bytes;
   }
-  // Node.js fallback
-  return new Uint8Array(Buffer.from(base64, "base64"));
 }
 
 function tryInitializeWasmInstance(): void {
