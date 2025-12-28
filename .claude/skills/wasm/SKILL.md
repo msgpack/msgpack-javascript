@@ -1,9 +1,9 @@
 ---
 name: wasm
 description: |
-  Modern WebAssembly (WASM) development expertise covering WASM 3.0 features
+  Modern WebAssembly (Wasm) development expertise covering modern Wasm features
   and optimization techniques. Use this skill when working with WebAssembly
-  modules, optimizing WASM performance, or integrating WASM with JavaScript/TypeScript.
+  modules or optimizing Wasm performance.
 compatibility: WebAssembly v3.0 and later
 ---
 
@@ -23,7 +23,7 @@ local.get $y
 i32.add
 ```
 
-## WebAssembly 3.0 Features
+## WebAssembly Features
 
 ### Memory64 (64-bit Address Space)
 - Memories and tables use `i64` as address type
@@ -62,6 +62,21 @@ i32.add
 - Hardware-dependent SIMD optimizations beyond fixed-width 128-bit
 - `i8x16.relaxed_swizzle`, `f32x4.relaxed_madd`, etc.
 
+### WasmGC
+- Native garbage-collected types: `struct`, `array`
+- Instructions: `array.new`, `array.get`, `array.set`, `struct.new`, `struct.get`
+- Reference types: `(ref $type)`, `(ref null $type)`
+
+### externref
+- Opaque reference to host (JS) objects
+- Cannot be inspected or modified in Wasm, only passed around
+- Used with js-string-builtins for efficient string handling
+
+### js-string-builtins
+- Import `"wasm:js-string"` for direct JS string operations
+- Functions: `length`, `charCodeAt`, `fromCharCodeArray`, `intoCharCodeArray`
+- Avoids costly JS↔Wasm boundary crossings for string processing
+
 ### SIMD Example
 ```wat
 ;; Process 16 bytes at a time
@@ -75,25 +90,10 @@ i32.add
 
 | Task | Command |
 |------|---------|
-| Assemble WAT to WASM | `wasm-as module.wat -o module.wasm` |
-| Disassemble WASM to WAT | `wasm-dis module.wasm -o module.wat` |
+| Assemble WAT to Wasm | `wasm-as module.wat -o module.wasm` |
+| Disassemble Wasm to WAT | `wasm-dis module.wasm -o module.wat` |
 | Optimize for size | `wasm-opt -Oz in.wasm -o out.wasm` |
 | Optimize for speed | `wasm-opt -O3 in.wasm -o out.wasm` |
-
-## JavaScript/TypeScript Integration
-
-### Instantiation
-```typescript
-const module = await WebAssembly.compileStreaming(fetch('module.wasm'));
-const instance = await WebAssembly.instantiate(module, imports);
-```
-
-### Memory Access
-```typescript
-const memory = new WebAssembly.Memory({ initial: 1, maximum: 100 });
-const buffer = new Uint8Array(instance.exports.memory.buffer);
-buffer.set(data, offset);
-```
 
 ## Resources
 
