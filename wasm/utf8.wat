@@ -27,6 +27,7 @@
     (local $i i32)
     (local $byteLen i32)
     (local $code i32)
+    (local $next i32)
 
     (local.set $len (call $str_length (local.get $str)))
 
@@ -50,11 +51,23 @@
                       (i32.ge_u (local.get $code) (i32.const 0xD800))
                       (i32.le_u (local.get $code) (i32.const 0xDBFF)))
                   (then
-                    ;; 4-byte: surrogate pair, skip low surrogate
-                    (local.set $byteLen (i32.add (local.get $byteLen) (i32.const 4)))
-                    (local.set $i (i32.add (local.get $i) (i32.const 1))))
+                    ;; High surrogate - check if next is valid low surrogate
+                    (if (i32.lt_u (i32.add (local.get $i) (i32.const 1)) (local.get $len))
+                      (then
+                        (local.set $next (call $str_charCodeAt (local.get $str) (i32.add (local.get $i) (i32.const 1))))
+                        (if (i32.eq (i32.and (local.get $next) (i32.const 0xFC00)) (i32.const 0xDC00))
+                          (then
+                            ;; Valid surrogate pair: 4 bytes, skip low surrogate
+                            (local.set $byteLen (i32.add (local.get $byteLen) (i32.const 4)))
+                            (local.set $i (i32.add (local.get $i) (i32.const 1))))
+                          (else
+                            ;; Lone high surrogate: 3 bytes
+                            (local.set $byteLen (i32.add (local.get $byteLen) (i32.const 3))))))
+                      (else
+                        ;; Lone high surrogate at end: 3 bytes
+                        (local.set $byteLen (i32.add (local.get $byteLen) (i32.const 3))))))
                   (else
-                    ;; 3-byte: 0x800-0xFFFF
+                    ;; 3-byte: 0x800-0xFFFF (includes lone low surrogates)
                     (local.set $byteLen (i32.add (local.get $byteLen) (i32.const 3)))))))))
 
         (local.set $i (i32.add (local.get $i) (i32.const 1)))
@@ -104,32 +117,58 @@
                       (i32.ge_u (local.get $code) (i32.const 0xD800))
                       (i32.le_u (local.get $code) (i32.const 0xDBFF)))
                   (then
-                    ;; 4-byte: surrogate pair
-                    (local.set $i (i32.add (local.get $i) (i32.const 1)))
-                    (local.set $code2 (array.get_u $i16_array (local.get $arr) (local.get $i)))
-                    ;; Decode: ((high - 0xD800) << 10) + (low - 0xDC00) + 0x10000
-                    (local.set $code
-                      (i32.add
-                        (i32.const 0x10000)
-                        (i32.add
-                          (i32.shl
-                            (i32.sub (local.get $code) (i32.const 0xD800))
-                            (i32.const 10))
-                          (i32.sub (local.get $code2) (i32.const 0xDC00)))))
-                    ;; 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                    (i32.store8 (local.get $pos)
-                      (i32.or (i32.const 0xF0) (i32.shr_u (local.get $code) (i32.const 18))))
-                    (i32.store8 (i32.add (local.get $pos) (i32.const 1))
-                      (i32.or (i32.const 0x80)
-                        (i32.and (i32.shr_u (local.get $code) (i32.const 12)) (i32.const 0x3F))))
-                    (i32.store8 (i32.add (local.get $pos) (i32.const 2))
-                      (i32.or (i32.const 0x80)
-                        (i32.and (i32.shr_u (local.get $code) (i32.const 6)) (i32.const 0x3F))))
-                    (i32.store8 (i32.add (local.get $pos) (i32.const 3))
-                      (i32.or (i32.const 0x80) (i32.and (local.get $code) (i32.const 0x3F))))
-                    (local.set $pos (i32.add (local.get $pos) (i32.const 4))))
+                    ;; High surrogate - check if next is valid low surrogate
+                    ;; Use nested if to ensure bounds check before array access (short-circuit)
+                    (if (i32.lt_u (i32.add (local.get $i) (i32.const 1)) (local.get $len))
+                      (then
+                        (local.set $code2 (array.get_u $i16_array (local.get $arr) (i32.add (local.get $i) (i32.const 1))))
+                        (if (i32.eq (i32.and (local.get $code2) (i32.const 0xFC00)) (i32.const 0xDC00))
+                          (then
+                            ;; Valid surrogate pair: 4-byte encoding
+                            (local.set $i (i32.add (local.get $i) (i32.const 1)))
+                            ;; Decode: ((high - 0xD800) << 10) + (low - 0xDC00) + 0x10000
+                            (local.set $code
+                              (i32.add
+                                (i32.const 0x10000)
+                                (i32.add
+                                  (i32.shl
+                                    (i32.sub (local.get $code) (i32.const 0xD800))
+                                    (i32.const 10))
+                                  (i32.sub (local.get $code2) (i32.const 0xDC00)))))
+                            ;; 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                            (i32.store8 (local.get $pos)
+                              (i32.or (i32.const 0xF0) (i32.shr_u (local.get $code) (i32.const 18))))
+                            (i32.store8 (i32.add (local.get $pos) (i32.const 1))
+                              (i32.or (i32.const 0x80)
+                                (i32.and (i32.shr_u (local.get $code) (i32.const 12)) (i32.const 0x3F))))
+                            (i32.store8 (i32.add (local.get $pos) (i32.const 2))
+                              (i32.or (i32.const 0x80)
+                                (i32.and (i32.shr_u (local.get $code) (i32.const 6)) (i32.const 0x3F))))
+                            (i32.store8 (i32.add (local.get $pos) (i32.const 3))
+                              (i32.or (i32.const 0x80) (i32.and (local.get $code) (i32.const 0x3F))))
+                            (local.set $pos (i32.add (local.get $pos) (i32.const 4))))
+                          (else
+                            ;; Next char exists but not a low surrogate: 3-byte encoding
+                            (i32.store8 (local.get $pos)
+                              (i32.or (i32.const 0xE0) (i32.shr_u (local.get $code) (i32.const 12))))
+                            (i32.store8 (i32.add (local.get $pos) (i32.const 1))
+                              (i32.or (i32.const 0x80)
+                                (i32.and (i32.shr_u (local.get $code) (i32.const 6)) (i32.const 0x3F))))
+                            (i32.store8 (i32.add (local.get $pos) (i32.const 2))
+                              (i32.or (i32.const 0x80) (i32.and (local.get $code) (i32.const 0x3F))))
+                            (local.set $pos (i32.add (local.get $pos) (i32.const 3))))))
+                      (else
+                        ;; Lone high surrogate at end: 3-byte encoding
+                        (i32.store8 (local.get $pos)
+                          (i32.or (i32.const 0xE0) (i32.shr_u (local.get $code) (i32.const 12))))
+                        (i32.store8 (i32.add (local.get $pos) (i32.const 1))
+                          (i32.or (i32.const 0x80)
+                            (i32.and (i32.shr_u (local.get $code) (i32.const 6)) (i32.const 0x3F))))
+                        (i32.store8 (i32.add (local.get $pos) (i32.const 2))
+                          (i32.or (i32.const 0x80) (i32.and (local.get $code) (i32.const 0x3F))))
+                        (local.set $pos (i32.add (local.get $pos) (i32.const 3))))))
                   (else
-                    ;; 3-byte: 1110xxxx 10xxxxxx 10xxxxxx
+                    ;; 3-byte: 1110xxxx 10xxxxxx 10xxxxxx (includes lone low surrogates)
                     (i32.store8 (local.get $pos)
                       (i32.or (i32.const 0xE0) (i32.shr_u (local.get $code) (i32.const 12))))
                     (i32.store8 (i32.add (local.get $pos) (i32.const 1))
@@ -222,7 +261,9 @@
                         (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
                         (local.set $pos (i32.add (local.get $pos) (i32.const 4))))
                       (else
-                        ;; Invalid byte, skip
+                        ;; Invalid byte: preserve as code unit (same as JS)
+                        (array.set $i16_array (local.get $arr) (local.get $outIdx) (local.get $b1))
+                        (local.set $outIdx (i32.add (local.get $outIdx) (i32.const 1)))
                         (local.set $pos (i32.add (local.get $pos) (i32.const 1)))))))))))
 
         (br $continue)))
