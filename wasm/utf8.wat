@@ -18,8 +18,9 @@
   (import "wasm:js-string" "fromCharCodeArray"
     (func $str_from_array (param (ref $i16_array) i32 i32) (result (ref extern))))
 
-  ;; Linear memory for UTF-8 bytes (64KB initial)
-  (memory (export "memory") 1)
+  ;; Linear memory for UTF-8 bytes (64KB initial, 256MB max for RAB integration)
+  ;; Maximum is required for WebAssembly.Memory.toResizableBuffer()
+  (memory (export "memory") 1 4096)
 
   ;; Count UTF-8 byte length of a JS string
   (func (export "utf8Count") (param $str externref) (result i32)

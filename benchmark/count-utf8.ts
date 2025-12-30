@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { utf8CountJs, WASM_AVAILABLE } from "../src/utils/utf8.ts";
-import { getWasmError, utf8CountWasm } from "../src/utils/utf8-wasm.ts";
+import { getWasmError, utf8CountWasm, RAB_AVAILABLE } from "../src/utils/utf8-wasm.ts";
 
 // @ts-ignore
 import Benchmark from "benchmark";
@@ -15,6 +15,7 @@ console.log("WebAssembly Status:");
 console.log(`  WASM_AVAILABLE: ${WASM_AVAILABLE}`);
 if (WASM_AVAILABLE) {
   console.log("  js-string-builtins: enabled");
+  console.log(`  RAB_AVAILABLE: ${RAB_AVAILABLE} (resizable ArrayBuffer integration)`);
 } else {
   const error = getWasmError();
   console.log(`  Error: ${error?.message || "unknown"}`);
