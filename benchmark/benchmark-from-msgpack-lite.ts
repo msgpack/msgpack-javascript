@@ -1,7 +1,7 @@
 /* eslint-disable */
 // original: https://raw.githubusercontent.com/kawanet/msgpack-lite/master/lib/benchmark.js
 
-var msgpack_msgpack = require("../src");
+var msgpack_msgpack = require("../src/index.ts");
 
 var msgpack_node = try_require("msgpack");
 var msgpack_lite = try_require("msgpack-lite");

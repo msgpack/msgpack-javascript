@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
-import { utf8EncodeJs, utf8Count, utf8DecodeJs } from "../src/utils/utf8";
+import { utf8EncodeJs, utf8Count, utf8DecodeJs } from "../src/utils/utf8.ts";
+import { CachedKeyDecoder } from "../src/CachedKeyDecoder.ts";
+
+import data from "./benchmark-from-msgpack-lite-data.json" with { type: "json" };
 
 // @ts-ignore
 import Benchmark from "benchmark";
-import { CachedKeyDecoder } from "../src/CachedKeyDecoder";
 
 type InputType = {
   bytes: Uint8Array;
@@ -11,7 +13,7 @@ type InputType = {
   str: string;
 };
 
-const keys: Array<InputType> = Object.keys(require("./benchmark-from-msgpack-lite-data.json")).map((str) => {
+const keys: Array<InputType> = Object.keys(data).map((str) => {
   const byteLength = utf8Count(str);
   const bytes = new Uint8Array(new ArrayBuffer(byteLength));
   utf8EncodeJs(str, bytes, 0);

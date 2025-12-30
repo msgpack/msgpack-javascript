@@ -1,4 +1,4 @@
-import { encode } from "../src";
+import { encode } from "../src/index.ts";
 // @ts-ignore
 import _ from "lodash";
 

@@ -1,4 +1,4 @@
-import { encode, decode } from "../src";
+import { encode, decode } from "../src/index.ts";
 
 const data = new Array(100).fill(new Date());
 
