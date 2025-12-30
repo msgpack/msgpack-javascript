@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { utf8EncodeJs, utf8Count, utf8EncodeTE } from "../src/utils/utf8";
+import { utf8EncodeJs, utf8Count, utf8EncodeTE } from "../src/utils/utf8.ts";
 
 // @ts-ignore
 import Benchmark from "benchmark";

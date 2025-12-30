@@ -1,4 +1,4 @@
-import { encode, decode, decodeAsync } from "../src";
+import { encode, decode, decodeAsync } from "../src/index.ts";
 // @ts-ignore
 import _ from "lodash";
 const data = require("./benchmark-from-msgpack-lite-data.json");

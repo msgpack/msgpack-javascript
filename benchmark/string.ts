@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { encode, decode } from "../src";
+import { encode, decode } from "../src/index.ts";
 
 const ascii = "A".repeat(40000);
 const emoji = "🌏".repeat(20000);

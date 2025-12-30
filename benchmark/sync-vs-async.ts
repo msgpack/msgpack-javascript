@@ -1,12 +1,14 @@
-#!ts-node
+#!/usr/bin/env node
 /* eslint-disable no-console */
 
-import { encode, decode, decodeAsync, decodeArrayStream } from "../src";
-import { writeFileSync, unlinkSync, readFileSync, createReadStream } from "fs";
-import { deepStrictEqual } from "assert";
+import { encode, decode, decodeAsync, decodeArrayStream } from "../src/index.ts";
+import { writeFileSync, unlinkSync, readFileSync, createReadStream } from "node:fs";
+import { deepStrictEqual } from "node:assert";
+
+type Data = { id: number; score: number; title: string; content: string; createdAt: Date };
 
 (async () => {
-  const data = [];
+  const data: Data[] = [];
   for (let i = 0; i < 1000; i++) {
     const id = i + 1;
     data.push({
