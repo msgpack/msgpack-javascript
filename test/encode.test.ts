@@ -1,5 +1,5 @@
 import assert from "assert";
-import { encode, decode } from "../src/index.ts";
+import { encode, decode, ExtensionCodec } from "../src/index.ts";
 
 describe("encode", () => {
   context("sortKeys", () => {
@@ -63,6 +63,40 @@ describe("encode", () => {
 
     it("encodes { foo: undefined } to {} with `ignoreUndefined: true`", () => {
       assert.deepStrictEqual(decode(encode({ foo: undefined, bar: 42 }, { ignoreUndefined: true })), { bar: 42 });
+    });
+  });
+
+  context("undefinedAsNil", () => {
+    const extensionCodec = new ExtensionCodec();
+    extensionCodec.register({
+      type: 0,
+      encode: (value) => (value === undefined ? new Uint8Array([0]) : null),
+      decode: () => undefined,
+    });
+
+    it("encodes { foo: undefined } as null by default", () => {
+      assert.deepStrictEqual(decode(encode({ foo: undefined, bar: 42 })), { foo: null, bar: 42 });
+    });
+
+    it("encodes { foo: undefined } as undefined with `undefinedAsNil: false`", () => {
+      assert.deepStrictEqual(
+        decode(encode({ foo: undefined, bar: 42 }, { extensionCodec, ignoreUndefined: false, undefinedAsNil: false }), {
+          extensionCodec,
+        }),
+        {
+          foo: undefined,
+          bar: 42,
+        },
+      );
+    });
+
+    it("encodes { foo: undefined } to { foo: null } with `undefinedAsNil: true`", () => {
+      assert.deepStrictEqual(
+        decode(encode({ foo: undefined, bar: 42 }, { extensionCodec, ignoreUndefined: false, undefinedAsNil: true }), {
+          extensionCodec,
+        }),
+        { foo: null, bar: 42 },
+      );
     });
   });
 
