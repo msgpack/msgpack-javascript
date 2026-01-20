@@ -651,8 +651,8 @@ export class Decoder<ContextType = undefined> {
             continue DECODE;
           }
         } else if (state.type === STATE_MAP_KEY) {
-          if (object === "__proto__") {
-            throw new DecodeError("The key __proto__ is not allowed");
+          if (object === "__proto__" || object === "constructor" || object === "prototype") {
+            throw new DecodeError(`The key ${object} is not allowed`);
           }
 
           state.key = this.mapKeyConverter(object);
