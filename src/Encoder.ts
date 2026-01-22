@@ -62,6 +62,15 @@ export type EncoderOptions<ContextType = undefined> = Partial<
     ignoreUndefined: boolean;
 
     /**
+     * If `true`, an object property with `undefined` value are encoded as `nil`, same as null.
+     * e.g. `{ foo: undefined }` will be encoded as `{ foo: nil }`.
+     * This flag has no effect if `ignoreUndefined` is `true`.
+     *
+     * Defaults to `true`.
+     */
+    undefinedAsNil: boolean;
+
+    /**
      * If `true`, integer numbers are encoded as floating point numbers,
      * with the `forceFloat32` option taken into account.
      *
@@ -82,6 +91,7 @@ export class Encoder<ContextType = undefined> {
   private readonly forceFloat32: boolean;
   private readonly ignoreUndefined: boolean;
   private readonly forceIntegerToFloat: boolean;
+  private readonly undefinedAsNil: boolean;
 
   private pos: number;
   private view: DataView<ArrayBuffer>;
@@ -99,6 +109,7 @@ export class Encoder<ContextType = undefined> {
     this.sortKeys = options?.sortKeys ?? false;
     this.forceFloat32 = options?.forceFloat32 ?? false;
     this.ignoreUndefined = options?.ignoreUndefined ?? false;
+    this.undefinedAsNil = options?.undefinedAsNil ?? true;
     this.forceIntegerToFloat = options?.forceIntegerToFloat ?? false;
 
     this.pos = 0;
@@ -174,7 +185,9 @@ export class Encoder<ContextType = undefined> {
       throw new Error(`Too deep objects in depth ${depth}`);
     }
 
-    if (object == null) {
+    if (object === null) {
+      this.encodeNil();
+    } else if (object === undefined && this.undefinedAsNil) {
       this.encodeNil();
     } else if (typeof object === "boolean") {
       this.encodeBoolean(object);
