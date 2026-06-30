@@ -35,4 +35,30 @@ describe("useBigInt64: true", () => {
     const encoded = encode(value, { useBigInt64: true });
     assert.deepStrictEqual(decode(encoded, { useBigInt64: true }), value);
   });
+
+  it("round-trips the boundary values of int64/uint64", () => {
+    const values = [
+      BigInt(0),
+      BigInt(42),
+      BigInt(2) ** BigInt(63) - BigInt(1), // max int64
+      -(BigInt(2) ** BigInt(63)), // min int64
+      BigInt(2) ** BigInt(64) - BigInt(1), // max uint64
+    ];
+    for (const value of values) {
+      const encoded = encode(value, { useBigInt64: true });
+      assert.deepStrictEqual(decode(encoded, { useBigInt64: true }), value);
+    }
+  });
+
+  it("throws when a bigint is out of the int64/uint64 range", () => {
+    const values = [
+      BigInt(2) ** BigInt(64), // uint64 max + 1
+      BigInt(2) ** BigInt(64) + BigInt(1),
+      -(BigInt(2) ** BigInt(63)) - BigInt(1), // int64 min - 1
+      -(BigInt(2) ** BigInt(100)),
+    ];
+    for (const value of values) {
+      assert.throws(() => encode(value, { useBigInt64: true }), /out of range/);
+    }
+  });
 });

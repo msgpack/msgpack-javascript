@@ -291,6 +291,9 @@ export class Encoder<ContextType = undefined> {
   }
 
   private encodeBigInt64(object: bigint): void {
+    if (object < -(BigInt(2) ** BigInt(63)) || object > BigInt(2) ** BigInt(64) - BigInt(1)) {
+      throw new Error(`Cannot encode BigInt as int64/uint64 because it is out of range: ${object}`);
+    }
     if (object >= BigInt(0)) {
       // uint 64
       this.writeU8(0xcf);
