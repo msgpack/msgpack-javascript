@@ -72,6 +72,10 @@ export type EncoderOptions<ContextType = undefined> = Partial<
 > &
   ContextOf<ContextType>;
 
+// Bounds of the int64/uint64 range msgpack can represent, precomputed once for encodeBigInt64.
+const INT64_MIN = -(BigInt(2) ** BigInt(63));
+const UINT64_MAX = BigInt(2) ** BigInt(64) - BigInt(1);
+
 export class Encoder<ContextType = undefined> {
   private readonly extensionCodec: ExtensionCodecType<ContextType>;
   private readonly context: ContextType;
@@ -291,7 +295,7 @@ export class Encoder<ContextType = undefined> {
   }
 
   private encodeBigInt64(object: bigint): void {
-    if (object < -(BigInt(2) ** BigInt(63)) || object > BigInt(2) ** BigInt(64) - BigInt(1)) {
+    if (object < INT64_MIN || object > UINT64_MAX) {
       throw new Error(`Cannot encode BigInt as int64/uint64 because it is out of range: ${object}`);
     }
     if (object >= BigInt(0)) {
