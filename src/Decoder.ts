@@ -80,6 +80,22 @@ export type DecoderOptions<ContextType = undefined> = Readonly<
 > &
   ContextOf<ContextType>;
 
+/**
+ * The result of {@link Decoder#decodeSingle} and {@link decodeSingle}.
+ */
+export type DecodeSingleResult = {
+  /**
+   * The decoded object.
+   */
+  value: unknown;
+
+  /**
+   * The number of bytes consumed to decode {@link value},
+   * which is the position where the extra bytes begin in the buffer.
+   */
+  bytesConsumed: number;
+};
+
 const STATE_ARRAY = "array";
 const STATE_MAP_KEY = "map_key";
 const STATE_MAP_VALUE = "map_value";
@@ -327,6 +343,33 @@ export class Decoder<ContextType = undefined> {
         throw this.createExtraByteError(this.pos);
       }
       return object;
+    } finally {
+      this.entered = false;
+    }
+  }
+
+  /**
+   * It decodes a single MessagePack object in a buffer and returns the decoded object and the
+   * number of bytes consumed. Unlike {@link decode}, it does not throw an error even if the
+   * buffer has extra bytes after the object.
+   *
+   * @throws {@link RangeError} if the buffer is incomplete, including the case where the buffer is empty.
+   * @throws {@link DecodeError} if the buffer contains invalid data.
+   */
+  public decodeSingle(buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike): DecodeSingleResult {
+    if (this.entered) {
+      const instance = this.clone();
+      return instance.decodeSingle(buffer);
+    }
+
+    try {
+      this.entered = true;
+
+      this.reinitializeState();
+      this.setBuffer(buffer);
+
+      const value = this.doDecodeSync();
+      return { value, bytesConsumed: this.pos };
     } finally {
       this.entered = false;
     }

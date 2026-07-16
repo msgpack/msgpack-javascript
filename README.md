@@ -44,6 +44,7 @@ deepStrictEqual(decode(encoded), object);
     - [`EncoderOptions`](#encoderoptions)
   - [`decode(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): unknown`](#decodebuffer-arraylikenumber--buffersource-options-decoderoptions-unknown)
     - [`DecoderOptions`](#decoderoptions)
+  - [`decodeSingle(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): DecodeSingleResult`](#decodesinglebuffer-arraylikenumber--buffersource-options-decoderoptions-decodesingleresult)
   - [`decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): Generator<unknown, void, unknown>`](#decodemultibuffer-arraylikenumber--buffersource-options-decoderoptions-generatorunknown-void-unknown)
   - [`decodeAsync(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): Promise<unknown>`](#decodeasyncstream-readablestreamlikearraylikenumber--buffersource-options-decoderoptions-promiseunknown)
   - [`decodeArrayStream(stream: ReadableStreamLike<ArrayLike<number> | BufferSource>, options?: DecoderOptions): AsyncIterable<unknown>`](#decodearraystreamstream-readablestreamlikearraylikenumber--buffersource-options-decoderoptions-asynciterableunknown)
@@ -129,7 +130,7 @@ It decodes `buffer` that includes a MessagePack-encoded object, and returns the 
 
 `buffer` must be an array of bytes, which is typically `Uint8Array` or `ArrayBuffer`. `BufferSource` is defined as `ArrayBuffer | ArrayBufferView`.
 
-The `buffer` must include a single encoded object. If the `buffer` includes extra bytes after an object or the `buffer` is empty, it throws `RangeError`. To decode `buffer` that includes multiple encoded objects, use `decodeMulti()` or `decodeMultiStream()` (recommended) instead.
+The `buffer` must include a single encoded object. If the `buffer` includes extra bytes after an object or the `buffer` is empty, it throws `RangeError`. To decode a single object from a `buffer` that may have extra bytes after it, use `decodeSingle()` instead. To decode `buffer` that includes multiple encoded objects, use `decodeMulti()` or `decodeMultiStream()` (recommended) instead.
 
 for example:
 
@@ -163,6 +164,24 @@ NodeJS `Buffer` is also acceptable because it is a subclass of `Uint8Array`.
 To skip UTF-8 decoding of strings, `rawStrings` can be set to `true`. In this case, strings are decoded into `Uint8Array`.
 
 You can use `max${Type}Length` to limit the length of each type decoded.
+
+### `decodeSingle(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): DecodeSingleResult`
+
+It decodes `buffer` that includes a single MessagePack-encoded object, and returns the decoded object and the number of bytes consumed. Unlike `decode()`, it does not throw `RangeError` even if the `buffer` includes extra bytes after the object.
+
+`DecodeSingleResult` is defined as `{ value: unknown, bytesConsumed: number }`, where `value` is the decoded object and `bytesConsumed` is the position where the extra bytes begin in the `buffer`.
+
+This is useful to handle a protocol that mixes MessagePack-encoded objects and other data, for example `[msgpack object][opaque bytes][msgpack object]`:
+
+```typescript
+import { decodeSingle } from "@msgpack/msgpack";
+
+const buffer: Uint8Array; // includes a MessagePack-encoded object followed by other data
+
+const { value, bytesConsumed } = decodeSingle(buffer);
+console.log(value); // the first object in the buffer
+const rest = buffer.subarray(bytesConsumed); // the extra bytes after the object
+```
 
 ### `decodeMulti(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): Generator<unknown, void, unknown>`
 

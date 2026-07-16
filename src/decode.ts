@@ -1,5 +1,5 @@
 import { Decoder } from "./Decoder.ts";
-import type { DecoderOptions } from "./Decoder.ts";
+import type { DecoderOptions, DecodeSingleResult } from "./Decoder.ts";
 import type { SplitUndefined } from "./context.ts";
 
 /**
@@ -17,6 +17,23 @@ export function decode<ContextType = undefined>(
 ): unknown {
   const decoder = new Decoder(options);
   return decoder.decode(buffer);
+}
+
+/**
+ * It decodes a single MessagePack object in a buffer and returns the decoded object and the
+ * number of bytes consumed. Unlike {@link decode}, it does not throw an error even if the
+ * buffer has extra bytes after the object, so it is useful to decode a buffer that contains
+ * non-MessagePack data after a MessagePack object.
+ *
+ * @throws {@link RangeError} if the buffer is incomplete, including the case where the buffer is empty.
+ * @throws {@link DecodeError} if the buffer contains invalid data.
+ */
+export function decodeSingle<ContextType = undefined>(
+  buffer: ArrayLike<number> | ArrayBufferView | ArrayBufferLike,
+  options?: DecoderOptions<SplitUndefined<ContextType>>,
+): DecodeSingleResult {
+  const decoder = new Decoder(options);
+  return decoder.decodeSingle(buffer);
 }
 
 /**

@@ -3,16 +3,16 @@
 import { encode } from "./encode.ts";
 export { encode };
 
-import { decode, decodeMulti } from "./decode.ts";
-export { decode, decodeMulti };
+import { decode, decodeSingle, decodeMulti } from "./decode.ts";
+export { decode, decodeSingle, decodeMulti };
 
 import { decodeAsync, decodeArrayStream, decodeMultiStream } from "./decodeAsync.ts";
 export { decodeAsync, decodeArrayStream, decodeMultiStream };
 
 import { Decoder } from "./Decoder.ts";
 export { Decoder };
-import type { DecoderOptions } from "./Decoder.ts";
-export type { DecoderOptions };
+import type { DecoderOptions, DecodeSingleResult } from "./Decoder.ts";
+export type { DecoderOptions, DecodeSingleResult };
 import { DecodeError } from "./DecodeError.ts";
 export { DecodeError };
 
