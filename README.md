@@ -122,6 +122,7 @@ console.log(buffer);
 | forceFloat32        | boolean        | false                         |
 | forceIntegerToFloat | boolean        | false                         |
 | ignoreUndefined     | boolean        | false                         |
+| undefinedAsNil      | boolean        | true                          |
 
 ### `decode(buffer: ArrayLike<number> | BufferSource, options?: DecoderOptions): unknown`
 
