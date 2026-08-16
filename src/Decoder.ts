@@ -264,6 +264,7 @@ export class Decoder<ContextType = undefined> {
       maxMapLength: this.maxMapLength,
       maxExtLength: this.maxExtLength,
       keyDecoder: this.keyDecoder,
+      mapKeyConverter: this.mapKeyConverter,
     } as any);
   }
 
