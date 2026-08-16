@@ -45,4 +45,31 @@ describe("reuse instances with extensions", () => {
     const data = context.decode(buf);
     deepStrictEqual(data, [BigInt(1), BigInt(2), BigInt(3)]);
   });
+
+  it("keeps mapKeyConverter for maps decoded re-entrantly inside an extension", () => {
+    const MSGPACK_EXT_TYPE_WRAP = 1;
+    const extensionCodec = new ExtensionCodec();
+    const encoder = new Encoder({ extensionCodec });
+    const decoder = new Decoder({ extensionCodec, mapKeyConverter: (key) => String(key).toUpperCase() });
+
+    class Wrapped {
+      readonly inner: unknown;
+      constructor(inner: unknown) {
+        this.inner = inner;
+      }
+    }
+    extensionCodec.register({
+      type: MSGPACK_EXT_TYPE_WRAP,
+      encode: (value) => (value instanceof Wrapped ? encoder.encode(value.inner) : null),
+      // decode re-enters the same decoder instance, which triggers Decoder#clone()
+      decode: (data) => new Wrapped(decoder.decode(data)),
+    });
+
+    const buf = encoder.encode({ a: 1, nested: new Wrapped({ b: 2 }) });
+    const decoded = decoder.decode(buf) as Record<string, Wrapped>;
+
+    // The nested map is decoded on the cloned decoder; it must use the same converter.
+    deepStrictEqual(Object.keys(decoded), ["A", "NESTED"]);
+    deepStrictEqual(decoded["NESTED"]!.inner, { B: 2 });
+  });
 });
