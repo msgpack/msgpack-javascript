@@ -430,13 +430,13 @@ export class Decoder<ContextType = undefined> {
 
         this.appendBuffer(buffer);
 
-        if (isArrayHeaderRequired) {
-          arrayItemsLeft = this.readArraySize();
-          isArrayHeaderRequired = false;
-          this.complete();
-        }
-
         try {
+          if (isArrayHeaderRequired) {
+            arrayItemsLeft = this.readArraySize();
+            isArrayHeaderRequired = false;
+            this.complete();
+          }
+
           while (true) {
             yield this.doDecodeSync();
             if (--arrayItemsLeft === 0) {
@@ -450,6 +450,10 @@ export class Decoder<ContextType = undefined> {
           // fallthrough
         }
         this.totalPos += this.pos;
+      }
+
+      if (isArrayHeaderRequired) {
+        throw new RangeError("Insufficient data in parsing array header");
       }
     } finally {
       this.entered = false;
