@@ -57,4 +57,20 @@ describe("decodeStream", () => {
 
     assert.deepStrictEqual(result, items);
   });
+  for (const finalItem of ["unfinished", { nested: [1, 2] }]) {
+    it(`rejects a stream ending inside ${typeof finalItem}`, async () => {
+      const encoded = encode(finalItem);
+      const createTruncatedStream = async function* () {
+        yield encode({ id: 1 });
+        yield encoded.subarray(0, encoded.length - 1);
+      };
+      const items: Array<unknown> = [];
+      await assert.rejects(async () => {
+        for await (const item of decodeMultiStream(createTruncatedStream())) {
+          items.push(item);
+        }
+      }, RangeError);
+      assert.deepStrictEqual(items, [{ id: 1 }]);
+    });
+  }
 });
