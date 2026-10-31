@@ -451,6 +451,10 @@ export class Decoder<ContextType = undefined> {
         }
         this.totalPos += this.pos;
       }
+
+      if (arrayItemsLeft > 0 || this.headByte !== HEAD_BYTE_REQUIRED || this.stack.length > 0) {
+        throw new RangeError("Insufficient data in stream");
+      }
     } finally {
       this.entered = false;
     }

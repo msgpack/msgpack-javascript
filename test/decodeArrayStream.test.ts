@@ -88,4 +88,24 @@ describe("decodeArrayStream", () => {
       }
     }, /.*Unrecognized array type byte:.*/i);
   });
+  for (const missingItem of [false, true]) {
+    it(`rejects an array stream ending ${missingItem ? "before" : "inside"} its last item`, async () => {
+      const first = encode({ id: 1 });
+      const second = encode({ label: "unfinished" });
+      const createTruncatedStream = async function* () {
+        yield Uint8Array.of(0x92);
+        yield first;
+        if (!missingItem) {
+          yield second.subarray(0, second.length - 1);
+        }
+      };
+      const items: Array<unknown> = [];
+      await assert.rejects(async () => {
+        for await (const item of decodeArrayStream(createTruncatedStream())) {
+          items.push(item);
+        }
+      }, RangeError);
+      assert.deepStrictEqual(items, [{ id: 1 }]);
+    });
+  }
 });
