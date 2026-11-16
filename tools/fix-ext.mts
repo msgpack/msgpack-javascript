@@ -35,7 +35,7 @@ for (const file of files) {
 
     // .js.map => .mjs.map
     const mapping = JSON.parse(fs.readFileSync(`${file}.map`).toString("utf-8"));
-    mapping.file = mapping.file.replace(/\.js$/, ext);
+    mapping.file = mapping.file.replace(/\.js$/, `.${ext}`);
     fs.writeFileSync(`${fileMjs}.map`, JSON.stringify(mapping));
     fs.unlinkSync(`${file}.map`);
   }

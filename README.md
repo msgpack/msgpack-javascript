@@ -634,15 +634,13 @@ Note that `JSON` cases use `Buffer` to emulate I/O where a JavaScript string mus
 
 ### NPM / npmjs.com
 
-The NPM package distributed in npmjs.com includes both ES2015+ and ES5 files:
+The npm package provides three ES2020-targeted builds:
 
-* `dist/` is compiled into ES2020 with CommomJS, provided for NodeJS v10
-* `dist.umd/` is compiled into ES5 with UMD
-  * `dist.umd/msgpack.min.js` - the minified file
-  * `dist.umd/msgpack.js` - the non-minified file
-* `dist.esm/` is compiled into ES2020 with ES modules, provided for webpack-like bundlers and NodeJS's ESM-mode
+* `dist.cjs/index.cjs`: CommonJS entry point for Node.js `require()`, with `index.d.cts` declarations.
+* `dist.esm/index.mjs`: ES module entry point for Node.js `import` and compatible bundlers, with `index.d.mts` declarations.
+* `dist.umd/msgpack.min.js` and `dist.umd/msgpack.js`: minified and unminified browser bundles, respectively.
 
-If you use NodeJS and/or webpack, their module resolvers use the suitable one automatically.
+Node.js requires version 18 or later. Use the package name `@msgpack/msgpack` rather than a path into `dist.cjs/` or `dist.esm/`; the package export map selects the appropriate entry point.
 
 ### CDN / unpkg.com
 
