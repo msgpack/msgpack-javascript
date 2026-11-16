@@ -160,6 +160,30 @@ NodeJS `Buffer` is also acceptable because it is a subclass of `Uint8Array`.
 
 `MapKeyConverterType` is defined as `(key: unknown) => string | number`.
 
+When another language encodes a map key as an `int64` or `uint64`, the default decoder reads the key as a JavaScript `number`. Integers outside the safe integer range may lose precision before `mapKeyConverter` runs. To keep those keys exact, enable `useBigInt64` and convert `bigint` keys to decimal strings:
+
+```typescript
+import { decode } from "@msgpack/msgpack";
+
+// A one-entry MessagePack map: uint64 key 9007199254740993 -> nil.
+const encoded = Uint8Array.of(0x81, 0xcf, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xc0);
+const object = decode(encoded, {
+  useBigInt64: true,
+  mapKeyConverter(key) {
+    if (typeof key === "bigint") {
+      return key.toString();
+    }
+    if (typeof key === "string" || typeof key === "number") {
+      return key;
+    }
+    throw new TypeError("Expected a string, number, or bigint map key");
+  },
+});
+// { "9007199254740993": null }
+```
+
+This option also decodes `int64` and `uint64` values as `bigint`. Decoded maps are plain objects, so numeric and string keys with the same string representation are not distinct.
+
 To skip UTF-8 decoding of strings, `rawStrings` can be set to `true`. In this case, strings are decoded into `Uint8Array`.
 
 You can use `max${Type}Length` to limit the length of each type decoded.
