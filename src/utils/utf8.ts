@@ -108,6 +108,9 @@ export function utf8Encode(str: string, output: Uint8Array, outputOffset: number
 
 const CHUNK_SIZE = 0x1_000;
 
+// Decodes UTF-8 like TextDecoder (WHATWG Encoding Standard): an ill-formed
+// sequence becomes one U+FFFD per maximal subpart, and a sequence is never
+// read past `inputOffset + byteLength`.
 export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength: number): string {
   let offset = inputOffset;
   const end = offset + byteLength;
@@ -119,29 +122,60 @@ export function utf8DecodeJs(bytes: Uint8Array, inputOffset: number, byteLength:
     if ((byte1 & 0x80) === 0) {
       // 1 byte
       units.push(byte1);
-    } else if ((byte1 & 0xe0) === 0xc0) {
+    } else if (byte1 >= 0xc2 && byte1 <= 0xdf) {
       // 2 bytes
-      const byte2 = bytes[offset++]! & 0x3f;
-      units.push(((byte1 & 0x1f) << 6) | byte2);
-    } else if ((byte1 & 0xf0) === 0xe0) {
-      // 3 bytes
-      const byte2 = bytes[offset++]! & 0x3f;
-      const byte3 = bytes[offset++]! & 0x3f;
-      units.push(((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
-    } else if ((byte1 & 0xf8) === 0xf0) {
-      // 4 bytes
-      const byte2 = bytes[offset++]! & 0x3f;
-      const byte3 = bytes[offset++]! & 0x3f;
-      const byte4 = bytes[offset++]! & 0x3f;
-      let unit = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
-      if (unit > 0xffff) {
-        unit -= 0x10000;
-        units.push(((unit >>> 10) & 0x3ff) | 0xd800);
-        unit = 0xdc00 | (unit & 0x3ff);
+      const byte2 = offset < end ? bytes[offset]! : 0;
+      if ((byte2 & 0xc0) === 0x80) {
+        offset++;
+        units.push(((byte1 & 0x1f) << 6) | (byte2 & 0x3f));
+      } else {
+        units.push(0xfffd);
       }
-      units.push(unit);
+    } else if (byte1 >= 0xe0 && byte1 <= 0xef) {
+      // 3 bytes; E0 and ED narrow the second byte to reject overlongs and surrogates
+      const byte2 = offset < end ? bytes[offset]! : 0;
+      const lower = byte1 === 0xe0 ? 0xa0 : 0x80;
+      const upper = byte1 === 0xed ? 0x9f : 0xbf;
+      if (byte2 >= lower && byte2 <= upper) {
+        offset++;
+        const byte3 = offset < end ? bytes[offset]! : 0;
+        if ((byte3 & 0xc0) === 0x80) {
+          offset++;
+          units.push(((byte1 & 0x0f) << 12) | ((byte2 & 0x3f) << 6) | (byte3 & 0x3f));
+        } else {
+          units.push(0xfffd);
+        }
+      } else {
+        units.push(0xfffd);
+      }
+    } else if (byte1 >= 0xf0 && byte1 <= 0xf4) {
+      // 4 bytes; F0 and F4 narrow the second byte to reject overlongs and values above U+10FFFF
+      const byte2 = offset < end ? bytes[offset]! : 0;
+      const lower = byte1 === 0xf0 ? 0x90 : 0x80;
+      const upper = byte1 === 0xf4 ? 0x8f : 0xbf;
+      if (byte2 >= lower && byte2 <= upper) {
+        offset++;
+        const byte3 = offset < end ? bytes[offset]! : 0;
+        if ((byte3 & 0xc0) === 0x80) {
+          offset++;
+          const byte4 = offset < end ? bytes[offset]! : 0;
+          if ((byte4 & 0xc0) === 0x80) {
+            offset++;
+            const unit =
+              (((byte1 & 0x07) << 18) | ((byte2 & 0x3f) << 12) | ((byte3 & 0x3f) << 6) | (byte4 & 0x3f)) - 0x10000;
+            units.push(((unit >>> 10) & 0x3ff) | 0xd800, 0xdc00 | (unit & 0x3ff));
+          } else {
+            units.push(0xfffd);
+          }
+        } else {
+          units.push(0xfffd);
+        }
+      } else {
+        units.push(0xfffd);
+      }
     } else {
-      units.push(byte1);
+      // continuation byte without a lead byte, C0, C1 or F5..FF
+      units.push(0xfffd);
     }
 
     if (units.length >= CHUNK_SIZE) {
