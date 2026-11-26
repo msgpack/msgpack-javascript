@@ -65,6 +65,10 @@ export function utf8EncodeJs(str: string, output: Uint8Array, outputOffset: numb
         }
       }
 
+      if (value >= 0xd800 && value <= 0xdfff) {
+        value = 0xfffd;
+      }
+
       if ((value & 0xffff0000) === 0) {
         // 3-byte
         output[offset++] = ((value >> 12) & 0x0f) | 0xe0;

@@ -49,6 +49,18 @@ describe("encode", () => {
     });
   });
 
+  context("strings", () => {
+    it("encodes lone surrogates as U+FFFD in short strings", () => {
+      assert.deepStrictEqual(encode("a\ud800"), Uint8Array.from([0xa4, 0x61, 0xef, 0xbf, 0xbd]));
+      assert.deepStrictEqual(encode("a\udc00b"), Uint8Array.from([0xa5, 0x61, 0xef, 0xbf, 0xbd, 0x62]));
+      assert.deepStrictEqual(encode("\udc00\ud800"), Uint8Array.from([0xa6, 0xef, 0xbf, 0xbd, 0xef, 0xbf, 0xbd]));
+    });
+
+    it("keeps surrogate pairs intact in short strings", () => {
+      assert.deepStrictEqual(encode("a\ud83d\ude00"), Uint8Array.from([0xa5, 0x61, 0xf0, 0x9f, 0x98, 0x80]));
+    });
+  });
+
   context("ignoreUndefined", () => {
     it("encodes { foo: undefined } as is by default", () => {
       assert.deepStrictEqual(decode(encode({ foo: undefined, bar: 42 })), { foo: null, bar: 42 });
